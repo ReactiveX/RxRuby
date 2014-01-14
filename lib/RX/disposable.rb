@@ -1,4 +1,4 @@
-# Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root
+# Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 module RX
   class Disposable
@@ -14,6 +14,7 @@ module RX
       @gate.synchronize do
         should_dispose = !@disposed
       end
+      
       if should_dispose
         @disposable_action.call
       end

@@ -95,7 +95,7 @@ module RX
     
     def self.range(start, length, scheduler = RX::Scheduler.immediate)
       max = start + length - 1
-      RX::Observable.generate(start, lambda {|x| x <= max}, lambda {|x| x}, lambda {|x| x + 1 }, scheduler)
+      RX::Observable.generate(start, {|x| x <= max}, {|x| x}, {|x| x + 1 }, scheduler)
     end 
     
     def merge
@@ -153,33 +153,33 @@ module RX
       end
     end
     
-    def where(&predicate)
+    def select(&predicate)
       RX::AnonymousObservable.new do |observer|
         on_next_action = proc do |next_value| 
           shouldFire = false
+
           begin
             shouldFire = predicate.call(next_value)
           rescue => err
             observer.on_error(err)
             return
           end
-          if shouldFire
-            observer.on_next(next_value) 
-          end
+
+          observer.on_next(next_value) if shouldFire
         end
         
         obs = RX::Observer.new do |o|
           o.with_on_next do |next_value| 
             shouldFire = false
+
             begin
               shouldFire = predicate.call(next_value)
             rescue => err
               observer.on_error(err)
               return
             end
-            if shouldFire
-              observer.on_next(next_value) 
-            end
+
+            observer.on_next(next_value) if shouldFire
           end
           
           o.with_on_error do |exception|
@@ -195,7 +195,7 @@ module RX
       end
     end
     
-    def select(&selector)
+    def map(&selector)
       RX::AnonymousObservable.new do |observer|
         obs = RX::Observer.new do |o|
           o.with_on_next do |next_value| 
@@ -221,8 +221,8 @@ module RX
       end
     end
     
-    def select_many(&selector)
-      self.select(&selector).merge
+    def flat_map(&selector)
+      self.map(&selector).merge
     end
 
     def finally(&finally_action)
