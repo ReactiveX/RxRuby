@@ -1,5 +1,7 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+include 'thread'
+
 module RX
   class Disposable
     
@@ -15,9 +17,7 @@ module RX
         should_dispose = !@disposed
       end
       
-      if should_dispose
-        @disposable_action.call
-      end
+      @disposable_action.call if should_dispose
     end
   end
 end

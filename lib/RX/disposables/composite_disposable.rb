@@ -1,17 +1,23 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+require 'thread'
+
 module RX
   class CompositeDisposable
     
     include Enumerable
 
-    attr_reader :length, :disposed
+    attr_reader :length
 
     def initialize(disposables = [])
       @disposables = disposables
       @length = disposables.length
       @disposed = false
       @gate = Mutex.new
+    end
+
+    def disposed?
+      @disposed
     end
 
     def each(&block)
