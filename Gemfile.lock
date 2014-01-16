@@ -23,4 +23,4 @@ PLATFORMS
 DEPENDENCIES
   Rx.rb!
   rake
-  rspec
+  minitest

@@ -3,8 +3,13 @@
 require 'thread'
 
 module RX
-    class Disposable
-    
+    class EmptyDisposable
+        def dispose
+
+        end
+    end
+
+    class AnonymousDisposable
         def initialize(&disposable_action)
             @disposable_action = disposable_action
             @gate = Mutex.new
@@ -19,5 +24,19 @@ module RX
   
             @disposable_action.call if should_dispose
         end
+    end
+
+    class Disposable
+       
+        @@empty_disposable = EmptyDisposable.new
+
+        def self.create(&disposable_action)
+            AnonymousDisposable.new &disposable_action
+        end
+
+        def self.empty
+            @@empty_disposable
+        end
+
     end
 end

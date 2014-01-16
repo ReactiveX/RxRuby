@@ -33,7 +33,7 @@ module RX
             end
 
             old.dispose unless old.nil?
-            new_disposable.dispose if shouldDispose && !foo.nil?
+            new_disposable.dispose if shouldDispose && !new_disposable.nil?
         end
 
         def dispose
