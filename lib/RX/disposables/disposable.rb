@@ -3,21 +3,21 @@
 require 'thread'
 
 module RX
-  class Disposable
+    class Disposable
     
-    def initialize(&disposable_action)
-      @disposable_action = disposable_action
-      @gate = Mutex.new
-      @disposed = false
-    end
+        def initialize(&disposable_action)
+            @disposable_action = disposable_action
+            @gate = Mutex.new
+            @disposed = false
+        end
     
-    def dispose
-      should_dispose = false
-      @gate.synchronize do
-        should_dispose = !@disposed
-      end
-      
-      @disposable_action.call if should_dispose
+        def dispose
+            should_dispose = false
+            @gate.synchronize do
+                should_dispose = !@disposed
+            end
+  
+            @disposable_action.call if should_dispose
+        end
     end
-  end
 end

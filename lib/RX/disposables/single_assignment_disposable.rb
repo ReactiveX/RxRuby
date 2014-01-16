@@ -12,7 +12,7 @@ module RX
         end
 
         def disposed?
-            gate.synchronize do
+            @gate.synchronize do
                 return @disposed
             end
         end
@@ -29,7 +29,7 @@ module RX
             @gate.synchronize do
                 shouldDispose = @disposed
                 unless shouldDispose
-                    old = current
+                    old = @current
                     @current = new_disposable
                 end
             end
