@@ -14,4 +14,5 @@ def require_all(path)
   end
 end
 
+require_all 'rx/concurrency/'
 require_all 'rx/disposables/'

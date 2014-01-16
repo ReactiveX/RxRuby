@@ -7,8 +7,9 @@ module RX
 
         def initialize
             @gate = Mutex.new
-            @current = RX::Disposable.empty
+            @current = nil
             @disposed = false
+            @set = false
         end
 
         def disposed?
@@ -22,8 +23,9 @@ module RX
         end
 
         def disposable=(new_disposable)
-            raise Exception.new("Disposable already set") unless @current == RX::Disposable.empty
+            raise Exception.new("Disposable already set") unless @set
 
+            @set = true
             shouldDispose = false
             old = nil
             @gate.synchronize do
@@ -44,7 +46,7 @@ module RX
                 unless @disposed
                     @disposed = true
                     old = @current
-                    @current = RX::Disposable.empty
+                    @current = nil
                 end
             end
 
