@@ -64,20 +64,20 @@ module RX
       @gate.synchronize do
         currentDisposables = @disposables
         @disposables = []
-      
+        @length = 0
       end
       currentDisposables.each {|disposable| disposable.dispose}
     end
     
     def delete(disposable)
-      should_dispose = false
+      should_dispose = nil
       
       @gate.synchronize do
-        should_dispose = !@disposables.delete(disposable).nil?
-        @length -= 1 if should_dispose
+        should_dispose = @disposables.delete(disposable)
+        @length -= 1 unless should_dispose.nil?
       end
       
-      disposable.dispose if should_dispose
+      disposable.dispose unless should_dispose.nil?
 
       should_dispose
     end
