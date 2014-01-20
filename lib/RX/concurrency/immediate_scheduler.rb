@@ -14,15 +14,13 @@ module RX
 			@@instance
 		end
 
-		def schedule_with_state(state, &action)
+		def schedule_with_state(state, action)
 			action.call(AsyncLockScheduler.new(), state)
 		end
 
 		def schedule_relative_with_state(state, due_time, &action)
 			dt = RX::Scheduler.normalize(due_time)
-
 			sleep(dt) if dt > 0
-
 			action.call(AsyncLockScheduler.new(), state)
 		end
 
@@ -33,7 +31,7 @@ module RX
 				@gate = nil
 			end
 
-			def schedule_with_state(state, &action)
+			def schedule_with_state(state, action)
 				m = RX::SingleAssignmentDisposable.new
 
 				@gate = Mutex.new if @gate.nil?
@@ -45,7 +43,7 @@ module RX
 				return m
 			end
 
-			def schedule_relative_with_state(state, due_time, &action) 
+			def schedule_relative_with_state(state, due_time, action) 
 				return self.schedule_with_state if due_time <= 0
 
 				m = new RX::SingleAssignmentDisposable.new

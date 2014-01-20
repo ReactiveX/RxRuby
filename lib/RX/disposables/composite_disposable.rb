@@ -32,6 +32,7 @@ module RX
           @disposed = true
           currentDisposables = @disposables
           @disposables = []
+          @length = 0
         end
       end
 
@@ -41,10 +42,10 @@ module RX
     end
     
     def push(disposable)
-      shouldDispose = false
+      should_dispose = false
       
       @gate.synchronize do
-        shouldDispose = @disposed
+        should_dispose = @disposed
       
         unless @disposed
           @disposables.push(disposable)

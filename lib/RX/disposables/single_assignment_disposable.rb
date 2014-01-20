@@ -6,7 +6,7 @@ module RX
     class SingleAssignmentDisposable
 
         def initialize
-            @gate = Mutex.new
+            @gate = Mutex.new() 
             @current = nil
             @disposed = false
             @set = false
@@ -23,7 +23,7 @@ module RX
         end
 
         def disposable=(new_disposable)
-            raise Exception.new("Disposable already set") unless @set
+            raise Exception.new("Disposable already set") if @set
 
             @set = true
             shouldDispose = false
