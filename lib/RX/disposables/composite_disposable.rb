@@ -73,7 +73,7 @@ module RX
       should_dispose = false
       
       @gate.synchronize do
-        should_dispose = @disposables.delete(disposable).dispose.nil?
+        should_dispose = !@disposables.delete(disposable).nil?
         @length -= 1 if should_dispose
       end
       
