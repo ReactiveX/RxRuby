@@ -18,7 +18,7 @@ module RX
 			action.call(AsyncLockScheduler.new(), state)
 		end
 
-		def schedule_relative_with_state(state, due_time, &action)
+		def schedule_relative_with_state(state, due_time, action)
 			dt = RX::Scheduler.normalize(due_time)
 			sleep(dt) if dt > 0
 			action.call(AsyncLockScheduler.new(), state)
