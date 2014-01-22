@@ -7,43 +7,43 @@ module RX
 
         # Schedules an action to be executed.
         def schedule(action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_with_state(action, lambda { |sched, fn| RX::Scheduler.invoke(sched, fn) })
         end
 
         # Schedules an action to be executed after the specified relative due time.
         def schedule_relative(due_time, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_relative_with_state(action, due_time, lambda { |sched, fn| RX::Scheduler.invoke(sched, fn) })
         end
 
         # Schedules an action to be executed at the specified absolute due time.
         def schedule_absolute(due_time, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_absolute_with_state(action, due_time, lambda { |sched, fn| RX::Scheduler.invoke(sched, fn) })
         end
 
         # Schedules an action to be executed recursively.
         def schedule_recursive(action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
-            self.schedule_recursive_with_state(action, lambda {|_action, _self| _action(lambda { _self(_action) }) })
+            raise Exception.new 'action cannot be nil' if action.nil?
+            self.schedule_recursive_with_state(action, lambda {|_action, _self| _action.call(lambda { _self.call(_action) }) })
         end
 
         # Schedules an action to be executed recursively.
         def schedule_recursive_with_state(state, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_with_state({ :state => state, :action => action}, lambda { |sched, pair| RX::Scheduler.invoke_recursive(sched, pair) })
         end
 
         # Schedules an action to be executed recursively after a specified relative due time.
         def schedule_recursive_relative(due_time, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_recursive_relative_with_state(action, due_time, lambda {|_action, _self| _action(lambda {|dt| _self(_action, dt) }) })
         end
 
         # Schedules an action to be executed recursively after a specified relative due time.
         def schedule_recursive_relative_with_state(state, due_time, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_relative_with_state(
                 { :state => state, :action => action}, 
                 due_time,
@@ -53,13 +53,13 @@ module RX
 
         # Schedules an action to be executed recursively after a specified absolute due time.
         def schedule_recursive_absolute(due_time, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_absolute_relative_with_state(action, due_time, lambda {|_action, _self| _action(lambda {|dt| _self(_action, dt) }) })
         end
 
         # Schedules an action to be executed recursively after a specified absolute due time.
         def schedule_recursive_absolute_with_state(state, due_time, action)
-            raise ArgumentError.new 'action cannot be nil' if action.nil?
+            raise Exception.new 'action cannot be nil' if action.nil?
             self.schedule_absolute_with_state(
                 { :state => state, :action => action}, 
                 due_time,
@@ -86,10 +86,10 @@ module RX
             action = pair[:action]
 
             recursive_action = lambda {|state1|
-                action.call(state, lambda { |state2|  
+                action.call(state1, lambda {|state2|  
                     is_added = false
                     is_done = false
-                    d = scheduler.schedule_with_state(state2, lambda { |scheduler1, state3| 
+                    d = scheduler.schedule_with_state(state2, lambda {|scheduler1, state3| 
                         @gate.synchronize do
                             if is_added
                                 group.delete(d)
@@ -99,7 +99,7 @@ module RX
                         end
 
                         recursive_action.call(state3)
-                        return RX::Disposable.empty
+                        RX::Disposable.empty
                     })
 
                     @gate.synchronize do
@@ -112,7 +112,7 @@ module RX
             }
 
             recursive_action.call(state)
-            return group
+            group
         end
 
         def invoke_recursive_time(scheduler, pair, method)

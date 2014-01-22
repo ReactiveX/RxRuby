@@ -6,63 +6,68 @@ require 'rx/disposables/single_assignment_disposable'
 
 module RX
 
-	class ImmediateScheduler < RX::LocalScheduler
+    class AsyncLockScheduler < RX::LocalScheduler
 
-		@@instance = ImmediateScheduler.new
+        def initialize
+            @gate = nil
+        end
 
-		def self.instance
-			@@instance
-		end
+        def schedule_with_state(state, action)
+            m = RX::SingleAssignmentDisposable.new
 
-		def schedule_with_state(state, action)
-			action.call(AsyncLockScheduler.new(), state)
-		end
+            @gate = Mutex.new if @gate.nil?
 
-		def schedule_relative_with_state(state, due_time, action)
-			dt = RX::Scheduler.normalize(due_time)
-			sleep(dt) if dt > 0
-			action.call(AsyncLockScheduler.new(), state)
-		end
+            @gate.synchronize do 
+                m.disposable = action.call(self, state) unless m.disposed?
+            end
 
+            return m
+        end
 
-		class AsyncLockScheduler < RX::LocalScheduler
+        def schedule_relative_with_state(state, due_time, action) 
+            return self.schedule_with_state state, action if due_time <= 0
 
-			def initialize
-				@gate = nil
-			end
+            m = RX::SingleAssignmentDisposable.new
 
-			def schedule_with_state(state, action)
-				m = RX::SingleAssignmentDisposable.new
+            timer = Time.new
 
-				@gate = Mutex.new if @gate.nil?
+            @gate = Mutex.new if @gate.nil?
 
-				@gate.synchronize do 
-					m.disposable = action.call(self, state) unless m.disposed?
-				end
+            @gate.synchronize do
+                sleep_time = Time.new - timer
+                sleep(sleep_time) if sleep_time > 0
+                m.disposable = action.call(self, state) unless m.disposed?
+            end
 
-				return m
-			end
+            m
+        end
 
-			def schedule_relative_with_state(state, due_time, action) 
-				return self.schedule_with_state if due_time <= 0
+    end
 
-				m = new RX::SingleAssignmentDisposable.new
+    # Represents an object that schedules units of work to run immediately on the current thread.
+    class ImmediateScheduler < RX::LocalScheduler
 
-				timer = Time.new
+        @@instance = ImmediateScheduler.new
 
-				@gate = Mutex.new if @gate.nil?
+        # Gets the singleton instance of the immediate scheduler.
+        def self.instance
+            @@instance
+        end
 
-				@gate.synchronize do
-					sleep_time = Time.new() - timer
-					sleep(sleep_time) if sleep_time > 0
-					m.disposable = action.call(self, state) unless m.disposed?
-				end
+        # Schedules an action to be executed.
+        def schedule_with_state(state, action)
+            raise Exception.new 'action cannot be nil' if action.nil?
 
-				return m
-			end
+            action.call AsyncLockScheduler.new, state
+        end
 
-		end
+        def schedule_relative_with_state(state, due_time, action)
+            raise Exception.new 'action cannot be nil' if action.nil?
 
-	end
+            dt = RX::Scheduler.normalize(due_time)
+            sleep(dt) if dt > 0
+            action.call AsyncLockScheduler.new, state
+        end
+    end
 
 end
