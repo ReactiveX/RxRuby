@@ -21,7 +21,7 @@ module RX
                 m.disposable = action.call(self, state) unless m.disposed?
             end
 
-            return m
+            m
         end
 
         def schedule_relative_with_state(state, due_time, action) 
@@ -47,12 +47,7 @@ module RX
     # Represents an object that schedules units of work to run immediately on the current thread.
     class ImmediateScheduler < RX::LocalScheduler
 
-        @@instance = ImmediateScheduler.new
-
-        # Gets the singleton instance of the immediate scheduler.
-        def self.instance
-            @@instance
-        end
+        include Singleton
 
         # Schedules an action to be executed.
         def schedule_with_state(state, action)
