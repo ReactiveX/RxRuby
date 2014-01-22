@@ -3,7 +3,7 @@
 require 'thread'
 
 module RX
-    class Scheduler
+    module Scheduler
 
         # Schedules an action to be executed.
         def schedule(action)

@@ -4,7 +4,9 @@ require 'rx/concurrency/scheduler'
 
 module RX
 	# Abstract base class for machine-local schedulers, using the local system clock for time-based operations.
-	class LocalScheduler < RX::Scheduler
+	class LocalScheduler
+
+		include Scheduler
 
 		# Gets the scheduler's notion of current time.
 		def now

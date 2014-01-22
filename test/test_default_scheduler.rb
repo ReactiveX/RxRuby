@@ -11,4 +11,8 @@ class TestDefaultScheduler < MiniTest::Unit::TestCase
         assert (s.now - Time.new < 1)
     end
 
+    def test_default_schedule
+
+    end
+
 end
