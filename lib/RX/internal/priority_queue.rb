@@ -14,7 +14,7 @@ module RX
 		end
 
 		def peek
-			raise Exception.new 'Empty PriorityQueue' if @length == 0
+			raise 'Empty PriorityQueue' if @length == 0
 			@items[0].value
 		end
 

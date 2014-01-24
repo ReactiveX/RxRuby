@@ -6,8 +6,8 @@ require 'rx'
 class TestCompositeDisposable < MiniTest::Unit::TestCase
 
     def test_include
-        d1 = RX::Disposable.create lambda { }
-        d2 = RX::Disposable.create lambda { }
+        d1 = RX::Disposable.create  { }
+        d2 = RX::Disposable.create  { }
 
         g = RX::CompositeDisposable.new([d1, d2])
 
@@ -17,8 +17,8 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
     end
 
     def test_to_a
-        d1 = RX::Disposable.create lambda { }
-        d2 = RX::Disposable.create lambda { }
+        d1 = RX::Disposable.create  { }
+        d2 = RX::Disposable.create  { }
 
         ds = [d1, d2]
         g = RX::CompositeDisposable.new([d1, d2])
@@ -32,8 +32,8 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
     end
 
     def test_push
-        d1 = RX::Disposable.create lambda { }
-        d2 = RX::Disposable.create lambda { }
+        d1 = RX::Disposable.create  { }
+        d2 = RX::Disposable.create  { }
         g = RX::CompositeDisposable.new([d1])
 
         assert_equal 1, g.length
@@ -49,8 +49,8 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         disp1 = false
         disp2 = false
 
-        d1 = RX::Disposable.create lambda { disp1 = true }
-        d2 = RX::Disposable.create lambda { disp2 = true }
+        d1 = RX::Disposable.create  { disp1 = true }
+        d2 = RX::Disposable.create  { disp2 = true }
         g = RX::CompositeDisposable.new [d1]
         assert_equal 1, g.length
 
@@ -69,8 +69,8 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         disp1 = false
         disp2 = false
 
-        d1 = RX::Disposable.create lambda { disp1 = true }
-        d2 = RX::Disposable.create lambda { disp2 = true }
+        d1 = RX::Disposable.create  { disp1 = true }
+        d2 = RX::Disposable.create  { disp2 = true }
         g = RX::CompositeDisposable.new [d1, d2]
 
         assert_equal 2, g.length
@@ -89,7 +89,7 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         assert disp2
 
         disp3 = false
-        d3 = RX::Disposable.create lambda { disp3 = true }
+        d3 = RX::Disposable.create  { disp3 = true }
         assert_nil g.delete d3
         refute disp3
     end
@@ -98,8 +98,8 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         disp1 = false
         disp2 = false
 
-        d1 = RX::Disposable.create lambda { disp1 = true }
-        d2 = RX::Disposable.create lambda { disp2 = true }
+        d1 = RX::Disposable.create  { disp1 = true }
+        d2 = RX::Disposable.create  { disp2 = true }
         g = RX::CompositeDisposable.new [d1, d2]
         assert_equal 2, g.length
 
@@ -109,7 +109,7 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         assert_equal 0, g.length
 
         disp3 = false
-        d3 = RX::Disposable.create lambda { disp3 = true }
+        d3 = RX::Disposable.create  { disp3 = true }
         g.push d3
         refute disp3
         assert_equal 1, g.length

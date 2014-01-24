@@ -10,7 +10,7 @@ module RX
     end
 
     class AnonymousDisposable
-        def initialize(disposable_action = lambda { })
+        def initialize(&disposable_action)
 
             @disposable_action = disposable_action
             @gate = Mutex.new
@@ -33,8 +33,8 @@ module RX
         @@empty_disposable = RX::EmptyDisposable.new
 
         # Creates a disposable object that invokes the specified action when disposed.
-        def self.create(disposable_action)
-            AnonymousDisposable.new disposable_action
+        def self.create(&disposable_action)
+            AnonymousDisposable.new &disposable_action
         end
 
         # Gets the disposable that does nothing when disposed.

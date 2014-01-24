@@ -14,16 +14,16 @@ module RX
 
         # Schedules an action to be executed.
         def schedule_with_state(state, action)
-            raise Exception.new 'action cannot be nil' if action.nil?
+            raise 'action cannot be nil' unless action
 
             action.call AsyncLockScheduler.new, state
         end
 
         def schedule_relative_with_state(state, due_time, action)
-            raise Exception.new 'action cannot be nil' if action.nil?
+            raise 'action cannot be nil' unless action
 
-            dt = RX::Scheduler.normalize(due_time)
-            sleep(dt) if dt > 0
+            dt = RX::Scheduler.normalize due_time
+            sleep dt if dt > 0
             action.call AsyncLockScheduler.new, state
         end
 
@@ -41,7 +41,7 @@ module RX
                 @gate = Mutex.new if @gate.nil?
 
                 @gate.synchronize do 
-                    m.disposable = action.call(self, state) unless m.disposed?
+                    m.disposable = action.call self, state unless m.disposed?
                 end
 
                 m
@@ -58,8 +58,8 @@ module RX
 
                 @gate.synchronize do
                     sleep_time = Time.new - timer
-                    sleep(sleep_time) if sleep_time > 0
-                    m.disposable = action.call(self, state) unless m.disposed?
+                    sleep sleep_time if sleep_time > 0
+                    m.disposable = action.call self, state unless m.disposed?
                 end
 
                 m

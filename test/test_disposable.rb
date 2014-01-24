@@ -5,24 +5,24 @@ require 'rx'
 
 class TestDisposable < MiniTest::Unit::TestCase
 
-	def test_disposable_create
-		d = RX::Disposable.create lambda { }
-		refute_nil d
-	end
+    def test_disposable_create
+        d = RX::Disposable.create { }
+        refute_nil d
+    end
 
-	def test_create_dispose
-		disposed = false
-		d = RX::Disposable.create lambda { disposed = true }
-		refute disposed
+    def test_create_dispose
+        disposed = false
+        d = RX::Disposable.create { disposed = true }
+        refute disposed
 
-		d.dispose
-		assert disposed
-	end
+        d.dispose
+        assert disposed
+    end
 
-	def test_empty
-		d = RX::Disposable.empty
-		refute_nil d
-		d.dispose
-	end
+    def test_empty
+        d = RX::Disposable.empty
+        refute_nil d
+        d.dispose
+    end
 
 end

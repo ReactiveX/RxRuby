@@ -74,10 +74,10 @@ module RX
       
       @gate.synchronize do
         should_dispose = @disposables.delete(disposable)
-        @length -= 1 unless should_dispose.nil?
+        @length -= 1 if should_dispose
       end
       
-      disposable.dispose unless should_dispose.nil?
+      disposable.dispose if should_dispose
 
       should_dispose
     end

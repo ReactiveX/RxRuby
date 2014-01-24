@@ -25,7 +25,7 @@ module RX
 
         # Schedules an action to be executed after dueTime.
         def schedule_relative_with_state(state, due_time, action)
-            raise Exception.new 'action cannot be nil' if action.nil?
+            raise 'action cannot be nil' unless action
 
             dt = self.now.to_i + Scheduler.normalize(due_time)
             si = ScheduledItem.new self, state, action, dt
@@ -47,7 +47,7 @@ module RX
                 local_queue.push si
             end
 
-            Disposable.create lambda { si.cancel }
+            Disposable.create { si.cancel }
         end
 
         private
@@ -66,8 +66,8 @@ module RX
                 while queue.length > 0
                     item = queue.shift
                     unless item.cancelled?
-                        wait = (item.due_time - Scheduler.now.to_i)
-                        sleep(wait) if wait > 0
+                        wait = item.due_time - Scheduler.now.to_i
+                        sleep wait if wait > 0
                         item.invoke unless item.cancelled?
                     end
                 end

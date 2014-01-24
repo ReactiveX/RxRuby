@@ -16,7 +16,7 @@ class TestSingleAssignmentDisposable < MiniTest::Unit::TestCase
         disposed = false
 
         d = RX::SingleAssignmentDisposable.new
-        dd = RX::Disposable.create lambda { disposed = true }
+        dd = RX::Disposable.create { disposed = true }
         d.disposable = dd
 
         assert_same dd, d.disposable
@@ -37,7 +37,7 @@ class TestSingleAssignmentDisposable < MiniTest::Unit::TestCase
         disposed = false
 
         d = RX::SingleAssignmentDisposable.new
-        dd = RX::Disposable.create lambda{ disposed = true }
+        dd = RX::Disposable.create { disposed = true }
 
         refute disposed
         d.dispose
