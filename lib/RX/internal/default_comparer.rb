@@ -2,8 +2,10 @@
 
 module RX
 
+	# Default comparer to compare two objects.  
 	class DefaultComparer
 
+		# Compares two objects. If x > y then 1 else if y > x -1 else 0
 		def compare(x, y)
 			if x > y
 				return 1
@@ -16,3 +18,4 @@ module RX
 		end
 
 	end
+end

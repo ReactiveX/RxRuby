@@ -27,17 +27,19 @@ module RX
         end
     end
 
+    # Provides a set of class methods for creating Disposables.
     class Disposable
        
-        @@empty_disposable = EmptyDisposable.new
+        @@empty_disposable = RX::EmptyDisposable.new
 
+        # Creates a disposable object that invokes the specified action when disposed.
         def self.create(disposable_action)
             AnonymousDisposable.new disposable_action
         end
 
+        # Gets the disposable that does nothing when disposed.
         def self.empty
             @@empty_disposable
         end
-
     end
 end

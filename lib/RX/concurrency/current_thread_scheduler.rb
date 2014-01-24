@@ -2,6 +2,7 @@
 
 require 'singleton'
 require 'thread'
+require 'rx/internal/priority_queue'
 require 'rx/concurrency/local_scheduler'
 require 'rx/concurrency/scheduled_item'
 require 'rx/disposables/disposable'
@@ -22,11 +23,31 @@ module RX
             @@thread_local_queue.nil?
         end
 
+        # Schedules an action to be executed after dueTime.
         def schedule_relative_with_state(state, due_time, action)
             raise Exception.new 'action cannot be nil' if action.nil?
 
-            dt = self.now + RX::Scheduler.normalize(due_time)
-            si = ScheduledItem.new 
+            dt = self.now.to_i + Scheduler.normalize(due_time)
+            si = ScheduledItem.new self, state, action, dt
+
+            local_queue = self.class.queue
+
+            if local_queue.nil?
+                local_queue = PriorityQueue.new 4
+                local_queue.push si
+
+                self.class.queue = local_queue
+
+                begin
+                    Trampoline.run local_queue
+                ensure
+                    self.class.queue = nil
+                end
+            else
+                local_queue.push si
+            end
+
+            Disposable.create lambda { si.cancel }
         end
 
     	private
@@ -45,7 +66,7 @@ module RX
     			while queue.length > 0
     				item = queue.shift
     				unless item.cancelled?
-						wait = item.due_time - RX::Scheduler.now
+						wait = (item.due_time - Scheduler.now.to_i)
 						sleep(wait) if wait > 0
                         item.invoke unless item.cancelled?
     				end

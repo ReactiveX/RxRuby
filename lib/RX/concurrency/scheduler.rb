@@ -5,6 +5,11 @@ require 'thread'
 module RX
     module Scheduler
 
+    	# Gets the current time according to the local machine's system clock.
+    	def self.now
+    		Time.now
+    	end
+
         # Schedules an action to be executed.
         def schedule(action)
             raise Exception.new 'action cannot be nil' if action.nil?

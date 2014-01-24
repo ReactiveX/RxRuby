@@ -4,7 +4,7 @@ module RX
 
 	class PriorityQueue
 
-		@@count = 0
+		@@length = 0
 
 		attr_reader :length
 
@@ -20,7 +20,7 @@ module RX
 
 		def shift
 			result = self.peek
-			self.remove_at 0
+			delete_at 0
 			result
 		end
 
@@ -28,9 +28,17 @@ module RX
 			index = @length
 			@length += 1
 
-			@items[index] = IndexedItem.new @@count, item
-			@count += 1
-			self.percolate index
+			@items[index] = IndexedItem.new @@length, item
+			@@length += 1
+			percolate index
+		end
+
+		def delete(item)
+			for i in 0..@length
+				return true if @items[i].vaue == item
+			end
+
+			return false
 		end
 
 		private
@@ -51,11 +59,11 @@ module RX
 			parent = (index - 1) / 2
 			return if parent < 0 || parent == index
 
-			if self.higher_priority? index, parent
+			if higher_priority? index, parent
 				temp = @items[index]
 				@items[index] = @items[parent]
 				@items[parent] = temp
-				self.percolate parent
+				percolate parent
 			end
 		end
 
@@ -66,14 +74,29 @@ module RX
 			right = 2 * index + 2
 			first = index
 
-			first = left if left < @length && higher_priority? left, first
-			first = right if right < @length && higher_priority? right, first
+			first = left if left < @length && higher_priority?(left, first)
+			first = right if right < @length && higher_priority?(right, first)
 
 			if first != index
 				temp = @items[index]
 				@items[index] = @items[first]
 				@items[first] = temp
-				self.heapify first
+				heapify first
+			end
+		end
+
+		class IndexedItem
+			attr_reader :id , :value
+
+			def initialize(id, value)
+				@id = id
+				@value = value
+			end
+
+			def compare_to(other)
+				c = @value.compare_to other.value
+				c = @id - other.id if c == 0
+				return c
 			end
 		end
 

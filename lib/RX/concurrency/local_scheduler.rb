@@ -10,7 +10,7 @@ module RX
 
 		# Gets the scheduler's notion of current time.
 		def now
-			Time.new
+			Time.now
 		end
 
 		# Schedules an action to be executed.
