@@ -14,7 +14,7 @@ module RX
     # Represents an object that schedules units of work on the platform's default scheduler.
     class CurrentThreadScheduler < RX::LocalScheduler
 
-    	include Singleton
+        include Singleton
 
         @@thread_local_queue = nil
 
@@ -50,7 +50,7 @@ module RX
             Disposable.create lambda { si.cancel }
         end
 
-    	private
+        private
 
         def self.queue
             @@thread_local_queue
@@ -60,20 +60,20 @@ module RX
             @@thread_local_queue = new_queue
         end
 
-    	class Trampoline
+        class Trampoline
 
-    		def self.run(queue)
-    			while queue.length > 0
-    				item = queue.shift
-    				unless item.cancelled?
-						wait = (item.due_time - Scheduler.now.to_i)
-						sleep(wait) if wait > 0
+            def self.run(queue)
+                while queue.length > 0
+                    item = queue.shift
+                    unless item.cancelled?
+                        wait = (item.due_time - Scheduler.now.to_i)
+                        sleep(wait) if wait > 0
                         item.invoke unless item.cancelled?
-    				end
-    			end
-    		end
+                    end
+                end
+            end
 
-    	end
+        end
 
     end
 
