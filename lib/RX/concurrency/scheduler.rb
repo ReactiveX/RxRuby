@@ -81,11 +81,11 @@ module RX
 
         def self.invoke(scheduler, action)
             action.call()
-            RX::Disposable.empty
+            RX::Subscription.empty
         end
 
         def self.invoke_recursive(scheduler, pair)
-            group = RX::CompositeDisposable.new
+            group = RX::CompositeSubscription.new
             gate = Mutex.new
             state = pair[:state]
             action = pair[:action]
@@ -104,7 +104,7 @@ module RX
                         end
 
                         recursive_action.call(state3)
-                        RX::Disposable.empty
+                        RX::Subscription.empty
                     })
 
                     @gate.synchronize do
@@ -121,7 +121,7 @@ module RX
         end
 
         def invoke_recursive_time(scheduler, pair, method)
-            group = RX::CompositeDisposable.new
+            group = RX::CompositeSubscription.new
             gate = Mutex.new
             state = pair[:state]
             action = pair[:action]
@@ -140,7 +140,7 @@ module RX
                             end
                         end
                         recursive_action.call(state3)
-                        return RX::Disposable.empty
+                        return RX::Subscription.empty
                     })
 
                     @gate.synchronize do

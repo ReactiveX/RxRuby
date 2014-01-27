@@ -3,26 +3,26 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestDisposable < MiniTest::Unit::TestCase
+class TestSubscription < MiniTest::Unit::TestCase
 
     def test_disposable_create
-        d = RX::Disposable.create { }
+        d = RX::Subscription.create { }
         refute_nil d
     end
 
     def test_create_dispose
-        disposed = false
-        d = RX::Disposable.create { disposed = true }
-        refute disposed
+        unsubscribed = false
+        d = RX::Subscription.create { unsubscribed = true }
+        refute unsubscribed
 
-        d.dispose
-        assert disposed
+        d.unsubscribe
+        assert unsubscribed
     end
 
     def test_empty
-        d = RX::Disposable.empty
+        d = RX::Subscription.empty
         refute_nil d
-        d.dispose
+        d.unsubscribe
     end
 
 end

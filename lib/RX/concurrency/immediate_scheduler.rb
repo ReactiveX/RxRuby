@@ -3,7 +3,7 @@
 require 'singleton'
 require 'thread'
 require 'rx/concurrency/local_scheduler'
-require 'rx/disposables/single_assignment_disposable'
+require 'rx/subscriptions/single_assignment_subscription'
 
 module RX
 
@@ -36,12 +36,12 @@ module RX
             end
 
             def schedule_with_state(state, action)
-                m = SingleAssignmentDisposable.new
+                m = SingleAssignmentSubscription.new
 
                 @gate = Mutex.new if @gate.nil?
 
                 @gate.synchronize do 
-                    m.disposable = action.call self, state unless m.disposed?
+                    m.subscription = action.call self, state unless m.unsubscribed?
                 end
 
                 m
@@ -50,7 +50,7 @@ module RX
             def schedule_relative_with_state(state, due_time, action) 
                 return self.schedule_with_state state, action if due_time <= 0
 
-                m = SingleAssignmentDisposable.new
+                m = SingleAssignmentSubscription.new
 
                 timer = Time.new
 
@@ -59,7 +59,7 @@ module RX
                 @gate.synchronize do
                     sleep_time = Time.new - timer
                     sleep sleep_time if sleep_time > 0
-                    m.disposable = action.call self, state unless m.disposed?
+                    m.subscription = action.call self, state unless m.unsubscribed?
                 end
 
                 m

@@ -3,13 +3,13 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestCompositeDisposable < MiniTest::Unit::TestCase
+class TestCompositeSubscription < MiniTest::Unit::TestCase
 
     def test_include
-        d1 = RX::Disposable.create  { }
-        d2 = RX::Disposable.create  { }
+        d1 = RX::Subscription.create  { }
+        d2 = RX::Subscription.create  { }
 
-        g = RX::CompositeDisposable.new([d1, d2])
+        g = RX::CompositeSubscription.new([d1, d2])
 
         assert_equal 2, g.length
         assert g.include? d1
@@ -17,11 +17,11 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
     end
 
     def test_to_a
-        d1 = RX::Disposable.create  { }
-        d2 = RX::Disposable.create  { }
+        d1 = RX::Subscription.create  { }
+        d2 = RX::Subscription.create  { }
 
         ds = [d1, d2]
-        g = RX::CompositeDisposable.new([d1, d2])
+        g = RX::CompositeSubscription.new([d1, d2])
 
         assert_equal 2, g.length
 
@@ -32,9 +32,9 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
     end
 
     def test_push
-        d1 = RX::Disposable.create  { }
-        d2 = RX::Disposable.create  { }
-        g = RX::CompositeDisposable.new([d1])
+        d1 = RX::Subscription.create  { }
+        d2 = RX::Subscription.create  { }
+        g = RX::CompositeSubscription.new([d1])
 
         assert_equal 1, g.length
         assert g.include? d1
@@ -49,12 +49,12 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         disp1 = false
         disp2 = false
 
-        d1 = RX::Disposable.create  { disp1 = true }
-        d2 = RX::Disposable.create  { disp2 = true }
-        g = RX::CompositeDisposable.new [d1]
+        d1 = RX::Subscription.create  { disp1 = true }
+        d2 = RX::Subscription.create  { disp2 = true }
+        g = RX::CompositeSubscription.new [d1]
         assert_equal 1, g.length
 
-        g.dispose
+        g.unsubscribe
         assert disp1
         assert_equal 0, g.length
 
@@ -62,16 +62,16 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         assert disp2
         assert_equal 0, g.length
 
-        assert g.disposed?
+        assert g.unsubscribed?
     end
 
     def test_remove
         disp1 = false
         disp2 = false
 
-        d1 = RX::Disposable.create  { disp1 = true }
-        d2 = RX::Disposable.create  { disp2 = true }
-        g = RX::CompositeDisposable.new [d1, d2]
+        d1 = RX::Subscription.create  { disp1 = true }
+        d2 = RX::Subscription.create  { disp2 = true }
+        g = RX::CompositeSubscription.new [d1, d2]
 
         assert_equal 2, g.length
         assert g.include? d1
@@ -89,7 +89,7 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         assert disp2
 
         disp3 = false
-        d3 = RX::Disposable.create  { disp3 = true }
+        d3 = RX::Subscription.create  { disp3 = true }
         assert_nil g.delete d3
         refute disp3
     end
@@ -98,9 +98,9 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         disp1 = false
         disp2 = false
 
-        d1 = RX::Disposable.create  { disp1 = true }
-        d2 = RX::Disposable.create  { disp2 = true }
-        g = RX::CompositeDisposable.new [d1, d2]
+        d1 = RX::Subscription.create  { disp1 = true }
+        d2 = RX::Subscription.create  { disp2 = true }
+        g = RX::CompositeSubscription.new [d1, d2]
         assert_equal 2, g.length
 
         g.clear
@@ -109,7 +109,7 @@ class TestCompositeDisposable < MiniTest::Unit::TestCase
         assert_equal 0, g.length
 
         disp3 = false
-        d3 = RX::Disposable.create  { disp3 = true }
+        d3 = RX::Subscription.create  { disp3 = true }
         g.push d3
         refute disp3
         assert_equal 1, g.length

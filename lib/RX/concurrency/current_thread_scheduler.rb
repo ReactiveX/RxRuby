@@ -5,9 +5,7 @@ require 'thread'
 require 'rx/internal/priority_queue'
 require 'rx/concurrency/local_scheduler'
 require 'rx/concurrency/scheduled_item'
-require 'rx/disposables/disposable'
-require 'rx/disposables/single_assignment_disposable'
-require 'rx/disposables/composite_disposable'
+require 'rx/subscriptions/subscription'
 
 module RX
 
@@ -19,7 +17,7 @@ module RX
         @@thread_local_queue = nil
 
         # Gets a value that indicates whether the caller must call a Schedule method.
-        def schedule_required?
+        def self.schedule_required?
             @@thread_local_queue.nil?
         end
 
@@ -47,7 +45,7 @@ module RX
                 local_queue.push si
             end
 
-            Disposable.create { si.cancel }
+            Subscription.create { si.cancel }
         end
 
         private

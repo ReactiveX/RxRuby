@@ -42,7 +42,7 @@ class TestImmediateScheduler < MiniTest::Unit::TestCase
 
         s.schedule_with_state(42, lambda {|sched, xx|  
             x = xx
-            return RX::Disposable.empty
+            return RX::Subscription.empty
         })
 
         assert_equal 42, x
@@ -54,7 +54,7 @@ class TestImmediateScheduler < MiniTest::Unit::TestCase
 
         s.schedule_relative_with_state(42, 0, lambda {|sched, xx|  
             x = xx
-            return RX::Disposable.empty
+            return RX::Subscription.empty
         })
 
         assert_equal 42, x
@@ -66,7 +66,7 @@ class TestImmediateScheduler < MiniTest::Unit::TestCase
 
         s.schedule_absolute_with_state(42, Time.new, lambda {|sched, xx|  
             x = xx
-            RX::Disposable.empty
+            RX::Subscription.empty
         })
 
         assert_equal 42, x
@@ -81,7 +81,7 @@ class TestImmediateScheduler < MiniTest::Unit::TestCase
             x = xx 
             return sched.schedule_with_state(43, lambda {|sched1, yy| 
                 y = yy
-                return RX::Disposable.empty
+                return RX::Subscription.empty
             })
         })
     end
@@ -95,7 +95,7 @@ class TestImmediateScheduler < MiniTest::Unit::TestCase
             x = xx 
             return sched.schedule_relative_with_state(43, 1, lambda {|sched1, yy| 
                 y = yy
-                return RX::Disposable.empty
+                return RX::Subscription.empty
             })
         })
     end 
@@ -109,7 +109,7 @@ class TestImmediateScheduler < MiniTest::Unit::TestCase
             x = xx 
             sched.schedule_absolute_with_state(43, Time.new(), lambda { |sched1, yy| 
                 y = yy
-                return RX::Disposable.empty
+                return RX::Subscription.empty
             })
         })
     end     

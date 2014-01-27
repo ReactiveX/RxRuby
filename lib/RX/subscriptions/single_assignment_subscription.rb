@@ -3,54 +3,54 @@
 require 'thread'
 
 module RX
-    class SingleAssignmentDisposable
+    class SingleAssignmentSubscription
 
         def initialize
             @gate = Mutex.new() 
             @current = nil
-            @disposed = false
+            @unsubscribed = false
             @set = false
         end
 
-        def disposed?
+        def unsubscribed?
             @gate.synchronize do
-                return @disposed
+                return @unsubscribed
             end
         end
 
-        def disposable
+        def subscription
             @current
         end
 
-        def disposable=(new_disposable)
-            raise Exception.new("Disposable already set") if @set
+        def subscription=(new_subscription)
+            raise Exception.new("Subscription already set") if @set
 
             @set = true
-            shouldDispose = false
+            should_unsubscribe = false
             old = nil
             @gate.synchronize do
-                shouldDispose = @disposed
-                unless shouldDispose
+                should_unsubscribe = @unsubscribed
+                unless should_unsubscribe
                     old = @current
-                    @current = new_disposable
+                    @current = new_subscription
                 end
             end
 
-            old.dispose unless old.nil?
-            new_disposable.dispose if shouldDispose && !new_disposable.nil?            
+            old.unsubscribe if old
+            new_subscription.unsubscribe if should_unsubscribe && !new_subscription.nil?            
         end      
 
-        def dispose
+        def unsubscribe
             old = nil
             @gate.synchronize do
-                unless @disposed
-                    @disposed = true
+                unless @unsubscribed
+                    @unsubscribed = true
                     old = @current
                     @current = nil
                 end
             end
 
-            old.dispose unless old.nil?
+            old.unsubscribe if old
         end
 
     end

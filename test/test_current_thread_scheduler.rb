@@ -113,7 +113,7 @@ class TestCurrentThreadScheduler < MiniTest::Unit::TestCase
         s.ensure_trampoline lambda {
             ran1 = true
             d = s.schedule lambda { ran2 = true }
-            d.dispose
+            d.unsubscribe
         }
 
         assert ran1
@@ -128,7 +128,7 @@ class TestCurrentThreadScheduler < MiniTest::Unit::TestCase
         s.ensure_trampoline lambda {
             ran1 = true
             d = s.schedule_relative 1, lambda { ran2 = true }
-            d.dispose
+            d.unsubscribe
         }
 
         assert ran1

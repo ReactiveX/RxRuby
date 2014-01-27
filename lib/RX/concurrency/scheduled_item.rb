@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 require 'rx/internal/default_comparer'
-require 'rx/disposables/single_assignment_disposable'
+require 'rx/subscriptions/single_assignment_subscription'
 
 module RX
 	# Represents a scheduled work item based on the materialization of an scheduler.schedule method call.
@@ -15,17 +15,17 @@ module RX
 			@action = action
 			@due_time = due_time
 			@comparer = comparer
-			@disposable = SingleAssignmentDisposable.new
+			@subscription = SingleAssignmentSubscription.new
 		end
 
 		# Gets whether the work item has received a cancellation request.
 		def cancelled?
-			@disposable.disposed?
+			@subscription.unsubscribed?
 		end
 
 		# Invokes the work item.
 		def invoke
-			@disposable.disposable = @action.call @scheduler, @state unless @disposable.disposed?
+			@subscription.subscription = @action.call @scheduler, @state unless @subscription.unsubscribed?
 		end
 
 		# Compares the work item with another work item based on absolute time values.
@@ -36,7 +36,7 @@ module RX
 
 		# Cancels the work item by disposing the resource returned by invoke_core as soon as possible.
 		def cancel
-			@disposable.dispose
+			@subscription.unsubscribe
 		end
 
 	end

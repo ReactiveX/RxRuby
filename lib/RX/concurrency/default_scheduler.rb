@@ -4,9 +4,9 @@ require 'singleton'
 require 'thread'
 require 'rx/concurrency/local_scheduler'
 require 'rx/concurrency/periodic_scheduler'
-require 'rx/disposables/disposable'
-require 'rx/disposables/single_assignment_disposable'
-require 'rx/disposables/composite_disposable'
+require 'rx/subscriptions/subscription'
+require 'rx/subscriptions/single_assignment_subscription'
+require 'rx/subscriptions/composite_subscription'
 
 module RX
 
@@ -18,17 +18,17 @@ module RX
 
         # Schedules an action to be executed.
         def schedule_with_state(state, action)
-             raise Exception.new 'action cannot be nil' if action.nil?
+            raise 'action cannot be nil' unless action
 
-             d = SingleAssignmentDisposable.new
+            d = SingleAssignmentSubscription.new
 
-             t = Thread.new do
-                d.disposable = action.call self, state unless d.disposed?
-             end
+            t = Thread.new do
+                d.subscription = action.call self, state unless d.unsubscribed?
+            end
 
-             cancel = Disposable.create lambda { t.exit }
+            cancel = Subscription.create { t.exit }
 
-             CompositeDisposable.new [d, cancel]
+            CompositeSubscription.new [d, cancel]
         end
 
         # Schedules an action to be executed after dueTime
@@ -38,22 +38,22 @@ module RX
             dt = Scheduler.normalize due_time
             return self.schedule_with_state state, action if dt == 0
 
-            d = SingleAssignmentDisposable.new
+            d = SingleAssignmentSubscription.new
 
             t = Thread.new do
                 sleep dt
-                d.disposable = action.call self, state unless d.disposed?
+                d.subscription = action.call self, state unless d.unsubscribed?
             end
 
-            cancel = Disposable.create lambda { t.exit }
+            cancel = Subscription.create { t.exit }
 
-            CompositeDisposable.new [d, cancel]         
+            CompositeSubscription.new [d, cancel]         
         end
 
         # Schedules a periodic piece of work
         def schedule_periodic_with_state(state, due_time, action)
-            raise Exception.new 'action cannot be nil' if action.nil?
-            raise Exception.new 'due_time cannot be less than zero' if due_time < 0
+            raise 'action cannot be nil' unless action
+            raise 'due_time cannot be less than zero' if due_time < 0
 
             state1 = state
             gate = Mutex.new
@@ -70,15 +70,15 @@ module RX
         class PeriodicTimer
             def initialize(seconds, &action)
                 @seconds = seconds
-                @disposed = false
+                @unsubscribed = false
                 @gate = Mutex.new
 
                 self.run_loop &action
             end
 
-            def dispose
+            def unsubscribe
                 @gate.synchronize do
-                    @disposed = true unless @disposed
+                    @unsubscribed = true unless @unsubscribed
                 end
             end
 
@@ -95,7 +95,7 @@ module RX
                     while should_run
                         sleep( @seconds - time_block { yield } ) 
                         @gate.synchronize do
-                            should_run = !@disposed
+                            should_run = !@unsubscribed
                         end                    
                     end
                 end

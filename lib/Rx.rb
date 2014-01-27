@@ -16,5 +16,5 @@ end
 
 require_all 'rx/internal/'
 require_all 'rx/concurrency/'
-require_all 'rx/disposables/'
+require_all 'rx/subscriptions/'
 require_all 'rx/core/'

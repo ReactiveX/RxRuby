@@ -7,13 +7,25 @@ module RX
         DEFAULT_ON_ERROR = lambda {|error| raise error }
         DEFAULT_ON_COMPLETED = lambda { }
 
-        attr_accessor(:on_next, :on_error, :on_completed)
+        attr_reader :on_next_action, :on_error_action, :on_completed_action
 
         def initialize
-            @on_next = DEFAULT_ON_NEXT
-            @on_error = DEFAULT_ON_ERROR
-            @on_completed = DEFAULT_ON_COMPLETED
+            @on_next_action = DEFAULT_ON_NEXT
+            @on_error_action = DEFAULT_ON_ERROR
+            @on_completed_action = DEFAULT_ON_COMPLETED
         end
+
+        def on_next(&on_next_action)
+            @on_next_action = on_next_action
+        end
+
+        def on_error(&on_error_action)
+            @on_error_action = on_error_action
+        end
+
+        def on_completed(&on_completed_action)
+            @on_completed_action = on_completed_action
+        end    
     end
 
     # Base class for implementations of the Observer
@@ -27,7 +39,7 @@ module RX
         def self.configure
             config = ObserverConfiguration.new
             yield config
-            Observer.new config
+            self.new config
         end
 
         # Unsubscribes from the current observer causing it to transition to the stopped state.
@@ -37,7 +49,7 @@ module RX
         
         # Notifies the observer of a new element in the sequence.
         def on_next(value)
-            @config.on_next.call(value) unless @stopped
+            @config.on_next_action.call value unless @stopped
         end
         
         # Notifies the observer that an exception has occurred.
@@ -45,7 +57,7 @@ module RX
             raise 'Error cannot be nil' unless error
             unless @stopped
                 @stopped = true
-                @config.on_error.call(error)
+                @config.on_error_action.call error
             end
         end
         
@@ -53,8 +65,17 @@ module RX
         def on_completed
             unless @stopped
                 @stopped = true
-                @config.on_completed.call
+                @config.on_completed_action.call
             end
+        end
+
+        def fail(error) 
+            unless @stopped
+                @stopped = true
+                @config.on_error_action.call error
+                return true
+            end
+            return false
         end
     end
 end
