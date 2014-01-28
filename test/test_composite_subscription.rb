@@ -5,113 +5,113 @@ require 'rx'
 
 class TestCompositeSubscription < MiniTest::Unit::TestCase
 
-    def test_include
-        d1 = RX::Subscription.create  { }
-        d2 = RX::Subscription.create  { }
+  def test_include
+    d1 = RX::Subscription.create  { }
+    d2 = RX::Subscription.create  { }
 
-        g = RX::CompositeSubscription.new([d1, d2])
+    g = RX::CompositeSubscription.new([d1, d2])
 
-        assert_equal 2, g.length
-        assert g.include? d1
-        assert g.include? d2
+    assert_equal 2, g.length
+    assert g.include? d1
+    assert g.include? d2
+  end
+
+  def test_to_a
+    d1 = RX::Subscription.create  { }
+    d2 = RX::Subscription.create  { }
+
+    ds = [d1, d2]
+    g = RX::CompositeSubscription.new([d1, d2])
+
+    assert_equal 2, g.length
+
+    x = g.to_a
+    x.each_with_index do |item, index|
+      assert_equal ds[index], item
     end
+  end
 
-    def test_to_a
-        d1 = RX::Subscription.create  { }
-        d2 = RX::Subscription.create  { }
+  def test_push
+    d1 = RX::Subscription.create  { }
+    d2 = RX::Subscription.create  { }
+    g = RX::CompositeSubscription.new([d1])
 
-        ds = [d1, d2]
-        g = RX::CompositeSubscription.new([d1, d2])
+    assert_equal 1, g.length
+    assert g.include? d1
 
-        assert_equal 2, g.length
+    g.push d2
 
-        x = g.to_a
-        x.each_with_index do |item, index|
-            assert_equal ds[index], item
-        end
-    end
+    assert_equal 2, g.length
+    assert g.include? d2        
+  end
 
-    def test_push
-        d1 = RX::Subscription.create  { }
-        d2 = RX::Subscription.create  { }
-        g = RX::CompositeSubscription.new([d1])
+  def test_push_after_dispose
+    disp1 = false
+    disp2 = false
 
-        assert_equal 1, g.length
-        assert g.include? d1
+    d1 = RX::Subscription.create  { disp1 = true }
+    d2 = RX::Subscription.create  { disp2 = true }
+    g = RX::CompositeSubscription.new [d1]
+    assert_equal 1, g.length
 
-        g.push d2
+    g.unsubscribe
+    assert disp1
+    assert_equal 0, g.length
 
-        assert_equal 2, g.length
-        assert g.include? d2        
-    end
+    g.push d2
+    assert disp2
+    assert_equal 0, g.length
 
-    def test_push_after_dispose
-        disp1 = false
-        disp2 = false
+    assert g.unsubscribed?
+  end
 
-        d1 = RX::Subscription.create  { disp1 = true }
-        d2 = RX::Subscription.create  { disp2 = true }
-        g = RX::CompositeSubscription.new [d1]
-        assert_equal 1, g.length
+  def test_remove
+    disp1 = false
+    disp2 = false
 
-        g.unsubscribe
-        assert disp1
-        assert_equal 0, g.length
+    d1 = RX::Subscription.create  { disp1 = true }
+    d2 = RX::Subscription.create  { disp2 = true }
+    g = RX::CompositeSubscription.new [d1, d2]
 
-        g.push d2
-        assert disp2
-        assert_equal 0, g.length
+    assert_equal 2, g.length
+    assert g.include? d1
+    assert g.include? d2
 
-        assert g.unsubscribed?
-    end
+    refute_nil g.delete d1
+    assert_equal 1, g.length
+    refute g.include? d1
+    assert g.include? d2
+    assert disp1
 
-    def test_remove
-        disp1 = false
-        disp2 = false
+    refute_nil g.delete d2
+    refute g.include? d1
+    refute g.include? d2
+    assert disp2
 
-        d1 = RX::Subscription.create  { disp1 = true }
-        d2 = RX::Subscription.create  { disp2 = true }
-        g = RX::CompositeSubscription.new [d1, d2]
+    disp3 = false
+    d3 = RX::Subscription.create  { disp3 = true }
+    assert_nil g.delete d3
+    refute disp3
+  end
 
-        assert_equal 2, g.length
-        assert g.include? d1
-        assert g.include? d2
+  def test_clear
+    disp1 = false
+    disp2 = false
 
-        refute_nil g.delete d1
-        assert_equal 1, g.length
-        refute g.include? d1
-        assert g.include? d2
-        assert disp1
+    d1 = RX::Subscription.create  { disp1 = true }
+    d2 = RX::Subscription.create  { disp2 = true }
+    g = RX::CompositeSubscription.new [d1, d2]
+    assert_equal 2, g.length
 
-        refute_nil g.delete d2
-        refute g.include? d1
-        refute g.include? d2
-        assert disp2
+    g.clear
+    assert disp1
+    assert disp2
+    assert_equal 0, g.length
 
-        disp3 = false
-        d3 = RX::Subscription.create  { disp3 = true }
-        assert_nil g.delete d3
-        refute disp3
-    end
-
-    def test_clear
-        disp1 = false
-        disp2 = false
-
-        d1 = RX::Subscription.create  { disp1 = true }
-        d2 = RX::Subscription.create  { disp2 = true }
-        g = RX::CompositeSubscription.new [d1, d2]
-        assert_equal 2, g.length
-
-        g.clear
-        assert disp1
-        assert disp2
-        assert_equal 0, g.length
-
-        disp3 = false
-        d3 = RX::Subscription.create  { disp3 = true }
-        g.push d3
-        refute disp3
-        assert_equal 1, g.length
-    end
+    disp3 = false
+    d3 = RX::Subscription.create  { disp3 = true }
+    g.push d3
+    refute disp3
+    assert_equal 1, g.length
+  end
 end

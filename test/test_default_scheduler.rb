@@ -6,13 +6,13 @@ require 'rx'
 
 class TestDefaultScheduler < MiniTest::Unit::TestCase
 
-    def test_now
-        s = RX::DefaultScheduler.instance
-        assert (s.now - Time.new < 1)
-    end
+  def test_now
+    s = RX::DefaultScheduler.instance
+    assert (s.now - Time.new < 1)
+  end
 
-    def test_default_schedule
+  def test_default_schedule
 
-    end
+  end
 
 end
