@@ -68,13 +68,212 @@ module RX
           end
 
           o.on_error {|err| observer.on_error err }
-          o.on_completed { on_completed }
-
+          o.on_completed { observer.on_completed }
         end
 
         self.subscribe(new_observer)
       end
     end
 
+    # Projects each element of an observable sequence into a new form.
+    def map(&block)
+      AnonymousObservable.new do |observer|
+        new_observer = Observer.configure do |o|
+          count = 0
+
+          o.on_next do |x|
+            result
+            begin
+              result = block.call(x, i)
+              i += 1
+            rescue => e
+              observer.on_error e
+              return
+            end
+
+            observer.on_next result
+          end
+
+          o.on_error {|err| observer.on_error err }
+          o.on_completed { observer.on_completed }          
+        end
+
+        self.subscribe(new_observer)
+      end
+    end
+
+    # Projects each element of an observable sequence into a new form by incorporating the element's index.
+    def map_with_index(&block)
+      self.map {|x, i| block.call x }
+    end
+
+    # Projects each element of the source observable sequence to the other observable sequence and merges the resulting observable sequences into one observable sequence.
+    def flat_map(&block)
+      self.map(&block).merge_all
+    end
+
+    # Projects each element of an observable sequence to an observable sequence by incorporating the element's index and merges the resulting observable sequences into one observable sequence.
+    def flat_map_with_index(&block)
+      self.map_with_index(&block).merge_all
+    end
+
+    # Bypasses a specified number of elements in an observable sequence and then returns the remaining elements.
+    def skip(count)
+      AnonymousObservable.new do |observer|
+        remaning = count
+
+        new_observer = Observer.configure do |o|
+
+          o.on_next do |x|
+            if remaning <= 0
+              observer.on_next x
+            else 
+              remaning -= 1
+            end
+          end
+
+          o.on_error {|err| observer.on_error err }
+          o.on_completed { observer.on_completed }  
+        end
+
+
+        self.subscribe(new_observer)
+      end
+    end
+
+    # Bypasses elements in an observable sequence as long as a specified condition is true and then returns the remaining elements.
+    def skip_while(&block)
+      self.skip_while_with_index {|x, i| block.call x }
+    end
+
+    # Bypasses elements in an observable sequence as long as a specified condition is true and then returns the remaining elements.
+    # The element's index is used in the logic of the predicate function.
+    def skip_while_with_index(&block)
+      AnonymousObservable.new do |observer|
+        running = false
+        i = 0
+
+        new_observer = Observer.configure do |o|
+
+          o.on_next do |x|
+            unless running
+              begin
+                running = !block.call(x, i)
+                i += 1
+              rescue => e
+                observer.on_error e
+                return
+              end
+
+              observer.on_next x if running
+            end
+          end
+
+          o.on_error {|err| observer.on_error err }
+          o.on_completed { observer.on_completed }  
+        end
+
+        self.subscribe(new_observer)
+      end
+    end
+
+    # Returns a specified number of contiguous elements from the start of an observable sequence.
+    def take(count, scheduler = ImmediateScheduler.instance)
+      return self.class.empty(scheduler) if count == 0
+
+      AnonymousObservable.new do |observer|
+
+        remaining = count
+
+        new_observer = Observer.configure do |o|
+
+          o.on_next do |x|
+            if remaining > 0
+              remaining -= 1
+              observer.on_next x
+              observer.on_completed if remaining == 0
+            end
+          end
+
+          o.on_error {|err| observer.on_error err }
+          o.on_completed { observer.on_completed }  
+        end
+
+        self.subscribe(new_observer)
+      end
+    end
+
+    # Returns elements from an observable sequence as long as a specified condition is true.
+    def take_while(&block)
+      self.take_while_with_index {|x, i| block.call x }
+    end
+
+    # Returns elements from an observable sequence as long as a specified condition is true.
+    # The element's index is used in the logic of the predicate function.
+    def take_while_with_index(&block)
+      AnonymousObservable.new do |observer|
+        running = true
+        i = 0
+
+        new_observer = Observer.configure do |o|
+
+          o.on_next do |x|
+            if running
+              begin
+                running = block.call(x, i)
+                i += 1
+              rescue => e
+                observer.on_error e
+                return
+              end
+
+              if running
+                observer.on_next x
+              else
+                observer.on_completed
+              end
+            end
+          end
+
+          o.on_error {|err| observer.on_error err }
+          o.on_completed { observer.on_completed }  
+        end
+
+        self.subscribe(new_observer)
+      end      
+    end
+
+    # Filters the elements of an observable sequence based on a predicate.
+    def filter(&block)
+      self.filter_with_index {|x, i| block.call x }
+    end
+
+    # Filters the elements of an observable sequence based on a predicate by incorporating the element's index.
+    def filter_with_index(&block)
+      AnonymousObservable.new do |observer|
+        i = 0
+
+        new_observer = Observer.configure do |o|
+
+          o.on_next do |x|
+            should_run = false
+            begin
+              should_run = block.call(x, i)
+              i += 1
+            rescue => e
+              observer.on_error e
+              return
+            end
+
+            observer.on_next x if should_run
+          end
+
+          o.on_error {|err| observer.on_error err }
+          o.on_completed { observer.on_completed }  
+        end
+
+        self.subscribe(new_observer)        
+      end
+    end
   end
 end
