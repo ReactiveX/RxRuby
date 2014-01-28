@@ -44,6 +44,12 @@ class Observer
       self.new config
     end
 
+    def configure
+      config = ObserverConfiguration.new
+      yield config
+      @config = config
+    end    
+
     # Unsubscribes from the current observer causing it to transition to the stopped state.
     def unsubscribe
       @stopped = true

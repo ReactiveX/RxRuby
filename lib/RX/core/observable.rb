@@ -40,48 +40,11 @@ module RX
     def schedule_subscribe(scheduler, auto_detach_observer)
       begin
         auto_detach_observer.subscription = self.subscribe_core auto_detach_observer
-      rescue Exception => e
+      rescue => e
         raise e unless auto_detach_observer.fail e
       end
 
       RX::Subscription.empty
-    end
-
-    # Creation Operators
-
-    # Creates an observable sequence from a specified subscribe method implementation.
-    def self.create(&subscribe)
-      AnonymousObservable.new do |obs|
-        a = subscribe.call obs
-        a = RX::Subscription.empty unless a
-        a
-      end
-    end
-
-    # Returns an empty observable sequence, using the specified scheduler to send out the single OnCompleted message.
-    def self.empty(scheduler = RX::ImmediateScheduler.instance)
-      AnonymousObservable.new do |obs|
-        scheduler.schedule lambda {
-          obs.on_completed
-        }
-      end
-    end
-
-    # Returns a non-terminating observable sequence, which can be used to denote an infinite duration (e.g. when using reactive joins).
-    def self.never
-      AnonymousObservable.new do |obs|
-
-      end
-    end
-
-    # Returns an observable sequence that contains a single element.
-    def self.just(value, scheduler = RX::ImmediateScheduler.instance)
-      AnonymousObservable.new do |obs|
-        scheduler.schedule lambda {
-          obs.on_next value
-          obs.on_completed
-        }
-      end
     end
 
   end

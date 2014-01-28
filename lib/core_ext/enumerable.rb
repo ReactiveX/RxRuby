@@ -6,7 +6,7 @@ module Enumerable
           observer.on_next(e)
         end
       end
-    rescue Exception => ex
+    rescue => ex
       observer.on_error(ex)
       return
     end
