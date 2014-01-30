@@ -93,6 +93,22 @@ module RX
       end
     end
 
+    # Converts an array to an observable sequence, using an optional scheduler to enumerate the array.
+    def self.of_array(array, scheduler = CurrentThreadScheduler.instance)
+      AnonymousObservable.new do |observer|
+        count = 0
+        scheduler.schedule_recursive lambda {|this|
+          if count < array.length
+            observer.on_next array[count]
+            count += 1
+            this.call
+          else
+            observer.on_completed
+          end
+        }
+      end
+    end
+
     # Returns an observable sequence that terminates with an exception.
     def self.raise(error, scheduler = ImmediateScheduler.instance)
       AnonymousObservable.new do |observer|
