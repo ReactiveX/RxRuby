@@ -18,10 +18,92 @@ module RX
       @clock = initial_clock
       @comparer = comparer
       @queue = PriorityQueue.new 1024
+      @enabled = false
     end
 
-    # Schedules an action to be executed at dueTime.
-    def schedule_at_abosolute(state, due_time, action)
+    # Gets the scheduler's notion of current time.
+    def now
+      self.to_time @clock
+    end
+
+    # Gets whether the scheduler is enabled to run work.
+    def enabled?
+      @enabled
+    end
+
+    # Starts the virtual time scheduler.
+    def start
+      unless @enabled
+        @enabled = true
+
+        begin
+          next_item = self.get_next
+
+          unless next_item.nil?
+            if @comparer_compare(next_item.due_time, @clock) > 0
+              @clock = next_item.due_time
+            end
+
+            next_item.Invoke
+          else
+            @enabled = false
+          end
+
+        end while @enabled
+      end
+    end  
+
+    # Stops the virtual time scheduler.
+    def stop
+      @enabled = false
+    end
+
+    # Schedules an action to be executed.
+    def schedule_with_state(state, action)
+      raise 'action cannot be nil' unless action
+
+      self.schedule_at_absolute_with_state(state, @clock, action)
+    end
+
+    # Schedules an action to be executed after due_time.
+    def schedule_relative_with_state(state, due_time, action)
+      raise 'action cannot be nil' unless action
+
+      self.schedule_at_relative_with_state(state, self.to_relative(due_time), action)
+    end
+
+    # Schedules an action to be executed at due_time.
+    def schedule_absolute_with_state(state, due_time, action)
+      raise 'action cannot be nil' unless action
+
+      self.schedule_at_relative_with_state(state, self.to_relative(due_time - self.now), action)
+    end
+
+    # Schedules an action to be executed at due_time.
+    def schedule_at_relative(due_time, action)
+      raise 'action cannot be nil' unless action
+
+      self.schedule_at_relative_with_state(action, due_time, method(:invoke))
+    end
+
+    # Schedules an action to be executed at due_time.
+    def schedule_at_relative_with_state(state, due_time, action)
+      raise 'action cannot be nil' unless action
+
+      run_at = self.add(@clock, due_time)
+
+      self.schedule_at_absolute_with_state(state, run_at, action)
+    end
+
+    # Schedules an action to be executed at due_time.
+    def schedule_at_absolute(due_time, action)
+      raise 'action cannot be nil' unless action
+
+      self.schedule_at_absolute_with_state(action, due_time, method(:invoke))      
+    end
+
+    # Schedules an action to be executed at due_time.
+    def schedule_at_absolute_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
       si = nil
@@ -36,6 +118,64 @@ module RX
       Subscription.create { si.cancel }
     end
 
+    # Advances the scheduler's clock to the specified time, running all work till that point.
+    def advance_to(time)
+      due_to_clock = @comparer.compare(time, @clock)
+      raise 'Time is out of range' if due_to_clock < 0 
+
+      return if due_to_clock == 0
+
+      unless @enabled
+        @enabled = true
+
+        begin
+          next_item = self.get_next
+          if !next_item.nil? && @comparer.compare(next_item.due_time, time) <= 0
+            if @comparer.compare(next_item.due_time, @clock) > 0
+              @clock = next_item.due_time
+            end
+            next_item.invoke
+          else
+            @enabled = false
+          end
+
+        end while @enabled
+
+        @clock = time
+      else
+        raise 'Cannot advance while running'
+      end
+
+    end
+
+    # Advances the scheduler's clock by the specified relative time, running all work scheduled for that timespan.
+    def advance_by(time)
+      dt = self.add(@clock, time)
+
+      due_to_clock = @comparer.compare(dt, @clock)
+      raise 'Time is out of range' if due_to_clock < 0
+
+      return if due_to_clock == 0
+
+      raise 'Cannot advance while running' if @enabled
+
+      unless @enabled
+        self.advance_to dt
+      else
+        raise 'Cannot advance while running'
+      end
+    end  
+
+    # Advances the scheduler's clock by the specified relative time.
+    def sleep(time)
+      dt = self.add(@clock, time)
+
+      due_to_clock = @comparer.compare(dt, @clock)
+      raise 'Time is out of range' if due_to_clock < 0
+
+      @clock = dt
+    end
+
     # Gets the next scheduled item to be executed
     def get_next
       while queue.length > 0
@@ -48,6 +188,11 @@ module RX
       end
 
       return nil
+    end
+
+    def invoke(scheduler, action)
+      action.call
+      Subscription.empty
     end
   end
 end
