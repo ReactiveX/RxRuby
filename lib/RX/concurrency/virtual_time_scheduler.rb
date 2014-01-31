@@ -156,14 +156,9 @@ module RX
       raise 'Time is out of range' if due_to_clock < 0
 
       return if due_to_clock == 0
-
       raise 'Cannot advance while running' if @enabled
 
-      unless @enabled
-        self.advance_to dt
-      else
-        raise 'Cannot advance while running'
-      end
+      self.advance_to dt
     end  
 
     # Advances the scheduler's clock by the specified relative time.
