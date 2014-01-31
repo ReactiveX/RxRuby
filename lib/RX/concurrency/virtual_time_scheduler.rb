@@ -40,10 +40,7 @@ module RX
           next_item = self.get_next
 
           unless next_item.nil?
-            if @comparer_compare(next_item.due_time, @clock) > 0
-              @clock = next_item.due_time
-            end
-
+            @clock = next_item.due_time if @comparer_compare(next_item.due_time, @clock) > 0
             next_item.Invoke
           else
             @enabled = false
@@ -131,9 +128,7 @@ module RX
         begin
           next_item = self.get_next
           if !next_item.nil? && @comparer.compare(next_item.due_time, time) <= 0
-            if @comparer.compare(next_item.due_time, @clock) > 0
-              @clock = next_item.due_time
-            end
+            @clock = next_item.due_time if @comparer.compare(next_item.due_time, @clock) > 0
             next_item.invoke
           else
             @enabled = false
