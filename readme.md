@@ -66,7 +66,7 @@ class ArrayObservable
   	while index < @array.length
       change #notify of change
       notify_observers @array[index] # send the current value
-      @index += 1
+      index += 1
       sleep 1
   	end
   end
