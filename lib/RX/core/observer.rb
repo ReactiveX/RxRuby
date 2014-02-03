@@ -28,27 +28,31 @@ module RX
     def on_completed(&on_completed_action)
       @on_completed_action = on_completed_action
     end    
-end
+  end
 
-# Base class for implementations of the Observer
-class Observer
+  # Module for all Observers
+  module Observer
+
+    class << self
+
+      # Configures a new instance of an Observer
+      def configure
+        config = ObserverConfiguration.new
+        yield config
+        ObserverBase.new config
+      end
+
+    end
+
+  end
+
+  class ObserverBase
+    include Observer
 
     def initialize(config)
       @config = config
       @stopped = false
     end
-
-    def self.configure
-      config = ObserverConfiguration.new
-      yield config
-      self.new config
-    end
-
-    def configure
-      config = ObserverConfiguration.new
-      yield config
-      @config = config
-    end    
 
     # Unsubscribes from the current observer causing it to transition to the stopped state.
     def unsubscribe
@@ -84,6 +88,6 @@ class Observer
         return true
       end
       return false
-    end
+    end    
   end
 end

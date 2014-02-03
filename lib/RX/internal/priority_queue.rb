@@ -94,8 +94,8 @@ module RX
 			end
 
 			def compare_to(other)
-				c = @value.compare_to other.value
-				c = @id - other.id if c == 0
+				c = @value<=>value
+				c = @id<=>other.id if c == 0
 				return c
 			end
 		end

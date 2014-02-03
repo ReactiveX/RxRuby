@@ -26,7 +26,7 @@ module RX
       raise 'action cannot be nil' unless action
 
       dt = self.now.to_i + Scheduler.normalize(due_time)
-      si = ScheduledItem.new self, state, action, dt
+      si = ScheduledItem.new self, state, dt, &action
 
       local_queue = self.class.queue
 
@@ -37,7 +37,7 @@ module RX
         self.class.queue = local_queue
 
         begin
-          Trampoline.run local_queue
+          self.class.run_trampoline local_queue
         ensure
           self.class.queue = nil
         end
@@ -50,17 +50,16 @@ module RX
 
     private
 
-    def self.queue
-      @@thread_local_queue
-    end
+    class << self
+      def queue
+        @@thread_local_queue
+      end
 
-    def self.queue=(new_queue)
-      @@thread_local_queue = new_queue
-    end
+      def queue=(new_queue)
+        @@thread_local_queue = new_queue
+      end
 
-    class Trampoline
-
-      def self.run(queue)
+      def run_trampoline(queue)
         while queue.length > 0
           item = queue.shift
           unless item.cancelled?
@@ -70,6 +69,8 @@ module RX
           end
         end
       end
+
     end
+
   end
 end

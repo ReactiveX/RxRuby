@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 require 'rx/concurrency/virtual_time_scheduler'
-require 'rx/internal/default_comparer'
 require 'rx/internal/priority_queue'
 
 module RX
@@ -9,22 +8,20 @@ module RX
   # Provides a virtual time scheduler that uses Time for absolute time and Number for relative time.
   class HistoricalScheduler < VirtualTimeScheduler
 
-    def initialize(clock = Time.new(1, 1, 1), comparer = DefaultComparer)
+    def initialize(clock = Time.new(1, 1, 1))
       @queue = PriorityQueue.new 1024
-      super(clock, comparer)
+      super(clock)
     end
 
     # Schedules an action to be executed at due_time.
     def schedule_at_absolute_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
-      si = nil
-      run = lambda {|scheduler, state1|
+      si = ScheduledItem.new self, state, due_time, lambda {|scheduler, state1|
         queue.delete si
         action.call(scheduler, state1)
       }
 
-      si = ScheduledItem.new(self, state, run, due_time, @comparer)
       queue.push si
 
       Subscription.create { si.cancel }

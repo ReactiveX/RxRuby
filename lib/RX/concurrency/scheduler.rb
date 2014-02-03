@@ -3,6 +3,8 @@
 require 'thread'
 
 module RX
+
+  # Module for scheduling actions
   module Scheduler
 
     # Gets the current time according to the local machine's system clock.
@@ -81,11 +83,11 @@ module RX
 
     def invoke(scheduler, action)
       action.call()
-      RX::Subscription.empty
+      Subscription.empty
     end
 
     def invoke_recursive(scheduler, pair)
-      group = RX::CompositeSubscription.new
+      group = CompositeSubscription.new
       gate = Mutex.new
       state = pair[:state]
       action = pair[:action]
@@ -104,7 +106,7 @@ module RX
             end
 
             recursive_action.call(state3)
-            RX::Subscription.empty
+            Subscription.empty
           })
 
           @gate.synchronize do
@@ -121,7 +123,7 @@ module RX
     end
 
     def invoke_recursive_time(scheduler, pair, method)
-      group = RX::CompositeSubscription.new
+      group = CompositeSubscription.new
       gate = Mutex.new
       state = pair[:state]
       action = pair[:action]
@@ -140,7 +142,7 @@ module RX
               end
             end
             recursive_action.call(state3)
-            return RX::Subscription.empty
+            Subscription.empty
           })
 
           @gate.synchronize do

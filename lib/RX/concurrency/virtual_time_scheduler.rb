@@ -1,7 +1,6 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 require 'rx/concurrency/scheduler'
-require 'rx/internal/default_comparer'
 require 'rx/internal/priority_queue'
 require 'rx/subscriptions/subscription'
 
@@ -14,9 +13,8 @@ module RX
 
     attr_reader :clock
 
-    def initialize(initial_clock, comparer = DefaultComparer)
+    def initialize(initial_clock)
       @clock = initial_clock
-      @comparer = comparer
       @queue = PriorityQueue.new 1024
       @enabled = false
     end
@@ -40,7 +38,7 @@ module RX
           next_item = self.get_next
 
           unless next_item.nil?
-            @clock = next_item.due_time if @comparer_compare(next_item.due_time, @clock) > 0
+            @clock = next_item.due_time if next_item.due_time > @clock
             next_item.Invoke
           else
             @enabled = false
@@ -127,8 +125,8 @@ module RX
 
         begin
           next_item = self.get_next
-          if !next_item.nil? && @comparer.compare(next_item.due_time, time) <= 0
-            @clock = next_item.due_time if @comparer.compare(next_item.due_time, @clock) > 0
+          if !next_item.nil? && next_item.due_time <= time
+            @clock = next_item.due_time if next_item.due_time > @clock
             next_item.invoke
           else
             @enabled = false
@@ -147,7 +145,7 @@ module RX
     def advance_by(time)
       dt = self.add(@clock, time)
 
-      due_to_clock = @comparer.compare(dt, @clock)
+      due_to_clock = dt<=>@clock
       raise 'Time is out of range' if due_to_clock < 0
 
       return if due_to_clock == 0
@@ -160,7 +158,7 @@ module RX
     def sleep(time)
       dt = self.add(@clock, time)
 
-      due_to_clock = @comparer.compare(dt, @clock)
+      due_to_clock = dt<=>@clock
       raise 'Time is out of range' if due_to_clock < 0
 
       @clock = dt

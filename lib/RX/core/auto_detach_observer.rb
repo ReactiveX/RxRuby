@@ -5,7 +5,7 @@ require 'rx/subscriptions/single_assignment_subscription'
 
 module RX
 
-  class AutoDetachObserver < RX::Observer
+  class AutoDetachObserver < RX::ObserverBase
 
     def on_next_core(value) 
       no_error = false
