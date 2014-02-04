@@ -21,7 +21,7 @@ module RX
 
     # Gets the scheduler's notion of current time.
     def now
-      self.to_time @clock
+      self.to_time clock
     end
 
     # Gets whether the scheduler is enabled to run work.
