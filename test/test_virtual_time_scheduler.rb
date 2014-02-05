@@ -10,13 +10,13 @@ class VirtualSchedulerTestScheduler < RX::VirtualTimeScheduler
   end
 
   def add(absolute, relative)
-    absolute = '' if absolute.nil?
+    absolute ||=''
     absolute + relative
   end
 
   # Converts the absolute time value to a Time value.
   def to_time(absolute)
-    absolute = '' if absolute.nil?
+    absolute ||=''
     Time.at(absolute.length)
   end
 
@@ -30,7 +30,7 @@ class TestVirtualTimeScheduler < MiniTest::Unit::TestCase
 
   def test_now
     s = VirtualSchedulerTestScheduler.new
-    assert (s.now - Time.now < 1)
+    assert_operator s.now-Time.now, :<, 1
   end
 
   def test_schedule_action
@@ -54,9 +54,14 @@ class TestVirtualTimeScheduler < MiniTest::Unit::TestCase
       s = VirtualSchedulerTestScheduler.new
       s.schedule lambda { raise err }
       s.start
-      assert false
+      flunk 'Should not reach here'
     rescue => e
-      assert_equal err, e 
+      assert_equal err, e
     end
+  end
+
+  def test_virtual_initial_now
+    s = VirtualSchedulerTestScheduler.new 'bar'
+    assert_equal 3, s.now.to_i
   end
 end

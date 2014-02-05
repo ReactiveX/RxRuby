@@ -54,14 +54,14 @@ module RX
       self.schedule_relative_with_state(
         { :state => state, :action => action}, 
         due_time,
-        lambda { |sched, pair| self.invoke_recursive_time(sched, pair, 'schedule_relative_with_state') }
+        lambda { |sched, pair| invoke_recursive_time(sched, pair, 'schedule_relative_with_state') }
       )
     end
 
     # Schedules an action to be executed recursively after a specified absolute due time.
     def schedule_recursive_absolute(due_time, action)
       raise 'action cannot be nil' unless action
-      self.schedule_absolute_relative_with_state(action, due_time, lambda {|_action, _self| _action(lambda {|dt| _self(_action, dt) }) })
+      self.schedule_recursive_absolute_with_state(action, due_time, lambda {|_action, _self| _action(lambda {|dt| _self(_action, dt) }) })
     end
 
     # Schedules an action to be executed recursively after a specified absolute due time.
@@ -70,7 +70,7 @@ module RX
       self.schedule_absolute_with_state(
         { :state => state, :action => action}, 
         due_time,
-        lambda { |sched, pair| self.invoke_recursive_time(sched, pair, 'schedule_absolute_with_state') }
+        lambda { |sched, pair| invoke_recursive_time(sched, pair, 'schedule_absolute_with_state') }
       )
     end
 
@@ -97,7 +97,7 @@ module RX
           is_added = false
           is_done = false
           d = scheduler.schedule_with_state(state2, lambda {|scheduler1, state3| 
-            @gate.synchronize do
+            gate.synchronize do
               if is_added
                 group.delete(d)
               else
@@ -109,7 +109,7 @@ module RX
             Subscription.empty
           })
 
-          @gate.synchronize do
+          gate.synchronize do
             unless is_done
               group.push(d)
               is_added = true
@@ -134,7 +134,7 @@ module RX
           is_done = false
 
           d = scheduler.send(method, state2, due_time1, lambda { |scheduler1, state3|
-            @gate.synchronize do
+            gate.synchronize do
               if is_added
                 group.delete(d)
               else
@@ -145,7 +145,7 @@ module RX
             Subscription.empty
           })
 
-          @gate.synchronize do
+          gate.synchronize do
             unless is_done
               group.push(d)
               is_added = true
