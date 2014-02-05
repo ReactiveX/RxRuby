@@ -102,7 +102,6 @@ module RX
 
       si = nil
       run = lambda {|scheduler, state1|
-        puts 'run'
         @queue.delete si
         action.call(scheduler, state1)
       }

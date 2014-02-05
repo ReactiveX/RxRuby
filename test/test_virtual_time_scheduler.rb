@@ -46,4 +46,17 @@ class TestVirtualTimeScheduler < MiniTest::Unit::TestCase
     s.start
     assert ran
   end
+
+  def test_schedule_action_error
+    err = RuntimeError.new
+
+    begin
+      s = VirtualSchedulerTestScheduler.new
+      s.schedule lambda { raise err }
+      s.start
+      assert false
+    rescue => e
+      assert_equal err, e 
+    end
+  end
 end

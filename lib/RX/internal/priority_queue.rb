@@ -35,8 +35,10 @@ module RX
 
     def delete(item)
       for i in 0..@length
-        puts 'hi'
-        return true if @items[i].value == item
+        if @items[i].value == item
+          delete_at i
+          return true
+        end
       end
       return false
     end
