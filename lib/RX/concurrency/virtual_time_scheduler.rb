@@ -39,7 +39,7 @@ module RX
 
           unless next_item.nil?
             @clock = next_item.due_time if next_item.due_time > @clock
-            next_item.Invoke
+            next_item.invoke
           else
             @enabled = false
           end
@@ -56,7 +56,6 @@ module RX
     # Schedules an action to be executed.
     def schedule_with_state(state, action)
       raise 'action cannot be nil' unless action
-
       self.schedule_at_absolute_with_state(state, @clock, action)
     end
 
@@ -103,19 +102,20 @@ module RX
 
       si = nil
       run = lambda {|scheduler, state1|
-        queue.delete si
+        puts 'run'
+        @queue.delete si
         action.call(scheduler, state1)
       }
 
-      si = ScheduledItem.new(self, state, run, due_time, @comparer)
-      queue.push si
+      si = ScheduledItem.new(self, state, due_time, &run)
+      @queue.push si
 
       Subscription.create { si.cancel }
     end
 
     # Advances the scheduler's clock to the specified time, running all work till that point.
     def advance_to(time)
-      due_to_clock = @comparer.compare(time, @clock)
+      due_to_clock = time<=>@clock
       raise 'Time is out of range' if due_to_clock < 0 
 
       return if due_to_clock == 0
@@ -166,10 +166,10 @@ module RX
 
     # Gets the next scheduled item to be executed
     def get_next
-      while queue.length > 0
-        next_item = queue.peek
+      while @queue.length > 0
+        next_item = @queue.peek
         if next_item.cancelled?
-          queue.shift
+          @queue.shift
         else
           return next_item
         end

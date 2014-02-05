@@ -26,7 +26,9 @@ module RX
 
     # Invokes the work item.
     def invoke
-      @subscription.subscription = @action.call @scheduler, @state unless @subscription.unsubscribed?
+      unless @subscription.unsubscribed?
+        @subscription.subscription = @action.call @scheduler, @state
+      end
     end
 
     def <=>(other)
