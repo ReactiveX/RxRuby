@@ -64,8 +64,60 @@ class TestBaseScheduler < MiniTest::Unit::TestCase
       assert_equal t, 0
     end
 
-    ms.schedule_recursive_absolute(now, (lambda {|a| res = true }))
+    ms.schedule_recursive_absolute(now, lambda {|a| res = true })
     assert res
     assert_equal 0, ms.wait_cycles
   end
+
+  def test_schedule_recursive_absolute_recursive
+    now = Time.now
+    i = 0
+    ms = MyScheduler.new(now)
+
+    ms.check do |a, s, t|
+      assert_equal t, 0
+    end
+
+    ms.schedule_recursive_absolute(now, lambda {|a|
+      i += 1
+      a.call(now) if i < 10
+    })
+
+    assert_equal 0, ms.wait_cycles
+    assert_equal 10, i    
+  end
+
+  def test_schedule_recursive_relative_non_recursive
+    now = Time.now
+    ms = MyScheduler.new(now)
+    res = false
+
+    ms.check do |a, s, t|
+      assert_equal t, 0
+    end
+
+    ms.schedule_recursive_relative(0, lambda {|a| res = true })
+
+    assert res
+    assert_equal 0, ms.wait_cycles
+  end
+
+  def test_schedule_recursive_relative_recursive
+    now = Time.now
+    i = 0
+    ms = MyScheduler.new(now)
+
+    ms.check do |a, s, t|
+      assert_operator t, :<, 10
+    end
+
+    ms.schedule_recursive_relative(0, lambda {|a|
+      i += 1
+      a.call i if i < 10
+    })
+
+    assert_equal 45, ms.wait_cycles
+    assert_equal 10, i  
+  end
+
 end
