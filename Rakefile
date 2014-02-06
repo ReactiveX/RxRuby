@@ -1,12 +1,9 @@
 #!/usr/bin/env rake
-
-#require "bundler/gem_tasks"
-
-#require 'rspec/core/rake_task'
-#RSpec::Core::RakeTask.new=end
-
+require "bundler/gem_tasks"
 require 'rake/clean'
 require 'rake/testtask'
+
+Bundler::GemHelper.install_tasks
 
 task :default => :test
 
