@@ -123,12 +123,11 @@ class TestBaseScheduler < MiniTest::Unit::TestCase
   def test_schedule_state_threading
     lst = []
     RX::ImmediateScheduler.instance.schedule_recursive_with_state(0, lambda {|i, a|
-      puts i.to_s
       lst.push(i)
       a.call(i + 1) if i < 9
     })
 
-    assert_equal (0..9).to_a lst
+    assert_equal (0..9).to_a, lst
   end
 
 end

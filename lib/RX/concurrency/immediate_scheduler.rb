@@ -37,16 +37,15 @@ module RX
       def schedule_with_state(state, action)
         m = SingleAssignmentSubscription.new
 
-        @gate = Mutex.new if @gate.nil?
+        @gate = AsyncLock.new if @gate.nil?
 
-        @gate.synchronize do 
+        @gate.wait end
           m.subscription = action.call self, state unless m.unsubscribed?
         end
 
         m
       end
 
-=begin
       def schedule_relative_with_state(state, due_time, action) 
         return self.schedule_with_state state, action if due_time <= 0
 
@@ -54,17 +53,16 @@ module RX
 
         timer = Time.new
 
-        @gate = Mutex.new if @gate.nil?
+        @gate = AsyncLock.new if @gate.nil?
 
-        @gate.synchronize do
+        @gate.wait do
           sleep_time = Time.new - timer
           sleep sleep_time if sleep_time > 0
           m.subscription = action.call self, state unless m.unsubscribed?
         end
 
         m
-      end=end
-
+      end
     end
   end
 end
