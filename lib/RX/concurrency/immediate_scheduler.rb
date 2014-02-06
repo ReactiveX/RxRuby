@@ -46,6 +46,7 @@ module RX
         m
       end
 
+=begin
       def schedule_relative_with_state(state, due_time, action) 
         return self.schedule_with_state state, action if due_time <= 0
 
@@ -62,7 +63,8 @@ module RX
         end
 
         m
-      end
+      end=end
+
     end
   end
 end
