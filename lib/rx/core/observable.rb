@@ -2,6 +2,7 @@
 
 require 'rx/concurrency/current_thread_scheduler'
 require 'rx/concurrency/immediate_scheduler'
+require 'rx/core/observer'
 require 'rx/core/auto_detach_observer'
 require 'rx/subscriptions/subscription'
 
@@ -10,8 +11,7 @@ module RX
   module Observable
 
     # Subscribes the given observer to the observable sequence.
-    def subscribe(observer)
-      raise 'observer cannot be nil' unless observer
+    def subscribe(observer = Observer.configure)
 
       auto_detach_observer = AutoDetachObserver.new observer
 
