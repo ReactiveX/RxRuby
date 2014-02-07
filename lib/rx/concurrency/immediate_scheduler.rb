@@ -39,7 +39,7 @@ module RX
 
         @gate = AsyncLock.new if @gate.nil?
 
-        @gate.wait end
+        @gate.wait do
           m.subscription = action.call self, state unless m.unsubscribed?
         end
 
