@@ -6,6 +6,33 @@ require 'rx'
 
 class TestObserver < MiniTest::Unit::TestCase
 
+  def test_from_notifier_notification_on_next
+    i = 0
+    obs = RX::Observer.from_notifier do |n|  
+      assert_equal i, 0
+      i += 1
+      assert n.on_next?
+      assert_equal 42, n.value
+      assert n.has_value?
+    end
+
+    obs.on_next 42
+  end
+
+  def test_from_notifier_notification_on_error
+    err = RuntimeError.new
+    i = 0
+    obs = RX::Observer.from_notifier do |n|
+      assert_equal i, 0
+      i += 1
+      assert n.on_error?
+      assert_same n.error, err
+      refute n.has_value?
+    end
+
+    obs.on_error err
+  end
+
   def test_configure_on_next
     next_called = false
     res = RX::Observer.configure do |o|

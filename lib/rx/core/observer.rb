@@ -49,17 +49,6 @@ module RX
       lambda {|n| n.accept self}
     end
 
-    # Creates an observer from a notification callback.
-    def to_observer
-      raise 'Block required' unless block_given?
-
-      self.class.configure do |o|
-        o.on_next      {|x| yield Notification.create_on_next(x) }
-        o.on_error     {|err| yield Notification.create_on_error(err) }
-        o.on_completed { yield Notification.create_on_completed }
-      end
-    end
-
     class << self
 
       # Configures a new instance of an Observer
@@ -67,6 +56,17 @@ module RX
         config = ObserverConfiguration.new
         yield config if block_given?
         ObserverBase.new config
+      end
+
+      # Creates an observer from a notification callback.
+      def from_notifier
+        raise 'Block required' unless block_given?
+
+        configure do |o|
+          o.on_next      {|x| yield Notification.create_on_next(x) }
+          o.on_error     {|err| yield Notification.create_on_error(err) }
+          o.on_completed { yield Notification.create_on_completed }
+        end
       end
 
     end
