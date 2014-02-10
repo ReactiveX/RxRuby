@@ -5,6 +5,22 @@ require 'rx/core/observable'
 
 module RX
 
+  module Observer
+
+    class << self
+    # Creates an observer from a notification callback.
+      def from_notifier
+        raise 'Block required' unless block_given?
+
+        configure do |o|
+          o.on_next      {|x| yield Notification.create_on_next(x) }
+          o.on_error     {|err| yield Notification.create_on_error(err) }
+          o.on_completed { yield Notification.create_on_completed }
+        end
+      end
+    end
+  end
+
   # Represents a notification to an observer.
   module Notification
 

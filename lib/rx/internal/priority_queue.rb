@@ -28,8 +28,11 @@ module RX
       index = @length
       @length += 1
 
-      @items[index] = IndexedItem.new @@length, item
-      @@length += 1
+      Mutex.new.synchronize do
+        @items[index] = IndexedItem.new @@length, item
+        @@length += 1
+      end
+      
       percolate index
     end
 

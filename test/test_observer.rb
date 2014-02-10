@@ -4,6 +4,31 @@ require 'thread'
 require 'minitest/autorun'
 require 'rx'
 
+class MyObserver
+  include RX::Observer
+
+  attr_reader :next, :error, :completed
+
+  def initialize
+    @next = false
+    @error = false
+    @completed = false
+  end
+
+  def on_next(value)
+    @next = value
+  end
+
+  def on_error(error)
+    @error = error
+  end
+
+  def on_completed
+    @completed = true
+  end
+
+end
+
 class TestObserver < MiniTest::Unit::TestCase
 
   def test_from_notifier_notification_on_next
@@ -31,6 +56,55 @@ class TestObserver < MiniTest::Unit::TestCase
     end
 
     obs.on_error err
+  end
+
+  def test_from_notifier_notification_on_completed
+    i = 0
+    obs = RX::Observer.from_notifier do |n|
+      assert_equal i, 0
+      i += 1
+      assert n.on_completed?
+      refute n.has_value?      
+    end
+
+    obs.on_completed
+  end
+
+  def test_to_notifier_forwards
+    obsn = MyObserver.new
+    obsn.to_notifier.call(RX::Notification.create_on_next 42)
+    assert_equal 42, obsn.next
+
+    err = RuntimeError.new
+    obse = MyObserver.new
+    obse.to_notifier.call(RX::Notification.create_on_error err)
+    assert_same err, obse.error
+
+    obsc = MyObserver.new
+    obsc.to_notifier.call(RX::Notification.create_on_completed)
+    assert obsc.completed
+  end
+
+  def test_as_observer_hides
+    obs = MyObserver.new
+    res = obs.as_observer
+
+    refute_same obs, res
+  end
+
+  def test_as_observer_forwards
+    obsn = MyObserver.new
+    obsn.as_observer.on_next 42
+    assert_equal 42, obsn.next
+
+    err = RuntimeError.new
+    obse = MyObserver.new
+    obse.as_observer.on_error err
+    assert_same err, obse.error
+
+    obsc = MyObserver.new
+    obsc.as_observer.on_completed
+    assert obsc.completed    
   end
 
   def test_configure_on_next
@@ -263,5 +337,143 @@ class TestObserver < MiniTest::Unit::TestCase
     assert error
     refute completed
   end
+
+  def test_checked_already_terminated_completed
+    m = 0
+    n = 0
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| m += 1 }
+      obs.on_error {|err| flunk }
+      obs.on_completed { n += 1 }
+    end
+
+    o = o.checked
+
+    o.on_next 1
+    o.on_next 2
+    o.on_completed
+
+    assert_raises(RuntimeError) { o.on_completed }
+    assert_raises(RuntimeError) { o.on_error RuntimeError.new }
+
+    assert_equal 2, m
+    assert_equal 1, n
+  end
+
+  def test_checked_already_terminated_error
+    m = 0
+    n = 0
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| m += 1 }
+      obs.on_error {|err| n += 1 }
+      obs.on_completed { flunk }
+    end
+
+    o = o.checked
+
+    o.on_next 1
+    o.on_next 2
+    o.on_error RuntimeError.new
+
+    assert_raises(RuntimeError) { o.on_completed }
+    assert_raises(RuntimeError) { o.on_error RuntimeError.new }
+
+    assert_equal 2, m
+    assert_equal 1, n
+  end
+
+  def test_checked_reentrant_next
+    n = 0
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next do |x|
+        n += 1
+
+        assert_raises(RuntimeError) { o.on_next 9 }
+        assert_raises(RuntimeError) { o.on_error RuntimeError.new }
+        assert_raises(RuntimeError) { o.on_completed }
+      end
+
+      obs.on_error {|err| flunk }
+      obs.on_completed { flunk }
+    end
+
+    o = o.checked
+    o.on_next 1
+
+    assert_equal 1, n
+  end
+
+  def test_checked_reentrant_error
+    n = 0
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| flunk }
+
+      obs.on_error do |err|
+        n += 1
+
+        assert_raises(RuntimeError) { o.on_next 9 }
+        assert_raises(RuntimeError) { o.on_error RuntimeError.new }
+        assert_raises(RuntimeError) { o.on_completed }
+      end
+
+      obs.on_completed { flunk }
+    end
+
+    o = o.checked
+    o.on_error RuntimeError.new
+
+    assert_equal 1, n
+  end
+
+  def test_checked_reentrant_completed
+    n = 0
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| flunk }
+      obs.on_error {|x| flunk }
+
+      obs.on_completed do
+        n += 1
+
+        assert_raises(RuntimeError) { o.on_next 9 }
+        assert_raises(RuntimeError) { o.on_error RuntimeError.new }
+        assert_raises(RuntimeError) { o.on_completed }
+      end
+    end
+
+    o = o.checked
+    o.on_completed
+
+    assert_equal 1, n
+  end  
+
+=begin
+  def test_synchronize_monitor_reentrant_1
+    res = false
+    in_one = false
+
+    s = nil
+    o = RX::Observer.configure do |obs|
+      obs.on_next do |x|
+        if x == 1
+          in_one = true
+          s.on_next 2
+          in_one = false
+        elsif x == 2
+          res = in_one
+        end
+      end
+    end
+
+    s = RX::Observer.synchronize o
+    s.on_next 1
+    assert res
+  end
+=end
+
 
 end
