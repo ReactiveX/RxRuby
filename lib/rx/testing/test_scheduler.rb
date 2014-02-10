@@ -12,13 +12,17 @@ module RX
   # Virtual time scheduler used for testing applications and libraries built using Reactive Extensions.
   class TestScheduler < VirtualTimeScheduler
 
-    # Schedules an action to be executed at due_time.
-    def schedule_at_relative_with_state(state, due_time, action)
-      raise 'action cannot be nil' unless action
+    def initialize
+      super(0)
+    end
 
+    # Schedules an action to be executed at due_time.
+    def schedule_at_absolute_with_state(state, due_time, action)
+      raise 'action cannot be nil' unless action
+      
       due_time = clock + 1 if due_time <= clock
 
-      super(state, run_at, action)
+      super(state, due_time, action)
     end
 
     # Adds a relative virtual time to an absolute virtual time value.
@@ -37,7 +41,7 @@ module RX
     end    
 
     # Starts the test scheduler and uses the specified virtual times to invoke the factory function, subscribe to the resulting sequence, and unsubscribe the subscription.
-    def create(options = {}, &action)
+    def configure(options = {})
       o = {
         :created    => ReactiveTest::CREATED,
         :subscribed => ReactiveTest::SUBSCRIBED,
@@ -46,22 +50,24 @@ module RX
 
       source = nil
       subscription = nil
-      observer = self.create_observer
+      observer = create_observer
 
-      self.schedule_at_absolute_with_state(nil, o[:created], lambda {|scheduler, state|
-        source = acton.call
+      schedule_at_absolute_with_state(nil, o[:created], lambda {|scheduler, state|
+        source = yield
         Subscription.empty
       })
 
-      self.schedule_at_absolute_with_state(nil, o[:subscribed], lambda {|scheduler, state|
+      schedule_at_absolute_with_state(nil, o[:subscribed], lambda {|scheduler, state|
         subscription = source.subscribe observer
         Subscription.empty
       })
 
-       self.schedule_at_absolute_with_state(nil, o[:disposed], lambda {|scheduler, state|
+       schedule_at_absolute_with_state(nil, o[:disposed], lambda {|scheduler, state|
         subscription.unsubscribe
         Subscription.empty
       })
+
+      start
       
       observer           
     end

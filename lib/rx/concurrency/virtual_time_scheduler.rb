@@ -56,44 +56,44 @@ module RX
     # Schedules an action to be executed.
     def schedule_with_state(state, action)
       raise 'action cannot be nil' unless action
-      self.schedule_at_absolute_with_state(state, @clock, action)
+      schedule_at_absolute_with_state(state, clock, action)
     end
 
     # Schedules an action to be executed after due_time.
     def schedule_relative_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
-      self.schedule_at_relative_with_state(state, self.to_relative(due_time), action)
+      schedule_at_relative_with_state(state, to_relative(due_time), action)
     end
 
     # Schedules an action to be executed at due_time.
     def schedule_absolute_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
-      self.schedule_at_relative_with_state(state, self.to_relative(due_time - self.now), action)
+      schedule_at_relative_with_state(state, to_relative(due_time - now), action)
     end
 
     # Schedules an action to be executed at due_time.
     def schedule_at_relative(due_time, action)
       raise 'action cannot be nil' unless action
 
-      self.schedule_at_relative_with_state(action, due_time, method(:invoke))
+      schedule_at_relative_with_state(action, due_time, method(:invoke))
     end
 
     # Schedules an action to be executed at due_time.
     def schedule_at_relative_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
-      run_at = self.add(@clock, due_time)
+      run_at = add(@clock, due_time)
 
-      self.schedule_at_absolute_with_state(state, run_at, action)
+      schedule_at_absolute_with_state(state, run_at, action)
     end
 
     # Schedules an action to be executed at due_time.
     def schedule_at_absolute(due_time, action)
       raise 'action cannot be nil' unless action
 
-      self.schedule_at_absolute_with_state(action, due_time, method(:invoke))      
+      schedule_at_absolute_with_state(action, due_time, method(:invoke))      
     end
 
     # Schedules an action to be executed at due_time.
@@ -114,7 +114,7 @@ module RX
 
     # Advances the scheduler's clock to the specified time, running all work till that point.
     def advance_to(time)
-      due_to_clock = time<=>@clock
+      due_to_clock = time<=>clock
       raise 'Time is out of range' if due_to_clock < 0 
 
       return if due_to_clock == 0
@@ -144,7 +144,7 @@ module RX
     def advance_by(time)
       dt = self.add(@clock, time)
 
-      due_to_clock = dt<=>@clock
+      due_to_clock = dt<=>clock
       raise 'Time is out of range' if due_to_clock < 0
 
       return if due_to_clock == 0

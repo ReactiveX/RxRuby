@@ -11,7 +11,7 @@ module RX
 
     attr_reader :messages
 
-    def initalize(scheduler)
+    def initialize(scheduler)
       raise 'scheduler cannot be nil' unless scheduler
 
       @scheduler = scheduler

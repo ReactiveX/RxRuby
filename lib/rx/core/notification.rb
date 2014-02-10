@@ -66,9 +66,9 @@ module RX
     # Returns an observable sequence with a single notification.
     def to_observable(scheduler=ImmediateScheduler)
       AnonymousObservable.new do |observer|
-        scheduler.schedule lamdba {
-          self.accept observer
-          observer.on_completed if self.on_next?
+        scheduler.schedule lambda { 
+          accept observer
+          observer.on_completed if on_next?
         }
       end
     end
@@ -92,12 +92,12 @@ module RX
     end
 
     def ==(other)
-      o.class == self.class && other.on_next? && value == other.value
+      other.class == self.class && other.on_next? && value == other.value
     end
     alias_method :eql?, :==
 
     def to_s
-      "on_next#{value}"
+      "on_next(#{value})"
     end
 
     # Invokes the observer's method corresponding to the notification.
@@ -119,12 +119,12 @@ module RX
     end
 
     def ==(other)
-      o.class == self.class && other.on_error? && error == other.error
+      other.class == self.class && other.on_error? && error == other.error
     end
     alias_method :eql?, :==
 
     def to_s
-      "on_error#{error}"
+      "on_error(#{error})"
     end
 
     # Invokes the observer's method corresponding to the notification.
@@ -143,12 +143,12 @@ module RX
     end
 
     def ==(other)
-      o.class == self.class && other.on_completed?
+      other.class == self.class && other.on_completed?
     end
     alias_method :eql?, :==
 
     def to_s
-      "on_completed"
+      "on_completed()"
     end
 
     # Invokes the observer's method corresponding to the notification.

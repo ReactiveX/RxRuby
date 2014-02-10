@@ -44,5 +44,14 @@ module RX
       Recorded.new(ticks, Notification.create_on_completed)
     end
 
+    def reactive_assert(expected, actual)
+      assert_equal expected.length, actual.length
+
+      for i in 0..expected.length - 1
+        assert_equal expected[i].time, actual[i].time
+        assert_equal expected[i].value, actual[i].value
+      end
+    end
+
   end
 end
