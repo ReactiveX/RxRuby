@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-require 'thread'
+require 'monitor'
 require 'rx/core/observer'
 
 module RX
@@ -8,10 +8,10 @@ module RX
   module Observer
 
     class << self
-      # Synchronizes access to the observer such that its callback methods cannot be called concurrently by multiple threads, using the specified gate object for use by a Mutex based lock.
+      # Synchronizes access to the observer such that its callback methods cannot be called concurrently by multiple threads, using the specified gate object for use by a Monitor based lock.
       # This overload is useful when coordinating multiple observers that access shared state by synchronizing on a common gate object if given.
       # Notice reentrant observer callbacks on the same thread are still possible.
-      def synchronize(observer, gate = Mutex.new)
+      def allow_reentrancy(observer, gate = Monitor.new)
         SynchronizedObserver.new(observer, gate)
       end
     end

@@ -1,5 +1,6 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+require 'monitor'
 require 'thread'
 require 'minitest/autorun'
 require 'rx'
@@ -451,7 +452,6 @@ class TestObserver < MiniTest::Unit::TestCase
     assert_equal 1, n
   end  
 
-=begin
   def test_synchronize_monitor_reentrant_1
     res = false
     in_one = false
@@ -469,11 +469,75 @@ class TestObserver < MiniTest::Unit::TestCase
       end
     end
 
-    s = RX::Observer.synchronize o
+    s = RX::Observer.allow_reentrancy o
     s.on_next 1
     assert res
   end
-=end
 
+  def test_synchronize_monitor_reentrant_2
+    res = false
+    in_one = false
+
+    s = nil
+    o = RX::Observer.configure do |obs|
+      obs.on_next do |x|
+        if x == 1
+          in_one = true
+          s.on_next 2
+          in_one = false
+        elsif x == 2
+          res = in_one
+        end
+      end
+    end
+
+    s = RX::Observer.allow_reentrancy o, Monitor.new
+    s.on_next 1
+    assert res
+  end  
+
+  def test_synchronize_monitor_non_reentrant_1
+    res = false
+    in_one = false
+
+    s = nil
+    o = RX::Observer.configure do |obs|
+      obs.on_next do |x|
+        if x == 1
+          in_one = true
+          s.on_next 2
+          in_one = false
+        elsif x == 2
+          res = !in_one
+        end
+      end
+    end
+
+    s = RX::Observer.prevent_reentrancy o
+    s.on_next 1
+    assert res
+  end
+
+  def test_synchronize_monitor_non_reentrant_2
+    res = false
+    in_one = false
+
+    s = nil
+    o = RX::Observer.configure do |obs|
+      obs.on_next do |x|
+        if x == 1
+          in_one = true
+          s.on_next 2
+          in_one = false
+        elsif x == 2
+          res = !in_one
+        end
+      end
+    end
+
+    s = RX::Observer.prevent_reentrancy o, RX::AsyncLock.new
+    s.on_next 1
+    assert res
+  end 
 
 end

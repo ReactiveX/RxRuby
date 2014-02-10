@@ -15,8 +15,8 @@ module RX
 
       auto_detach_observer = AutoDetachObserver.new observer
 
-      if RX::CurrentThreadScheduler.schedule_required?
-        RX::CurrentThreadScheduler.instance.schedule_with_state auto_detach_observer, method(:schedule_subscribe)
+      if CurrentThreadScheduler.schedule_required?
+        CurrentThreadScheduler.instance.schedule_with_state auto_detach_observer, method(:schedule_subscribe)
       else
         begin
           auto_detach_observer.subscription = self.subscribe_core auto_detach_observer
@@ -30,7 +30,7 @@ module RX
 
     # Subscribes the given block to the on_next action of the observable sequence.
     def subscribe_on_next
-      obs = RX::Observer.configure do |o|
+      obs = Observer.configure do |o|
         o.on_next yield
       end
 
@@ -44,7 +44,7 @@ module RX
         raise e unless auto_detach_observer.fail e
       end
 
-      RX::Subscription.empty
+      Subscription.empty
     end
 
   end
@@ -59,7 +59,7 @@ module RX
 
     def subscribe_core(obs)
       res = @subscribe.call obs
-      return res.nil? ? RX::Subscription.empty : res
+      return res.nil? ? Subscription.empty : res
     end
 
   end
