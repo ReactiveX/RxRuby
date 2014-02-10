@@ -36,9 +36,9 @@ module RX
     # Hides the identity of an observer.
     def as_observer
       Observer.configure do |o|
-        o.on_next      {|x| self.on_next x }
-        o.on_error     {|err| self.on_error err }
-        o.on_completed { self.on_completed }
+        o.on_next &method(:on_next)
+        o.on_error &method(:on_error)
+        o.on_completed &method(:on_completed)
       end      
     end
 
@@ -60,6 +60,7 @@ module RX
 
   end
 
+  # Base class for all Observer implementations
   class ObserverBase
     include Observer
 

@@ -538,6 +538,98 @@ class TestObserver < MiniTest::Unit::TestCase
     s = RX::Observer.prevent_reentrancy o, RX::AsyncLock.new
     s.on_next 1
     assert res
-  end 
+  end
+
+  def test_synchronize_monitor_non_reentrant_next
+    res = false
+    s = nil
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| res = x == 1 }
+      obs.on_error {|err| flunk }
+      obs.on_completed { flunk }
+    end
+
+    s = RX::Observer.prevent_reentrancy o
+    s.on_next 1
+
+    assert res
+  end
+
+  def test_synchronize_monitor_non_reentrant_error
+    res = nil
+    e = RuntimeError.new
+    s = nil
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| flunk }
+      obs.on_error {|err| res = err }
+      obs.on_completed { flunk }
+    end
+
+    s = RX::Observer.prevent_reentrancy o
+    s.on_error e
+
+    assert_same e, res
+  end
+
+  def test_synchronize_monitor_non_reentrant_completed
+    res = false
+    s = nil
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| flunk }
+      obs.on_error {|err| flunk }
+      obs.on_completed { res = true }
+    end
+
+    s = RX::Observer.prevent_reentrancy o
+    s.on_completed
+
+    assert res
+  end
+
+  def test_notify_on_success
+    c = 0
+    num = 100
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| c += 1 }
+      obs.on_error {|err| flunk }
+      obs.on_completed { }
+    end
+
+    s = RX::ImmediateScheduler.instance
+    n = o.notify_on(s)
+
+    for i in 0..num
+      n.on_next i
+    end
+
+    n.on_completed
+
+    assert_equal c, 101
+  end
+
+  def test_notify_on_error
+    c = 0
+    num = 100
+    err = RuntimeError.new
+
+    o = RX::Observer.configure do |obs|
+      obs.on_next {|x| c += 1 }
+      obs.on_error {|e| assert_same err, e }
+      obs.on_completed { flunk }
+    end
+
+    s = RX::ImmediateScheduler.instance
+    n = o.notify_on(s)
+
+    for i in 0..num
+      n.on_next i
+    end
+
+    n.on_error err
+  end  
 
 end
