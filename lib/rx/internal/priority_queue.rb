@@ -32,7 +32,7 @@ module RX
         @items[index] = IndexedItem.new @@length, item
         @@length += 1
       end
-      
+
       percolate index
     end
 
@@ -99,7 +99,7 @@ module RX
       end
 
       def compare_to(other)
-        c = @value<=>value
+        c = @value<=>other.value
         c = @id<=>other.id if c == 0
         return c
       end
