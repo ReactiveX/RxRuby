@@ -54,7 +54,7 @@ module RX
 
       for i in 0..expected.length - 1
         assert_equal expected[i].time, actual[i].time
-        assert_equal expected[i].value, actual[i].value
+        assert (expected[i].value == actual[i].value)
       end
     end
 

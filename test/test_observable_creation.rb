@@ -181,5 +181,78 @@ class TestObservableCreation < MiniTest::Unit::TestCase
     assert_subscriptions [subscribe(200, 400)], xs.subscriptions 
   end
 
+  def test_defer_error
+    scheduler = RX::TestScheduler.new 
+
+    invoked = 0
+    xs = nil
+    err = RuntimeError.new
+
+    res = scheduler.configure do 
+      RX::Observable.defer do
+        invoked += 1
+
+        xs = scheduler.create_cold_observable(
+          on_next(100, scheduler.clock),
+          on_error(200, err)
+        )
+        xs
+      end
+    end
+
+    msgs = [on_next(300, 200), on_error(400, err)]
+    assert_messages msgs, res.messages    
+
+    assert_equal 1, invoked
+
+    assert_subscriptions [subscribe(200, 400)], xs.subscriptions     
+  end
+
+  def test_defer_unsubscribe
+    scheduler = RX::TestScheduler.new 
+
+    invoked = 0
+    xs = nil
+
+    res = scheduler.configure do 
+      RX::Observable.defer do
+        invoked += 1
+
+        xs = scheduler.create_cold_observable(
+          on_next(100, scheduler.clock),
+          on_next(200, invoked),
+          on_next(1100, 1000)
+        )
+        xs
+      end
+    end
+
+    msgs = [on_next(300, 200), on_next(400, 1)]
+    assert_messages msgs, res.messages    
+
+    assert_equal 1, invoked
+
+    assert_subscriptions [subscribe(200, 1000)], xs.subscriptions     
+  end
+
+  def test_defer_raise
+    scheduler = RX::TestScheduler.new 
+
+    invoked = 0
+    err = 'foo'
+
+    res = scheduler.configure do 
+      RX::Observable.defer do
+        invoked += 1
+        raise err
+      end
+    end
+
+    puts res.messages.to_s
+    msgs = [on_error(200, err)]
+    assert_messages msgs, res.messages    
+
+    assert_equal 1, invoked     
+  end
 
 end
