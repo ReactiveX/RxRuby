@@ -44,7 +44,12 @@ module RX
       Recorded.new(ticks, Notification.create_on_completed)
     end
 
-    def reactive_assert(expected, actual)
+    # Factory method for a subscription record based on a given subscription and unsubscribe time.
+    def subscribe(subscribe, unsubscribe)
+      TestSubscription.new(subscribe, unsubscribe)
+    end
+
+    def assert_messages(expected, actual)
       assert_equal expected.length, actual.length
 
       for i in 0..expected.length - 1
@@ -52,6 +57,38 @@ module RX
         assert_equal expected[i].value, actual[i].value
       end
     end
+
+    def assert_subscriptions(expected, actual)
+      assert_equal expected.length, actual.length
+
+      for i in 0..expected.length - 1
+        assert (expected[i] == actual[i])
+      end      
+    end
+
+    class OnNextPredicate
+
+      def initialize(&action)
+        @action = action
+      end
+
+      def ==(other)
+        other && other.on_next? && @action.call(other.value)
+      end
+      alias_method :eql?, :==
+    end
+
+    class OnErrorPredicate
+
+      def initialize(&action)
+        @action = action
+      end
+
+      def ==(other)
+        other && other.on_error? && @action.call(other.error)
+      end
+      alias_method :eql?, :==
+    end    
 
   end
 end

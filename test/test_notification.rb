@@ -13,7 +13,7 @@ class TestNotification < MiniTest::Unit::TestCase
       RX::Notification.create_on_completed.to_observable(scheduler)
     end
 
-    reactive_assert [on_completed(201)], res.messages
+    assert_messages [on_completed(201)], res.messages
   end
 
   def test_to_observable_just
@@ -23,7 +23,7 @@ class TestNotification < MiniTest::Unit::TestCase
       RX::Notification.create_on_next(42).to_observable(scheduler)
     end
 
-    reactive_assert [on_next(201, 42), on_completed(201)], res.messages
+    assert_messages [on_next(201, 42), on_completed(201)], res.messages
   end
 
   def test_to_observable_raise
@@ -34,7 +34,7 @@ class TestNotification < MiniTest::Unit::TestCase
       RX::Notification.create_on_error(err).to_observable(scheduler)
     end
 
-    reactive_assert [on_error(201, err)], res.messages
+    assert_messages [on_error(201, err)], res.messages
   end
 
   def test_notification_equality
