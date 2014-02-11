@@ -254,4 +254,230 @@ class TestObservableCreation < MiniTest::Unit::TestCase
     assert_equal 1, invoked     
   end
 
+  # Empty methods
+
+  def test_empty_basic
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure do
+      RX::Observable.empty(scheduler)
+    end
+
+    msgs = [on_completed(201)]
+    assert_messages msgs, res.messages       
+  end
+
+  def test_empty_disposed
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure({:disposed => 200}) do
+      RX::Observable.empty(scheduler)
+    end
+
+    msgs = []
+    assert_messages msgs, res.messages   
+  end
+
+  def test_empty_observer_raises
+    scheduler = RX::TestScheduler.new
+
+    xs = RX::Observable.empty(scheduler)
+
+    observer = RX::Observer.configure do |obs|
+      obs.on_completed { raise RuntimeError.new }
+    end
+
+    xs.subscribe observer
+
+    assert_raises(RuntimeError) { scheduler.start }
+  end
+
+  # Generate methods
+
+  def test_generate_finite
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure do
+      RX::Observable.generate(
+        0,
+        Proc.new { |x| return x <= 3 },
+        Proc.new { |x| return x + 1 },
+        Proc.new { |x| return x },
+        scheduler)
+    end
+
+    msgs = [
+      on_next(201, 0),
+      on_next(202, 1),
+      on_next(203, 2),
+      on_next(204, 3),
+      on_completed(205)      
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_generate_condition_raise
+    scheduler = RX::TestScheduler.new
+    err = RuntimeError.new
+
+    res = scheduler.configure do
+      RX::Observable.generate(
+        0,
+        Proc.new { |x| raise err },
+        Proc.new { |x| return x + 1 },
+        Proc.new { |x| return x },
+        scheduler)
+    end
+
+    msgs = [
+      on_error(201, err)  
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_generate_raise_result_selector
+    scheduler = RX::TestScheduler.new
+    err = RuntimeError.new
+
+    res = scheduler.configure do
+      RX::Observable.generate(
+        0,
+        Proc.new { |x| return true },
+        Proc.new { |x| return x + 1 },
+        Proc.new { |x| raise err },
+        scheduler)
+    end
+
+    msgs = [
+      on_error(201, err)  
+    ]
+    assert_messages msgs, res.messages    
+  end
+
+  def test_generate_raise_iterate
+    scheduler = RX::TestScheduler.new
+    err = RuntimeError.new
+
+    res = scheduler.configure do
+      RX::Observable.generate(
+        0,
+        Proc.new { |x| return true },
+        Proc.new { |x| raise err },
+        Proc.new { |x| return x },
+        scheduler)
+    end
+
+    msgs = [
+      on_error(201, err)  
+    ]
+    assert_messages msgs, res.messages    
+  end
+
+  def test_generate_dispose
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure(:dispose => 203) do
+      RX::Observable.generate(
+        0,
+        Proc.new { |x| return x <= 3 },
+        Proc.new { |x| return x + 1 },
+        Proc.new { |x| return x },
+        scheduler)
+    end
+
+    msgs = [
+      on_next(201, 0),
+      on_next(202, 1),     
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  # Never methods
+
+  def test_never_basic
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure do
+      RX::Observable.never
+    end
+
+    msgs = []
+    assert_messages msgs, res.messages
+  end
+
+  # Range methods
+
+  def test_range_zero
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure do
+      RX::Observable.range(0, 0, scheduler)
+    end
+
+    msgs = [on_completed(201)]
+    assert_messages msgs, res.messages    
+  end
+
+  def test_range_one
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure do
+      RX::Observable.range(0, 1, scheduler)
+    end
+
+    msgs = [on_next(201, 0), on_completed(202)]
+    assert_messages msgs, res.messages      
+  end
+
+  def test_range_five
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure do
+      RX::Observable.range(10, 5, scheduler)
+    end
+
+    msgs = [
+      on_next(201, 10),
+      on_next(202, 11),
+      on_next(203, 12),
+      on_next(204, 13),
+      on_next(205, 14),
+      on_completed(206)
+    ]
+    assert_messages msgs, res.messages      
+  end
+
+  def range_dispose
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure(:dispose => 204) do
+      RX::Observable.range(-10, 5, scheduler)
+    end
+
+    msgs = [
+      on_next(201, -10),
+      on_next(202, -9),
+      on_next(203, -8),
+    ]
+    assert_messages msgs, res.messages 
+  end
+
+  # Repeat methods
+
+=begin
+  def test_repeat_value_count_zero
+    scheduler = RX::TestScheduler.new
+
+    res = scheduler.configure(:dispose => 204) do
+      RX::Observable.repeat(42, 0, scheduler)
+    end
+
+    msgs = [
+      on_completed(201)
+    ]
+    assert_messages msgs, res.messages 
+  end
+=end
+
+
 end

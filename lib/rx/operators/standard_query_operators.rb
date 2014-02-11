@@ -23,7 +23,7 @@ module RX
             observer.on_next x
           end
 
-          o.on_error {|err| observer.on_error err }
+          o.on_error &observer.method(:on_error)
 
           o.on_completed do 
             observer.on_next(default_value) unless found
@@ -31,13 +31,13 @@ module RX
           end
         end
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end
     end
 
     # Returns an observable sequence that contains only distinct elements.
     def distinct
-      self.distinct_with_key {|x| x}
+      distinct_with_key {|x| x}
     end
 
     # Returns an observable sequence that contains only distinct elements according to the key_selector.
@@ -67,16 +67,16 @@ module RX
             observer.on_next x if has_added
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)
         end
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end
     end
 
-    # Projects each element of an observable sequence into a new form.
-    def map(&block)
+    # Projects each element of an observable sequence into a new form by incorporating the element's index.
+    def map_with_index(&block)
       AnonymousObservable.new do |observer|
         new_observer = Observer.configure do |o|
           count = 0
@@ -94,27 +94,27 @@ module RX
             observer.on_next result
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }          
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)          
         end
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end
     end
 
-    # Projects each element of an observable sequence into a new form by incorporating the element's index.
+    # Projects each element of an observable sequence into a new form.
     def map_with_index(&block)
-      self.map {|x, i| block.call x }
+      map {|x, i| block.call x }
     end
 
     # Projects each element of the source observable sequence to the other observable sequence and merges the resulting observable sequences into one observable sequence.
     def flat_map(&block)
-      self.map(&block).merge_all
+      map(&block).merge_all
     end
 
     # Projects each element of an observable sequence to an observable sequence by incorporating the element's index and merges the resulting observable sequences into one observable sequence.
     def flat_map_with_index(&block)
-      self.map_with_index(&block).merge_all
+      map_with_index(&block).merge_all
     end
 
     # Bypasses a specified number of elements in an observable sequence and then returns the remaining elements.
@@ -132,18 +132,18 @@ module RX
             end
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }  
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)  
         end
 
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end
     end
 
     # Bypasses elements in an observable sequence as long as a specified condition is true and then returns the remaining elements.
     def skip_while(&block)
-      self.skip_while_with_index {|x, i| block.call x }
+      skip_while_with_index {|x, i| block.call x }
     end
 
     # Bypasses elements in an observable sequence as long as a specified condition is true and then returns the remaining elements.
@@ -169,17 +169,17 @@ module RX
             end
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }  
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)  
         end
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end
     end
 
     # Returns a specified number of contiguous elements from the start of an observable sequence.
     def take(count, scheduler = ImmediateScheduler.instance)
-      return self.class.empty(scheduler) if count == 0
+      return Observable.empty(scheduler) if count == 0
 
       AnonymousObservable.new do |observer|
 
@@ -195,17 +195,17 @@ module RX
             end
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }  
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)  
         end
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end
     end
 
     # Returns elements from an observable sequence as long as a specified condition is true.
     def take_while(&block)
-      self.take_while_with_index {|x, i| block.call x }
+      take_while_with_index {|x, i| block.call x }
     end
 
     # Returns elements from an observable sequence as long as a specified condition is true.
@@ -235,17 +235,17 @@ module RX
             end
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }  
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)  
         end
 
-        self.subscribe(new_observer)
+        subscribe(new_observer)
       end      
     end
 
     # Filters the elements of an observable sequence based on a predicate.
     def filter(&block)
-      self.filter_with_index {|x, i| block.call x }
+      filter_with_index {|x, i| block.call x }
     end
 
     # Filters the elements of an observable sequence based on a predicate by incorporating the element's index.
@@ -268,11 +268,11 @@ module RX
             observer.on_next x if should_run
           end
 
-          o.on_error {|err| observer.on_error err }
-          o.on_completed { observer.on_completed }  
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)  
         end
 
-        self.subscribe(new_observer)        
+        subscribe(new_observer)        
       end
     end
   end

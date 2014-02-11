@@ -51,23 +51,26 @@ module RX
           first = true
           
           scheduler.schedule_recursive lambda{|this|
-            hasResult = false
+            has_result = false
             result = nil
             begin
+
               if first
                 first = false
               else
-                state = iterate.call state
+                state = iterate.call(state)
               end
-              hasResult = condition.call state
-              if hasResult
+
+              has_result = condition.call(state)
+
+              if has_result
                 result = result_selector.call state
               end
             rescue => err
               observer.on_error err
               return
             end
-            if hasResult
+            if has_result
               observer.on_next result
               this.call
             else
@@ -151,7 +154,7 @@ module RX
       # Generates an observable sequence of integral numbers within a specified range.
       def range(start, count, scheduler = CurrentThreadScheduler.instance)
         AnonymousObservable.new do |observer|
-          scheduler.schedule_with_state 0, lambda {|i, this|
+          scheduler.schedule_recursive_with_state 0, lambda {|i, this|
             if i < count
               observer.on_next (start + i)
               this.call(i + 1)
@@ -164,12 +167,12 @@ module RX
 
       # Generates an observable sequence that repeats the given element infinitely.
       def repeat_infinitely(value, scheduler = CurrentThreadScheduler.instance)
-        self.class.just(value, scheduler).repeat
+        Observable.just(value, scheduler).repeat
       end
 
       # Generates an observable sequence that repeats the given element the specified number of times.
       def repeat(value, count, scheduler = CurrentThreadScheduler.instance)
-        self.class.just(value, scheduler).repeat(count)
+        Observable.just(value, scheduler).repeat(count)
       end
 
       # Constructs an observable sequence that depends on a resource object, whose lifetime is tied to the resulting observable sequence's lifetime.
