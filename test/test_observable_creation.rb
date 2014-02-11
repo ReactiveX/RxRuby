@@ -239,7 +239,7 @@ class TestObservableCreation < MiniTest::Unit::TestCase
     scheduler = RX::TestScheduler.new 
 
     invoked = 0
-    err = 'foo'
+    err = RuntimeError.new
 
     res = scheduler.configure do 
       RX::Observable.defer do
@@ -248,7 +248,6 @@ class TestObservableCreation < MiniTest::Unit::TestCase
       end
     end
 
-    puts res.messages.to_s
     msgs = [on_error(200, err)]
     assert_messages msgs, res.messages    
 

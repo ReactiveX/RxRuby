@@ -16,9 +16,7 @@ module RX
       # Creates an observable sequence from a specified subscribe method implementation.
       def create(&subscribe)
         AnonymousObservable.new do |observer|
-          a = subscribe.call observer
-          a = RX::Subscription.empty unless a
-          a
+          subscribe.call(observer) || Subscription.empty
         end
       end
 
@@ -26,13 +24,14 @@ module RX
       def defer
         AnonymousObservable.new do |observer|
           result = nil
+          e = nil
           begin
             result = yield
           rescue => err
-            self.class.raise err
+            e = Observable.raise_error(err).subscribe(observer)
           end
 
-          result.subscribe observer
+          e || result.subscribe(observer)
         end
       end
 
@@ -141,7 +140,7 @@ module RX
       end
 
       # Returns an observable sequence that terminates with an exception.
-      def raise(error, scheduler = ImmediateScheduler.instance)
+      def raise_error(error, scheduler = ImmediateScheduler.instance)
         AnonymousObservable.new do |observer|
           scheduler.schedule lambda {
             observer.on_error error
@@ -183,7 +182,7 @@ module RX
             subscription = resource unless resource.nil?
             source = observable_factory.call resource
           rescue => e
-            return CompositeSubscription.new [self.class.raise(e).subscribe(observer), subscription]
+            return CompositeSubscription.new [self.class.raise_error(e).subscribe(observer), subscription]
           end
 
           CompositeSubscription.new [source.subscribe(observer), subscription]
