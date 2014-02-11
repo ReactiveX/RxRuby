@@ -79,10 +79,10 @@ module RX
     def map_with_index(&block)
       AnonymousObservable.new do |observer|
         new_observer = Observer.configure do |o|
-          count = 0
+          i = 0
 
           o.on_next do |x|
-            result
+            result = nil
             begin
               result = block.call(x, i)
               i += 1
@@ -103,8 +103,8 @@ module RX
     end
 
     # Projects each element of an observable sequence into a new form.
-    def map_with_index(&block)
-      map {|x, i| block.call x }
+    def map(&block)
+      map_with_index {|x, i| block.call x }
     end
 
     # Projects each element of the source observable sequence to the other observable sequence and merges the resulting observable sequences into one observable sequence.
