@@ -155,7 +155,6 @@ class TestObservableCreation < MiniTest::Unit::TestCase
 
   # Defer Method tests
 
-=begin
   def test_defer_complete
     scheduler = RX::TestScheduler.new 
 
@@ -174,16 +173,13 @@ class TestObservableCreation < MiniTest::Unit::TestCase
       end
     end
 
-    msgs = [
-      on_next(300, 200),
-      on_completed(400),
-    ]
+    msgs = [on_next(300, 200), on_completed(400)]
     assert_messages msgs, res.messages    
 
     assert_equal 1, invoked
 
     assert_subscriptions [subscribe(200, 400)], xs.subscriptions 
   end
-=end
+
 
 end

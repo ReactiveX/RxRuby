@@ -19,7 +19,7 @@ module RX
         CurrentThreadScheduler.instance.schedule_with_state auto_detach_observer, method(:schedule_subscribe)
       else
         begin
-          auto_detach_observer.subscription = self.subscribe_core auto_detach_observer
+          auto_detach_observer.subscription = subscribe_core auto_detach_observer
         rescue => e  
           raise e unless auto_detach_observer.fail e
         end
@@ -34,12 +34,32 @@ module RX
         o.on_next yield
       end
 
-      self.subscribe obs
+      subscribe obs
     end
+
+    # Subscribes the given block to the on_error action of the observable sequence.
+    def subscribe_on_error
+      obs = Observer.configure do |o|
+        o.on_error yield
+      end
+
+      subscribe obs
+    end    
+
+    # Subscribes the given block to the on_completed action of the observable sequence.
+    def subscribe_on_completed
+      obs = Observer.configure do |o|
+        o.on_completed yield
+      end
+
+      subscribe obs
+    end        
+
+    private
 
     def schedule_subscribe(scheduler, auto_detach_observer)
       begin
-        auto_detach_observer.subscription = self.subscribe_core auto_detach_observer
+        auto_detach_observer.subscription = subscribe_core auto_detach_observer
       rescue => e
         raise e unless auto_detach_observer.fail e
       end
@@ -57,9 +77,10 @@ module RX
       @subscribe = subscribe
     end
 
+    protected
+
     def subscribe_core(obs)
-      res = @subscribe.call obs
-      return res.nil? ? Subscription.empty : res
+      @subscribe.call(obs) || Subscription.empty
     end
 
   end

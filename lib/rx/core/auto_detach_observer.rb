@@ -13,7 +13,7 @@ module RX
         @observer.on_next(value)
         no_error = true
       ensure
-        self.unsubscribe unless no_error
+        unsubscribe unless no_error
       end
     end
 
@@ -21,7 +21,7 @@ module RX
       begin
         @observer.on_error(error)
       ensure
-        self.unsubscribe
+        unsubscribe
       end
     end
 
@@ -29,7 +29,7 @@ module RX
       begin
         @observer.on_completed
       ensure
-        self.unsubscribe
+        unsubscribe
       end
     end
 
@@ -47,6 +47,11 @@ module RX
 
     def subscription=(new_subscription)
       @m.subscription = new_subscription
+    end
+
+    def unsubscribe
+      super
+      @m.unsubscribe
     end
 
   end
