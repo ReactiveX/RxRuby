@@ -35,13 +35,10 @@ module RX
       end
     end
 
-    # Returns an observable sequence that contains only distinct elements.
-    def distinct
-      distinct_with_key {|x| x}
-    end
+    # Returns an observable sequence that contains only distinct elements according to the optional key_selector.
+    def distinct(&key_selector)
+      key_selector ||= lambda {|x| x}
 
-    # Returns an observable sequence that contains only distinct elements according to the key_selector.
-    def distinct_with_key(&key_selector)
       AnonymousObservable.new do |observer|
 
         h = Hash.new

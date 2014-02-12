@@ -167,7 +167,7 @@ module RX
 
       # Generates an observable sequence that repeats the given element infinitely.
       def repeat_infinitely(value, scheduler = CurrentThreadScheduler.instance)
-        Observable.just(value, scheduler).repeat
+        Observable.just(value, scheduler).repeat_infinitely
       end
 
       # Generates an observable sequence that repeats the given element the specified number of times.

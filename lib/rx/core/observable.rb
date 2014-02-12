@@ -29,27 +29,27 @@ module RX
     end
 
     # Subscribes the given block to the on_next action of the observable sequence.
-    def subscribe_on_next
+    def subscribe_on_next(&block)
       obs = Observer.configure do |o|
-        o.on_next yield
+        o.on_next &block
       end
 
       subscribe obs
     end
 
     # Subscribes the given block to the on_error action of the observable sequence.
-    def subscribe_on_error
+    def subscribe_on_error(&block)
       obs = Observer.configure do |o|
-        o.on_error yield
+        o.on_error &block
       end
 
       subscribe obs
     end    
 
     # Subscribes the given block to the on_completed action of the observable sequence.
-    def subscribe_on_completed
+    def subscribe_on_completed(&block)
       obs = Observer.configure do |o|
-        o.on_completed yield
+        o.on_completed &block
       end
 
       subscribe obs
