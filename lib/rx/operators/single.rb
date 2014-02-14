@@ -15,6 +15,8 @@ module RX
 
     # Projects each element of an observable sequence into zero or more buffers which are produced based on element count information.
     def buffer_with_count(count, skip = count)
+      raise ArgumentError.new 'Count must be greater than zero' if count <= 0
+      raise ArgumentError.new 'Skip must be greater than zero' if skip <= 0
       window(count, skip).flat_map(&method(:to_a)).filter {|x| x.length > 0 }
     end
 
@@ -67,7 +69,7 @@ module RX
     # Invokes the observer's methods for each message in the source sequence.
     # This method can be used for debugging, logging, etc. of query behavior by intercepting the message stream to run arbitrary actions for messages on the pipeline.
     def tap(observer)
-      raise 'Observer cannot be nil' unless observer
+      raise ArgumentError.new 'Observer cannot be nil' unless observer
       AnonymousObservable.new do |obs|
         new_obs = RX::Observer.configure do |o|
 
@@ -202,7 +204,7 @@ module RX
       elsif args.length == 0 && block_given?
         action = block
       else
-        raise 'Invalid arguments'
+        raise ArgumentError.new 'Invalid arguments'
       end
 
       AnonymousObservable.new do |observer|
@@ -240,6 +242,29 @@ module RX
 
         subscribe new_obs
       end
+    end
+
+    # Bypasses a specified number of elements at the end of an observable sequence.
+    def skip_last(count)
+      raise ArgumentError.new 'Count cannot be less than zero' if count < 0
+      AnonymousObservable.new do |observer|
+        q = []
+        new_obs = Observer.configure do |o|
+
+          o.on_next do |x|
+            q.push x
+            observer.on_next(q.shift) if q.length > count
+          end
+
+          o.on_error &observer.method(:on_error)
+          o.on_completed &observer.method(:on_completed)
+        end
+      end
+    end
+
+    # Prepends a sequence of values to an observable sequence.
+    def start_with(scheduler = CurrentThreadScheduler.instance, *args)
+      Observable.from_array(args, scheduler).concat(self)
     end
 
     def enumerator_repeat_times(num, value)
