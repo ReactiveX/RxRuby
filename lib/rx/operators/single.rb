@@ -158,7 +158,88 @@ module RX
 
     # Repeats the observable sequence indefinitely.
     def repeat_infinitely
+      concat_enumerator(enumerator_repeat_infinitely(self))
+    end
 
+    # Repeats the observable sequence a specified number of times.
+    def repeat(repeat_count)
+      concat_enumerator(enumerator_repeat_times(repeat_count, self))
+    end
+
+    # Repeats the source observable sequence until it successfully terminates.
+    def retry_infinitely
+      rescue_error_enumerator(enumerator_repeat_infinitely(self))
+    end
+
+    # Repeats the source observable sequence the specified number of times or until it successfully terminates.
+    def retry(retry_count)
+      rescue_error_enumerator(enumerator_repeat_times(retry_count, self))
+    end
+
+    # Applies an accumulator function over an observable sequence and returns each intermediate result. 
+    # The optional seed value is used as the initial accumulator value.
+    # For aggregation behavior with no intermediate results, see Observable.reduce.
+    def scan(*args, &block)
+      has_seed = false
+      seed = nil
+      action = nil
+
+      # Argument parsing to support:
+      # 1. (seed, Symbol)
+      # 2. (seed, &block)
+      # 3. (Symbol)
+      # 4. (&block)
+      if args.length == 2 && args[1].is_a?(Symbol)
+        seed = args[0]
+        action = args[1].to_proc
+        has_seed = true
+      elsif args.length == 1 && block_given?
+        seed = args[0]
+        has_seed = true
+        action = block
+      elsif args.length == 1 && args[0].is_a?(Symbol)
+        action = args[0].to_proc
+      elsif args.length == 0 && block_given?
+        action = block
+      else
+        raise 'Invalid arguments'
+      end
+
+      AnonymousObservable.new do |observer|
+
+        has_accumulation = false
+        accumulation = nil
+        has_value = false
+
+        new_obs = Observer.configure do |o|
+          o.on_next do |x|
+            begin
+              has_value = true unless has_value
+
+              if has_accumulation
+                accumulation = action.call(accumulation, x)
+              else
+                accumulation = has_seed ? action.call(seed, x) : x
+                has_accumulation = true
+              end
+            rescue => err
+              observer.on_error err
+              return
+            end
+
+            observer.on_next accumulation
+          end
+
+          o.on_error &observer.method(:on_error)
+
+          o.on_completed do 
+            observer.on_next seed if !has_value && has_seed
+            observer.on_completed
+          end
+        end
+
+        subscribe new_obs
+      end
     end
 
     def enumerator_repeat_times(num, value)
