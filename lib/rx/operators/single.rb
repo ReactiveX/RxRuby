@@ -267,6 +267,105 @@ module RX
       Observable.from_array(args, scheduler).concat(self)
     end
 
+    # Returns a specified number of contiguous elements from the end of an observable sequence.
+    def take_last(count, shceduler = CurrentThreadScheduler.instance)
+      raise ArgumentError.new 'Count cannot be less than zero' if count < 0
+      AnonymousObservable.new do |observer|
+        q = []
+        g = CompositeDisposable.new
+
+        new_obs = Observer.configure do |o|
+          o.on_next do |x|
+            q.push x
+            q.shift if q.length > 0
+          end
+
+          o.on_error &observer.method(:on_error)
+
+          o.on_completed do
+            g.push(scheduler.schedule_recursive lambda |this|
+              if q.length > 0
+                observer.on_next(q.shift)
+                this.call
+              else
+                observer.on_completed
+              end
+            ) 
+          end
+
+          g.add(subscribe new_obs)
+          g
+        end
+      end
+    end
+
+    # Returns a list with the specified number of contiguous elements from the end of an observable sequence.
+    def take_last_buffer(count)
+      AnonymousObservable.new do |observer|
+        q = []
+        new_obs = Observer.configure do |o|
+          o.on_next do |x|
+            q.push x
+            q.shift if q.length > 0
+          end
+
+          o.on_error &observer.method(:on_error)
+
+          o.on_completed do 
+            observer.on_next q
+            observer.on_completed
+          end
+        end
+      end
+    end
+
+    # Projects each element of an observable sequence into zero or more windows which are produced based on element count information.
+    def window_with_count(count, skip)
+      raise ArgumentError.new 'Count must be greater than zero' if count <= 0
+      raise ArgumentError.new 'Skip must be greater than zero' if skip <= 0
+
+      AnonymousObservable.new do |observer|
+        q = []
+        n = 0
+
+        m = SingleAssignmentDisposable.new
+        ref_count_disposable = RefCountDisposable.new m
+
+        create_window = lambda {
+          s = Subject.new
+          q.push s
+          observer.on_next(s.add_ref(ref_count_disposable))
+        }
+
+        create_window.call
+
+        new_obs = Observer.configure do |o|
+          o.on_next do |x|
+            q.each {|s| s.on_next x}
+
+            c = n - count + 1
+            q.shift.on_completed if c >=0 && c % skip == 0
+
+            n += 1
+            create_window.call if n % skip == 0
+          end
+
+          o.on_error do |err|
+            q.shift.on_error err while q.length > 0
+            observer.on_error err
+          end
+
+          o.on_completed do 
+            q.shift.on_completed while q.length > 0
+            observer.on_completed
+          end
+        end
+
+        m.subscription = subscribe new_obs
+        ref_count_disposable
+      end
+    end
+
     def enumerator_repeat_times(num, value)
       Enumerator.new do |y|
         num.times do |i|
