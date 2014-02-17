@@ -1,6 +1,9 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 require 'rx/subscriptions/subscription'
+require 'rx/subscriptions/composite_subscription'
+require 'rx/subscriptions/ref_count_subscription'
+require 'rx/subscriptions/single_assignment_subscription'
 require 'rx/core/observer'
 require 'rx/core/observable'
 
@@ -170,12 +173,12 @@ module RX
 
     # Repeats the source observable sequence until it successfully terminates.
     def retry_infinitely
-      rescue_error_enumerator(enumerator_repeat_infinitely(self))
+      Observable.rescue_error(enumerator_repeat_infinitely(self))
     end
 
     # Repeats the source observable sequence the specified number of times or until it successfully terminates.
     def retry(retry_count)
-      rescue_error_enumerator(enumerator_repeat_times(retry_count, self))
+      Observable.rescue_error(enumerator_repeat_times(retry_count, self))
     end
 
     # Applies an accumulator function over an observable sequence and returns each intermediate result. 
@@ -272,7 +275,7 @@ module RX
       raise ArgumentError.new 'Count cannot be less than zero' if count < 0
       AnonymousObservable.new do |observer|
         q = []
-        g = CompositeDisposable.new
+        g = CompositeSubscription.new
 
         new_obs = Observer.configure do |o|
           o.on_next do |x|
@@ -328,8 +331,8 @@ module RX
         q = []
         n = 0
 
-        m = SingleAssignmentDisposable.new
-        ref_count_disposable = RefCountDisposable.new m
+        m = SingleAssignmentSubscription.new
+        ref_count_disposable = RefCountSubscription.new m
 
         create_window = lambda {
           s = Subject.new
