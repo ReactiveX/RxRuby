@@ -14,7 +14,7 @@ module RX
 
   class ObserveOnObserver < ScheduledObserver
 
-    def initialize(scheduler, observer, cancel)
+    def initialize(scheduler, observer, cancel = nil)
       @cancel = cancel
 
       super(scheduler, observer)      

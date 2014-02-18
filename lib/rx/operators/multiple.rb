@@ -112,17 +112,82 @@ module RX
       end
     end  
 
+    # Merges two observable sequences into one observable sequence by using the selector function whenever one of the observable sequences produces an element.
     def combineLatest(other, &result_selector)
-      has_left = false
-      has_right = false
+      AnonymousObservable.new do |observer|
+        has_left = false
+        has_right = false
 
-      left = nil
-      right = nil
+        left = nil
+        right = nil
 
-      left_done = false
-      right_done = false
+        left_done = false
+        right_done = false
 
-      # TODO: Finish Impl
+        left_subscription = SingleAssignmentSubscription.new
+        right_subscription = SingleAssignmentSubscription.new
+
+        gate = Monitor.new
+
+        left_obs = Observer.configure do |o|
+          o.on_next do |l|
+            has_left = true
+            left = l
+
+            if has_right
+              res = nil
+              begin
+                res = result_selector.call left, right
+              rescue => e
+                observer.on_error e
+                return
+              end
+              observer.on_next res
+            end
+
+            observer.on_completed if right_done
+          end
+
+          o.on_error &observer.method(:on_error)  
+
+          o.on_completed do 
+            left_done = true
+            observer.on_completed if right_done
+          end
+        end
+
+        right_obs = Observer.configure do |o|
+          o.on_next do |r|
+            has_right = true
+            right = r
+
+            if has_left
+              res = nil
+              begin
+                res = result_selector.call left, right
+              rescue => e
+                observer.on_error e
+                return
+              end
+              observer.on_next res
+            end
+
+            observer.on_completed if left_done
+          end
+
+          o.on_error &observer.method(:on_error)  
+
+          o.on_completed do 
+            right_done = true
+            observer.on_completed if left_done
+          end
+        end
+
+        left_subscription.subscription = synchronize(gate).subscribe(left_obs)
+        right_subscription.subscription = other.synchronize(gate).subscribe(right_obs)
+
+        CompositeSubscription.new [left_subscription, right_subscription]
+      end
     end
 
     class << self
@@ -187,6 +252,34 @@ module RX
         end
       end
 
+      # Merges the specified observable sequences into one observable sequence by using the selector function whenever any of the observable sequences produces an element.
+      def combine_latest(*args, &result_selector)
+        AnonymousObservable.new do |observer|
+          n = args.length
+          has_value = Array.new(n, false)
+          has_value_all = false
+
+          values = Array.new(n)
+          is_done = Array.new(n, false)
+
+          next_item = lambda do |i|
+            has_value[i] = true
+            if has_value_all || (has_value_all = has_value.all?)
+              res = nil
+              begin
+                res = result_selector.call(values)
+              rescue => e
+                observer.on_error e
+                return
+              end
+
+              observer.on_next(res)
+            #TODO FInish
+            end
+
+          end
+        end
+      end     
     end
   end
 end
