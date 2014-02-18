@@ -112,6 +112,19 @@ module RX
       end
     end  
 
+    def combineLatest(other, &result_selector)
+      has_left = false
+      has_right = false
+
+      left = nil
+      right = nil
+
+      left_done = false
+      right_done = false
+
+      # TODO: Finish Impl
+    end
+
     class << self
 
       # Propagates the observable sequence that reacts first.
