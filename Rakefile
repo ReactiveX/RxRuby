@@ -5,8 +5,8 @@ require 'rake/testtask'
 
 Bundler::GemHelper.install_tasks
 
-task :default => :test
+task default: :test
 
-Rake::TestTask.new do |t|
-  t.test_files = FileList['test/test*.rb']
+Rake::TestTask.new do |task|
+  task.test_files = FileList['test/**/test*.rb']
 end
