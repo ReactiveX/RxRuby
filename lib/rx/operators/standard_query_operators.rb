@@ -241,12 +241,13 @@ module RX
     end
 
     # Filters the elements of an observable sequence based on a predicate.
-    def filter(&block)
+    def select(&block)
       filter_with_index {|x, i| block.call x }
     end
+    alias_method :find_all, :select
 
     # Filters the elements of an observable sequence based on a predicate by incorporating the element's index.
-    def filter_with_index(&block)
+    def select_with_index(&block)
       AnonymousObservable.new do |observer|
         i = 0
 
@@ -272,5 +273,7 @@ module RX
         subscribe(new_observer)        
       end
     end
+
+    alias_method :find_all_with_index, :select_with_index
   end
 end

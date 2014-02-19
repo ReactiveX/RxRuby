@@ -190,6 +190,107 @@ module RX
       end
     end
 
+    # Concatenates the second observable sequence to the first observable sequence upon successful termination of the first.
+    def concat(other)
+      Observable.concat([self, other].to_enum)
+    end
+
+    # Merges elements from all inner observable sequences into a single observable sequence, limiting the number of concurrent subscriptions to inner sequences.
+    def merge_concurrent(max_concurrent = 1)
+      AnonymousObservable.new do |observer|
+        gate = Mutex.new
+        q = []
+        stopped = false
+        group = CompositeSubscription.new
+        active = 0
+
+        subscriber = lambda do |xs|
+          subscription = SingleAssignmentSubscription.new
+          group >> subscription
+
+          new_obs = Observer.configure do |o|
+            o.on_next {|x| gate.synchronize { observer.on_next x } }
+            
+            o.on_error {|err| gate.synchronize { observer.on_error err } }
+            
+            o.on_completed do 
+              group.delete subscription
+              gate.synchronize do
+                if q.length > 0
+                  s = q.shift
+                  subscriber.call s
+                else
+                  active -= 1
+                  observer.on_completed if stopped && active == 0
+                end
+              end
+            end
+          end
+
+          xs.subscribe new_obs
+        end
+
+        inner_obs = Observer.configure do |o|
+          o.on_next do |inner_source|
+            gate.synchronize do
+              if active < max_concurrent
+                active += 1
+                subscriber.call inner_source
+              else
+                q >> inner_source
+              end
+            end
+          end
+
+          o.on_error {|err| gate.synchronize { observer.on_error err } }
+
+          o.on_completed do
+            stopped = true
+            observer.on_completed if active == 0
+          end
+        end
+
+        group >> subscribe(inner_obs)
+      end
+    end
+
+    # Concatenates all inner observable sequences, as long as the previous observable sequence terminated successfully.
+    def merge_all
+      AnonymousObservable.new do |observer|
+        gate = Mutex.new
+        stopped = false
+        m = SingleAssignmentSubscription.new
+        group = CompositeDisposable.new [m]
+
+        new_obs = Observer.configure do |o|
+          o.on_next do |inner_source|
+            inner_subscription = SingleAssignmentSubscription.new
+            group >> inner_subscription
+
+            inner_obs = Observer.configure do |io|
+              io.on_next {|x| gate.synchronize { observer.on_next x } }
+              
+              io.on_error {|err| gate.synchronize { observer.on_error x } }
+              
+              io.on_completed do
+                group.delete inner_subscription
+                gate.synchronize { observer.on_completed } if stopped && group.length == 1
+              end
+            end
+
+            inner_subscription.subscription = inner_source.subscribe inner_obs
+          end
+
+          o.on_error {|err| gate.synchronize { observer.on_error err } }
+
+          o.on_completed do
+            stopped = true
+            gate.synchronize { observer.on_completed } if group.length == 1
+          end
+        end
+      end
+    end    
+
     class << self
 
       # Propagates the observable sequence that reacts first.
@@ -210,6 +311,7 @@ module RX
             gate.wait do
               current = nil
               has_next = false
+              err = nil
 
               if !disposed
                 begin
@@ -217,8 +319,15 @@ module RX
                   has_next = true
                 rescue StopIteration => se
                   
+                rescue => e
+                  err = e
                 end
               else
+                return
+              end
+
+              if err
+                observer.on_error err
                 return
               end
 
@@ -274,12 +383,104 @@ module RX
               end
 
               observer.on_next(res)
-            #TODO FInish
+            elsif enumerable_select_with_index(is_done) {|x, j| j != i} .all?
+              observer.on_completed
+              return
+            end
+          end
+
+          done = lambda do |i|
+            is_done[i] = true
+            observer.on_completed if is_done.all?
+          end
+
+          gate = Mutex.new
+          subscriptions = Array.new(n) do |i|
+            sas = SingleAssignmentSubscription.new
+
+            sas_obs = Observer.configure do |o|
+              o.on_next do |x|
+                values[i] = x
+                next_item.call i
+              end
+
+              o.on_error &observer.method(:on_error)   
+
+              o.on_completed { done.call i }
             end
 
+            sas.subscription = args[i].synchronize(gate).subscribe(sas_obs)
+
+            subscriptions[i] = sas
           end
+
+          CompositeSubscription.new subscriptions
         end
       end     
+    end
+
+    # Concatenates all of the specified observable sequences, as long as the previous observable sequence terminated successfully.
+    def concat(*args)
+      AnonymousObservable.new do |observer|
+        disposed = false
+        e = args.length == 1 && args[0].is_a?(Enumerator) ? args[0] : args.to_enum
+        subscription = SerialSubscription.new
+        gate = AsyncLock.new
+
+        cancelable = CurrentThreadScheduler.instance.schedule_recursive do |this|
+          gate.wait do 
+            current = nil
+            has_next = false
+            err = nil
+
+            if !disposed
+              begin
+                current = e.next
+                has_next = true
+              rescue StopIteration => se
+                
+              rescue => e
+                err = e
+              end
+            else
+              return
+            end
+
+            if err
+              observer.on_error err
+              return
+            end
+
+            unless has_next
+              observer.on_completed
+              return
+            end
+
+            d = SingleAssignmentSubscription.new
+            subscription.subscription = d
+
+            new_obs = Observer.configure do |o|
+              o.on_next &observer.method(:on_next)   
+              o.on_error &observer.method(:on_error)   
+              o.on_completed { this.call }
+            end
+
+            current.subscribe new_obs
+          end
+        end
+
+        CompositeSubscription.new [subscription, cancelable, Subscription.create { gate.wait { disposed = true }}]
+      end
+    end
+
+    private
+
+    def enumerable_select_with_index(arr, &block)
+      [].tap do |new_arr|
+        arr.each_with_index do |item, index|
+          new_arr.push item if block.call item, index
+        end
+      end
     end
   end
 end

@@ -163,12 +163,12 @@ module RX
 
     # Repeats the observable sequence indefinitely.
     def repeat_infinitely
-      concat_enumerator(enumerator_repeat_infinitely(self))
+      Observable.concat(enumerator_repeat_infinitely(self))
     end
 
     # Repeats the observable sequence a specified number of times.
     def repeat(repeat_count)
-      concat_enumerator(enumerator_repeat_times(repeat_count, self))
+      Observable.concat(enumerator_repeat_times(repeat_count, self))
     end
 
     # Repeats the source observable sequence until it successfully terminates.
