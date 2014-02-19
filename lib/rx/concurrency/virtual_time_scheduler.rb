@@ -15,7 +15,7 @@ module RX
 
     def initialize(initial_clock)
       @clock = initial_clock
-      @queue = PriorityQueue.new 1024
+      @queue = PriorityQueue.new
       @enabled = false
     end
 

@@ -8,9 +8,9 @@ module RX
 
     attr_reader :length
 
-    def initialize(capacity = 1024)
+    def initialize
       @length = 0
-      @items = Array.new(capacity)
+      @items = []
     end
 
     def peek
@@ -19,7 +19,7 @@ module RX
     end
 
     def shift
-      result = self.peek
+      result = peek
       delete_at 0
       result
     end
