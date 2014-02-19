@@ -31,7 +31,7 @@ module RX
       local_queue = self.class.queue
 
       unless local_queue
-        local_queue = PriorityQueue.new 4
+        local_queue = PriorityQueue.new
         local_queue.push si
 
         self.class.queue = local_queue

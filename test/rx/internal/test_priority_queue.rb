@@ -24,12 +24,6 @@ class TestPriorityQueue < MiniTest::Unit::TestCase
     assert_equal 500, queue.shift
   end
 
-  def test_dynamic_growth
-    queue = RX::PriorityQueue.new 2
-    10.times { queue.push 400 }
-    assert_equal 10, queue.length
-  end
-
   def test_delete
     queue = RX::PriorityQueue.new
     [1, 4, 5, 2, 3].each {|it| queue.push it }
@@ -41,4 +35,5 @@ class TestPriorityQueue < MiniTest::Unit::TestCase
     assert_equal 4, queue.shift
     assert_equal 5, queue.shift
   end
+
 end

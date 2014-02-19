@@ -9,7 +9,7 @@ module RX
   class HistoricalScheduler < VirtualTimeScheduler
 
     def initialize(clock = Time.new(1, 1, 1))
-      @queue = PriorityQueue.new 1024
+      @queue = PriorityQueue.new
       super(clock)
     end
 
