@@ -11,7 +11,7 @@ require 'rx/core/observe_on_observer'
 module RX
   module Observable
 
-    # Wraps the source sequence in order to run its subscription and unsubscription logic on the specified scheduler.
+    # Wraps the source sequence in order to run its subscription and unsubscribe logic on the specified scheduler.
     def subscribe_on(scheduler)
       raise ArgumentError.new 'Scheduler cannot be nil' unless scheduler
 
@@ -29,7 +29,7 @@ module RX
     end
   
     # Wraps the source sequence in order to run its observer callbacks on the specified scheduler.
-    def observe_on(sceduler)
+    def observe_on(scheduler)
       raise ArgumentError.new 'Scheduler cannot be nil' unless scheduler
 
       AnonymousObservable.new do |observer|

@@ -6,6 +6,7 @@ require 'rx/subscriptions/ref_count_subscription'
 require 'rx/subscriptions/single_assignment_subscription'
 require 'rx/core/observer'
 require 'rx/core/observable'
+require 'rx/operators/creation'
 
 module RX
 
@@ -130,7 +131,7 @@ module RX
     def ignore_elements
       AnonymousObservable.new do |observer|
         new_obs = RX::Observer.configure do |o|
-          o.on_next {|x| }
+          o.on_next {|_| }
           o.on_error &observer.method(:on_error)
           o.on_completed &observer.method(:on_completed)  
         end
@@ -262,6 +263,8 @@ module RX
           o.on_error &observer.method(:on_error)
           o.on_completed &observer.method(:on_completed)
         end
+
+        subscribe new_obs
       end
     end
 
@@ -271,7 +274,7 @@ module RX
     end
 
     # Returns a specified number of contiguous elements from the end of an observable sequence.
-    def take_last(count, shceduler = CurrentThreadScheduler.instance)
+    def take_last(count, scheduler = CurrentThreadScheduler.instance)
       raise ArgumentError.new 'Count cannot be less than zero' if count < 0
       AnonymousObservable.new do |observer|
         q = []
@@ -286,14 +289,14 @@ module RX
           o.on_error &observer.method(:on_error)
 
           o.on_completed do
-            g.push(scheduler.schedule_recursive lambda |this|
+            g.push(scheduler.schedule_recursive lambda {|this|
               if q.length > 0
                 observer.on_next(q.shift)
                 this.call
               else
                 observer.on_completed
               end
-            ) 
+            })
           end
 
           g.add(subscribe new_obs)
@@ -309,7 +312,7 @@ module RX
         new_obs = Observer.configure do |o|
           o.on_next do |x|
             q.push x
-            q.shift if q.length > 0
+            q.shift if q.length > count
           end
 
           o.on_error &observer.method(:on_error)
@@ -319,6 +322,8 @@ module RX
             observer.on_completed
           end
         end
+
+        susbcribe new_obs
       end
     end
 

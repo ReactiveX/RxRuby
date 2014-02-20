@@ -82,7 +82,7 @@ module RX
 
       # Returns a non-terminating observable sequence, which can be used to denote an infinite duration (e.g. when using reactive joins).
       def never
-        AnonymousObservable.new do |observer|
+        AnonymousObservable.new do |_|
 
         end
       end
@@ -128,7 +128,7 @@ module RX
             begin
               value = enum.next
               has_value = true
-            rescue StopIteration => se
+            rescue StopIteration => _
               observer.on_completed
             rescue => e
               observer.on_error e

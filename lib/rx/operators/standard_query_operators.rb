@@ -101,7 +101,7 @@ module RX
 
     # Projects each element of an observable sequence into a new form.
     def map(&block)
-      map_with_index {|x, i| block.call x }
+      map_with_index {|x, _| block.call x }
     end
 
     # Projects each element of the source observable sequence to the other observable sequence and merges the resulting observable sequences into one observable sequence.
@@ -117,15 +117,15 @@ module RX
     # Bypasses a specified number of elements in an observable sequence and then returns the remaining elements.
     def skip(count)
       AnonymousObservable.new do |observer|
-        remaning = count
+        remaining = count
 
         new_observer = Observer.configure do |o|
 
           o.on_next do |x|
-            if remaning <= 0
+            if remaining <= 0
               observer.on_next x
             else 
-              remaning -= 1
+              remaining -= 1
             end
           end
 
@@ -140,7 +140,7 @@ module RX
 
     # Bypasses elements in an observable sequence as long as a specified condition is true and then returns the remaining elements.
     def skip_while(&block)
-      skip_while_with_index {|x, i| block.call x }
+      skip_while_with_index {|x, _| block.call x }
     end
 
     # Bypasses elements in an observable sequence as long as a specified condition is true and then returns the remaining elements.
@@ -202,7 +202,7 @@ module RX
 
     # Returns elements from an observable sequence as long as a specified condition is true.
     def take_while(&block)
-      take_while_with_index {|x, i| block.call x }
+      take_while_with_index {|x, _| block.call x }
     end
 
     # Returns elements from an observable sequence as long as a specified condition is true.
@@ -242,7 +242,7 @@ module RX
 
     # Filters the elements of an observable sequence based on a predicate.
     def select(&block)
-      filter_with_index {|x, i| block.call x }
+      select_with_index {|x, _| block.call x }
     end
     alias_method :find_all, :select
 
