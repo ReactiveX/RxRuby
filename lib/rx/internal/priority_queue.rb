@@ -20,9 +20,11 @@ module RX
     end
 
     def shift
-      result = peek
-      delete_at 0
-      result
+      @mutex.synchronize do
+        result = peek
+        delete_at 0
+        result
+      end
     end
 
     def push(item)
