@@ -62,4 +62,11 @@ class TestPriorityQueue < MiniTest::Unit::TestCase
     assert_equal 0, queue.length
   end
 
+  def test_delete_same_item
+    queue = RX::PriorityQueue.new
+    10.times { queue.push 42 }
+    queue.delete 42
+    assert_equal 9, queue.length
+  end
+
 end
