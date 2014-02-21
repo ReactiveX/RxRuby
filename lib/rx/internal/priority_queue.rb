@@ -15,13 +15,14 @@ module RX
     end
 
     def peek
-      raise 'Empty PriorityQueue' if @length == 0
-      @items[0].value
+      @mutex.synchronize do
+        unsafe_peek
+      end
     end
 
     def shift
       @mutex.synchronize do
-        result = peek
+        result = unsafe_peek
         delete_at 0
         result
       end
@@ -39,16 +40,23 @@ module RX
     end
 
     def delete(item)
-      for i in 0...@length
-        if @items[i].value == item
-          delete_at i
-          return true
+      @mutex.synchronize do
+        for i in 0...@length
+          if @items[i].value == item
+            delete_at i
+            return true
+          end
         end
       end
       return false
     end
 
     private
+
+    def unsafe_peek
+      raise 'Empty PriorityQueue' if @length == 0
+      @items[0].value
+    end
 
     def delete_at(index)
       @length -= 1
