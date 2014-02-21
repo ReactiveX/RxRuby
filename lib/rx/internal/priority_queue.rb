@@ -11,6 +11,7 @@ module RX
     def initialize
       @length = 0
       @items = []
+      @mutex = Mutex.new
     end
 
     def peek
@@ -24,16 +25,15 @@ module RX
       result
     end
 
-    def push(item) 
-      index = @length
-      @length += 1
-
-      Mutex.new.synchronize do
+    def push(item)
+      @mutex.synchronize do
+        index = @length
+        @length += 1
         @items[index] = IndexedItem.new @@length, item
         @@length += 1
-      end
 
-      percolate index
+        percolate index
+      end
     end
 
     def delete(item)
