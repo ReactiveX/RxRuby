@@ -48,4 +48,18 @@ class TestPriorityQueue < MiniTest::Unit::TestCase
     assert_equal 500, queue.length
   end
 
+  def test_shift_thread_safety
+    queue = RX::PriorityQueue.new
+    500.times {|i| queue.push i }
+
+    5.times.map {
+      Thread.new do
+        100.times do |i|
+          queue.shift
+        end
+      end
+    }.each(&:join)
+    assert_equal 0, queue.length
+  end
+
 end
