@@ -165,8 +165,7 @@ module RX
 
     # Gets the next scheduled item to be executed
     def get_next
-      while @queue.length > 0
-        next_item = @queue.peek
+      while next_item = @queue.peek
         if next_item.cancelled?
           @queue.shift
         else

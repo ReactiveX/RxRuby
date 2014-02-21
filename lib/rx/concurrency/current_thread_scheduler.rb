@@ -60,8 +60,7 @@ module RX
       end
 
       def run_trampoline(queue)
-        while queue.length > 0
-          item = queue.shift
+        while item = queue.shift
           unless item.cancelled?
             wait = item.due_time - Scheduler.now.to_i
             sleep wait if wait > 0

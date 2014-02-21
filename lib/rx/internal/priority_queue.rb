@@ -49,8 +49,7 @@ module RX
     private
 
     def unsafe_peek
-      raise 'Empty PriorityQueue' if length == 0
-      @items.first.value
+      @items.first.value unless @items.empty?
     end
 
     def delete_at(index)

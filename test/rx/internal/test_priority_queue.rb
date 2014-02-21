@@ -10,7 +10,7 @@ class TestPriorityQueue < MiniTest::Unit::TestCase
     queue.push 400
 
     assert_equal 400, queue.shift
-    assert_raises(RuntimeError) { queue.shift }
+    assert !queue.shift
   end
 
   def test_shift_with_priority
