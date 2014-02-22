@@ -38,13 +38,9 @@ module RX
 
           begin
             work.call
-          rescue => e
-            @gate.synchronize do
-              @queue = []
-              @has_faulted = true
-            end
-
-            raise e
+          rescue
+            clear
+            raise
           end
         end
       end
