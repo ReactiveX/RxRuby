@@ -14,45 +14,40 @@ module RX
     end
 
     def wait(&action)
-      is_owner = false
       @gate.synchronize do
-        unless @has_faulted
-          @queue.push action
-          is_owner = !@is_acquired
+        @queue.push action unless @has_faulted
+
+        if @is_acquired or @has_faulted
+          return
+        else
           @is_acquired = true
         end
       end
 
-      if is_owner
-        while true
-          work = nil
-          @gate.synchronize do
-            if @queue.length > 0
-              work = @queue.shift
-            else
-              @is_acquired = false
-            end
+      loop do
+        work = nil
+
+        @gate.synchronize do
+          work = @queue.shift
+
+          unless work
+            @is_acquired = false
+            return
           end
+        end
 
-          break unless @is_acquired
-
-          begin
-            work.call
-          rescue => e
-            @gate.synchronize do
-              @queue = []
-              @has_faulted = true
-            end
-
-            raise e
-          end
+        begin
+          work.call
+        rescue
+          clear
+          raise
         end
       end
     end
 
     # Clears the work items in the queue and drops further work being queued.
     def clear
-      @gate.synchronize do 
+      @gate.synchronize do
         @queue = []
         @has_faulted = true
       end
