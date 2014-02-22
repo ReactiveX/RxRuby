@@ -14,34 +14,33 @@ module RX
     end
 
     def wait(&action)
-      is_owner = false
       @gate.synchronize do
-        unless @has_faulted
-          @queue.push action
-          is_owner = !@is_acquired
+        @queue.push action unless @has_faulted
+
+        if @is_acquired or @has_faulted
+          return
+        else
           @is_acquired = true
         end
       end
 
-      if is_owner
-        while true
-          work = nil
-          @gate.synchronize do
-            if @queue.length > 0
-              work = @queue.shift
-            else
-              @is_acquired = false
-            end
-          end
+      loop do
+        work = nil
 
-          break unless work
+        @gate.synchronize do
+          work = @queue.shift
 
-          begin
-            work.call
-          rescue
-            clear
-            raise
+          unless work
+            @is_acquired = false
+            return
           end
+        end
+
+        begin
+          work.call
+        rescue
+          clear
+          raise
         end
       end
     end
