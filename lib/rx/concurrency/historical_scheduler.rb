@@ -43,8 +43,7 @@ module RX
     end
 
     def get_next
-      while queue.length > 0
-        next_item = queue.Peek
+      while next_item = queue.peek
         if next_item.cancelled?
           queue.shift
         else

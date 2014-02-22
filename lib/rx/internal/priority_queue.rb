@@ -2,106 +2,119 @@
 
 module RX
 
+  # Priority Queue implemented as a binary heap.
   class PriorityQueue
-
-    @@length = 0
-
-    attr_reader :length
-
     def initialize
-      @length = 0
       @items = []
+      @mutex = Mutex.new
     end
 
     def peek
-      raise 'Empty PriorityQueue' if @length == 0
-      @items[0].value
+      @mutex.synchronize do
+        unsafe_peek
+      end
     end
 
     def shift
-      result = peek
-      delete_at 0
-      result
+      @mutex.synchronize do
+        result = unsafe_peek
+        delete_at 0
+        result
+      end
     end
 
-    def push(item) 
-      index = @length
-      @length += 1
-
-      Mutex.new.synchronize do
-        @items[index] = IndexedItem.new @@length, item
-        @@length += 1
+    def push(item)
+      @mutex.synchronize do
+        @items.push IndexedItem.new(item)
+        percolate length - 1
       end
-
-      percolate index
     end
 
     def delete(item)
-      for i in 0...@length
-        if @items[i].value == item
-          delete_at i
-          return true
+      @mutex.synchronize do
+        index = @items.index {|it| it.value == item }
+        if index
+          delete_at index
+          true
+        else
+          false
         end
       end
-      return false
+    end
+
+    def length
+      @items.length
     end
 
     private
 
+    def unsafe_peek
+      @items.first.value unless @items.empty?
+    end
+
     def delete_at(index)
-      @length -= 1
-      @items[index] = @items[@length]
-      @items[@length] = nil
-      heapify
+      substitute = @items.pop
+      if substitute and index < @items.length
+        @items[index] = substitute
+        heapify index
+      end
     end
 
-    def higher_priority?(left, right)
-      @items[left].compare_to(@items[right]) < 0
-    end
-
+    # bubble up an item while it's smaller than parents
     def percolate(index)
-      return if index > @length || index < 0
       parent = (index - 1) / 2
-      return if parent < 0 || parent == index
+      return if parent < 0
 
-      if higher_priority? index, parent
-        temp = @items[index]
-        @items[index] = @items[parent]
-        @items[parent] = temp
+      current_value = @items[index]
+      parent_value  = @items[parent]
+
+      if current_value < parent_value
+        @items[index]  = parent_value
+        @items[parent] = current_value
         percolate parent
       end
     end
 
-    def heapify(index = 0)
-      return if index >= @length || index < 0
+    # bubble down an item while it's bigger than children
+    def heapify(index)
+      current_index = index
+      left_index    = 2 * index + 1
+      right_index   = 2 * index + 2
 
-      left = 2 * index + 1
-      right = 2 * index + 2
-      first = index
+      current_value = @items[index]
+      left_value    = @items[left_index]
+      right_value   = @items[right_index]
 
-      first = left if left < @length && higher_priority?(left, first)
-      first = right if right < @length && higher_priority?(right, first)
+      if right_value && right_value < current_value && right_value < left_value
+        current_index = right_index
+      elsif left_value && left_value < current_value
+        current_index = left_index
+      end
 
-      if first != index
-        temp = @items[index]
-        @items[index] = @items[first]
-        @items[first] = temp
-        heapify first
+      if current_index != index
+        @items[index] = @items[current_index]
+        @items[current_index] = current_value
+        heapify current_index
       end
     end
 
     class IndexedItem
+      include Comparable
       attr_reader :id , :value
 
-      def initialize(id, value)
-        @id = id
+      @@length = 0
+
+      def initialize(value)
+        @id = @@length += 1
         @value = value
       end
 
-      def compare_to(other)
-        c = @value<=>other.value
-        c = @id<=>other.id if c == 0
-        return c
+      def <=>(other)
+        if @value == other.value
+          @id <=> other.id
+        else
+          @value <=> other.value
+        end
       end
     end
 

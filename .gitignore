@@ -3,6 +3,7 @@
 #################
 .ruby-version
 pkg/
+Gemfile.lock
 
 #################
 ## Eclipse
