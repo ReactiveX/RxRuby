@@ -34,7 +34,7 @@ module RX
             end
           end
 
-          break unless @is_acquired
+          break unless work
 
           begin
             work.call
@@ -48,7 +48,7 @@ module RX
 
     # Clears the work items in the queue and drops further work being queued.
     def clear
-      @gate.synchronize do 
+      @gate.synchronize do
         @queue = []
         @has_faulted = true
       end
