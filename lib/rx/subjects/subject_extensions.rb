@@ -1,5 +1,8 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+require 'rx/core/observer'
+require 'rx/core/observable'
+
 module RX
 
   # Provides a set of static methods for creating subjects.

@@ -14,12 +14,12 @@ module RX
 
     # Schedules an action to be executed.
     def schedule_with_state(state, action)
-      raise 'action cannot be nil' unless action
+      raise ArgumentError.new 'action cannot be nil' unless action
       action.call AsyncLockScheduler.new, state
     end
 
     def schedule_relative_with_state(state, due_time, action)
-      raise 'action cannot be nil' unless action
+      raise ArgumentError.new 'action cannot be nil' unless action
 
       dt = RX::Scheduler.normalize due_time
       sleep dt if dt > 0

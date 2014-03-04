@@ -96,7 +96,8 @@ module RX
         action.call(state1, lambda {|state2|  
           is_added = false
           is_done = false
-          d = scheduler.schedule_with_state(state2, lambda {|scheduler1, state3| 
+          d = nil
+          d = scheduler.schedule_with_state(state2, lambda do |_, state3|
             gate.synchronize do
               if is_added
                 group.delete(d)
@@ -107,7 +108,7 @@ module RX
 
             recursive_action.call(state3)
             Subscription.empty
-          })
+          end)
 
           gate.synchronize do
             unless is_done
@@ -133,7 +134,8 @@ module RX
           is_added = false
           is_done = false
 
-          d = scheduler.send(method, state2, due_time1, lambda { |scheduler1, state3|
+          d = nil
+          d = scheduler.send(method, state2, due_time1, lambda do |_, state3|
             gate.synchronize do
               if is_added
                 group.delete(d)
@@ -143,7 +145,7 @@ module RX
             end
             recursive_action.call(state3)
             Subscription.empty
-          })
+          end)
 
           gate.synchronize do
             unless is_done

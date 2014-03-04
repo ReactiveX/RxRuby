@@ -17,14 +17,14 @@ module RX
     def schedule_with_state(state, action)
       raise 'action cannot be nil' unless action
 
-      self.schedule_relative_with_state(state, 0, action)
+      schedule_relative_with_state(state, 0, action)
     end
 
     # Schedules an action to be executed at dueTime.
     def schedule_absolute_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
-      self.schedule_relative_with_state(state, (due_time - self.now), action)
+      schedule_relative_with_state(state, (due_time - self.now), action)
     end
 
   end

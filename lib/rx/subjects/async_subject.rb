@@ -42,7 +42,7 @@ module RX
 
         unless @stopped
           os = @observers.clone
-          observers = []
+          @observers = []
           @stopped = true
           v = @value
           hv = @has_value
@@ -116,7 +116,7 @@ module RX
       if err
         observer.on_next err
       elsif hv
-        observer.on_next @value
+        observer.on_next v
         observer.on_completed
       else
         observer.on_completed
@@ -128,8 +128,8 @@ module RX
     # Unsubscribe all observers and release resources.
     def unsubscribe
       gate.synchronize do
-        unsubscribed = true
-        observers = nil
+        @unsubscribed = true
+        @observers = nil
         @error = nil
         @value = nil
       end
@@ -156,7 +156,7 @@ module RX
     private 
 
     def check_unsubscribed
-      raise 'Subject unsubscribed' if unsubscribed
+      raise ArgumentError.new 'Subject unsubscribed' if unsubscribed
     end
   end
 end  

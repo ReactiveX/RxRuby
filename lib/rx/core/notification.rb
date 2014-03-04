@@ -10,7 +10,7 @@ module RX
     class << self
     # Creates an observer from a notification callback.
       def from_notifier
-        raise 'Block required' unless block_given?
+        raise ArgumentError.new 'Block required' unless block_given?
 
         configure do |o|
           o.on_next      {|x| yield Notification.create_on_next(x) }
@@ -64,9 +64,9 @@ module RX
     end
 
     # Returns an observable sequence with a single notification.
-    def to_observable(scheduler=ImmediateScheduler)
+    def to_observable(scheduler = ImmediateScheduler.instance)
       AnonymousObservable.new do |observer|
-        scheduler.schedule lambda { 
+        scheduler.schedule lambda {
           accept observer
           observer.on_completed if on_next?
         }

@@ -58,7 +58,7 @@ class TestNotification < MiniTest::Unit::TestCase
     assert(c1.eql? c2)       
   end
 
-  def test_on_next_intialize
+  def test_on_next_initialize
     n = RX::Notification.create_on_next(42)
 
     assert n.on_next?
@@ -97,15 +97,15 @@ class TestNotification < MiniTest::Unit::TestCase
     end
 
     def on_next(value)
-      @config.on_next(value)
+      @config.on_next_action.call value
     end
 
     def on_error(error)
-      @config.on_error(error)
+      @config.on_error_action.call error
     end
 
     def on_completed
-      @config.on_completed
+      @config.on_completed_action.call
     end
   end
 

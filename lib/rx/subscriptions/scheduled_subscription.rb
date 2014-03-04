@@ -4,7 +4,7 @@ module RX
   # Represents a disposable resource whose disposal invocation will be scheduled on the specified scheduler
   class ScheduledDisposable
 
-    attr_reader :scheduler, :disposable
+    attr_reader :scheduler, :subscription
 
     def initialize(scheduler, subscription)
       raise 'disposable cannot be nil' unless subscription
@@ -21,12 +21,12 @@ module RX
 
     # Unsubscribes the wrapped subscription on the provided scheduler.
     def unsubscribe
-      @scheduler.schedule lambda {
+      @scheduler.schedule lambda do
         unless @subscription.nil?
-          @subscription.dispose
+          @subscription.unsubscribe
           @subscription = nil
         end
-      }
+      end
     end
   end
 end

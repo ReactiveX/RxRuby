@@ -1,5 +1,9 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+require 'thread'
+require 'rx/core/observer'
+require 'rx/core/observable'
+
 module RX
 
   # Represents a value that changes over time.
@@ -78,7 +82,7 @@ module RX
         os = @observers.clone unless @stopped
       end
 
-      os.each {|o| observer.on_next value } if os      
+      os.each {|o| o.on_next value } if os
     end
 
     # Subscribes an observer to the subject.
@@ -109,8 +113,8 @@ module RX
     # Unsubscribe all observers and release resources.
     def unsubscribe
       gate.synchronize do
-        unsubscribed = true
-        observers = nil
+        @unsubscribed = true
+        @observers = nil
         @error = nil
         @value = nil
       end

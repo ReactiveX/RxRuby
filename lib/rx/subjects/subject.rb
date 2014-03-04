@@ -40,7 +40,7 @@ module RX
         end 
       end
 
-      os.each {|o| observer.on_completed } if os
+      os.each {|o| o.on_completed } if os
     end
 
     # Notifies all subscribed observers with the error.
@@ -59,7 +59,7 @@ module RX
         end         
       end
 
-      os.each {|o| observer.on_error error } if os
+      os.each {|o| o.on_error error } if os
     end
 
     # Notifies all subscribed observers with the value.
@@ -83,8 +83,8 @@ module RX
         if !@stopped
           @observers.push(observer)
           return InnerSubscription.new(self, observer)
-        elsif @exception
-          observer.on_error @exception
+        elsif @error
+          observer.on_error @error
           return Subscription.empty
         else
           observer.on_completed
@@ -125,7 +125,7 @@ module RX
     end
 
     def check_disposed
-      raise 'Subject disposed' if @disposed
+      raise ArgumentError.new 'Subject disposed' if @disposed
     end
   end
 end  

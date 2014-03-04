@@ -5,13 +5,13 @@ module RX
   # Records information about subscriptions to and unsubscriptions from observable sequences.
   class TestSubscription < Struct.new(:subscribe, :unsubscribe)
 
-    FIXNUM_MAX = (2**(0.size * 8 -2) -1)
+    FIXNUM_MAX = Float::MAX.to_i
 
     def initialize(subscribe, unsubscribe = FIXNUM_MAX)
       super
     end
 
-    def inifinite?
+    def infinite?
       unsubscribe == FIXNUM_MAX
     end
     

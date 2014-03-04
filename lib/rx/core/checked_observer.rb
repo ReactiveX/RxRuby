@@ -16,13 +16,9 @@ module RX
   class CheckedObserver
     include Observer
 
-    IDLE = 0
-    BUSY = 1
-    DONE = 2
-
     def initialize(observer)
       @observer = observer
-      @state = IDLE
+      @state = :idle
     end
 
     def on_next(value)
@@ -30,7 +26,7 @@ module RX
       begin
         @observer.on_next value
       ensure
-        Mutex.new.synchronize { @state = IDLE }
+        Mutex.new.synchronize { @state = :idle }
       end
     end
 
@@ -39,7 +35,7 @@ module RX
       begin
         @observer.on_error error
       ensure
-        Mutex.new.synchronize { @state = DONE }
+        Mutex.new.synchronize { @state = :done }
       end
     end
 
@@ -48,7 +44,7 @@ module RX
       begin
         @observer.on_completed
       ensure
-        Mutex.new.synchronize { @state = DONE }
+        Mutex.new.synchronize { @state = :done }
       end
     end
 
@@ -57,11 +53,11 @@ module RX
     def check_access
       Mutex.new.synchronize do 
         old = @state
-        @state = BUSY if @state == IDLE
+        @state = :busy if @state == :idle
         case old
-        when BUSY
+        when :busy
           raise 'Re-entrancy detected'
-        when DONE
+        when :done
           raise 'Observer terminated'
         end
       end

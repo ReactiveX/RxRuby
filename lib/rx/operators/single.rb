@@ -249,6 +249,7 @@ module RX
     end
 
     # Bypasses a specified number of elements at the end of an observable sequence.
+    # @param [Numeric] count The number of elements to bypass at the end of an observable sequence.
     def skip_last(count)
       raise ArgumentError.new 'Count cannot be less than zero' if count < 0
       AnonymousObservable.new do |observer|

@@ -11,6 +11,8 @@ module RX
   module Observable
 
     # Subscribes the given observer to the observable sequence.
+    # @param [Observer] observer
+    # @return [Subscription]
     def subscribe(observer = Observer.configure)
 
       auto_detach_observer = AutoDetachObserver.new observer
@@ -20,7 +22,7 @@ module RX
       else
         begin
           auto_detach_observer.subscription = subscribe_core auto_detach_observer
-        rescue => e  
+        rescue => e
           raise e unless auto_detach_observer.fail e
         end
       end
@@ -29,35 +31,28 @@ module RX
     end
 
     # Subscribes the given block to the on_next action of the observable sequence.
+    # @param [Object] block
+    # @return [Subscription]
     def subscribe_on_next(&block)
-      obs = Observer.configure do |o|
-        o.on_next &block
-      end
-
-      subscribe obs
+      raise ArgumentError.new 'Block is required' unless block_given?
+      subscribe(Observer.configure {|o| o.on_next &block })
     end
 
     # Subscribes the given block to the on_error action of the observable sequence.
     def subscribe_on_error(&block)
-      obs = Observer.configure do |o|
-        o.on_error &block
-      end
-
-      subscribe obs
-    end    
+      raise ArgumentError.new 'Block is required' unless block_given?
+      subscribe(Observer.configure {|o| o.on_error &block })
+    end
 
     # Subscribes the given block to the on_completed action of the observable sequence.
     def subscribe_on_completed(&block)
-      obs = Observer.configure do |o|
-        o.on_completed &block
-      end
-
-      subscribe obs
-    end        
+      raise ArgumentError.new 'Block is required' unless block_given?
+      subscribe(Observer.configure {|o| o.on_completed &block })
+    end
 
     private
 
-    def schedule_subscribe(scheduler, auto_detach_observer)
+    def schedule_subscribe(_, auto_detach_observer)
       begin
         auto_detach_observer.subscription = subscribe_core auto_detach_observer
       rescue => e

@@ -210,6 +210,7 @@ module RX
         group = CompositeSubscription.new
         active = 0
 
+        subscriber = nil
         subscriber = lambda do |xs|
           subscription = SingleAssignmentSubscription.new
           group >> subscription
@@ -318,7 +319,7 @@ module RX
         gate = Monitor.new
 
         source_obs = Observer.configure do |o|
-          o.on_next {|x| observer.on_next if open }
+          o.on_next {|x| observer.on_next x if open }
           o.on_error &observer.method(:on_error)
           o.on_completed { observer.on_completed if open }
         end
@@ -358,7 +359,6 @@ module RX
             gate.synchronize do
               latest_num += 1
               id = latest_num
-              has_next = true
             end
 
             d = SingleAssignmentSubscription.new
@@ -403,7 +403,7 @@ module RX
         gate = Monitor.new
 
         other_obs = Observer.configure do |o|
-          o.on_next {|x| observer.on_completed }
+          o.on_next {|_| observer.on_completed }
           o.on_error &observer.method(:on_error)   
         end
 
@@ -442,7 +442,9 @@ module RX
               has_next = false
               err = nil
 
-              if !disposed
+              if disposed
+                return
+              else
                 begin
                   current = e.next
                   has_next = true
@@ -451,8 +453,6 @@ module RX
                 rescue => e
                   err = e
                 end
-              else
-                return
               end
 
               if err
@@ -563,7 +563,9 @@ module RX
               has_next = false
               err = nil
 
-              if !disposed
+              if disposed
+                return
+              else
                 begin
                   current = e.next
                   has_next = true
@@ -572,8 +574,6 @@ module RX
                 rescue => e
                   err = e
                 end
-              else
-                return
               end
 
               if err
@@ -718,8 +718,6 @@ module RX
       end
 
     end
-
-
 
     private
 
