@@ -89,6 +89,7 @@ module RX
     def subscribe(observer)
       raise 'observer cannot be nil' unless observer
 
+      err = nil
       gate.synchronize do
         self.check_unsubscribed
 
