@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestCompositeSubscription < MiniTest::Unit::TestCase
+class TestCompositeSubscription < Minitest::Test
 
   def test_include
     d1 = RX::Subscription.create  { }

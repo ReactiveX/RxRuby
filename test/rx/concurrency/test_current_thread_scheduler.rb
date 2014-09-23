@@ -19,7 +19,7 @@ module RX
   end
 end
 
-class TestCurrentThreadScheduler < MiniTest::Unit::TestCase
+class TestCurrentThreadScheduler < Minitest::Test
 
   def test_now
     s = RX::CurrentThreadScheduler.instance

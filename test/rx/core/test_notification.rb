@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestNotification < MiniTest::Unit::TestCase
+class TestNotification < Minitest::Test
   include RX::ReactiveTest
 
   def test_to_observable_empty

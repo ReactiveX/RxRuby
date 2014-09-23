@@ -4,6 +4,6 @@ require 'thread'
 require 'minitest/autorun'
 require 'rx'
 
-class TestScheduledItem < MiniTest::Unit::TestCase
+class TestScheduledItem < Minitest::Test
 
 end

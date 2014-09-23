@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestAsyncLock < MiniTest::Unit::TestCase
+class TestAsyncLock < Minitest::Test
 
   def test_simple_wait
     lock = RX::AsyncLock.new

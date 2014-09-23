@@ -26,7 +26,7 @@ class VirtualSchedulerTestScheduler < RX::VirtualTimeScheduler
   end  
 end
 
-class TestVirtualTimeScheduler < MiniTest::Unit::TestCase
+class TestVirtualTimeScheduler < Minitest::Test
 
   def test_now
     s = VirtualSchedulerTestScheduler.new

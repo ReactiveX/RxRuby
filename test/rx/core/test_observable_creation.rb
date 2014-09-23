@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestObservableCreation < MiniTest::Unit::TestCase
+class TestObservableCreation < Minitest::Test
   include RX::ReactiveTest
 
   # Create Methods
