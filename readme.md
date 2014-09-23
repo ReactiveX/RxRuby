@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Reactive-Extensions/Rx.rb.png)](https://travis-ci.org/Reactive-Extensions/Rx.rb)
+[![Build Status](https://travis-ci.org/ReactiveX/Rx.rb.svg?branch=master)](https://travis-ci.org/ReactiveX/Rx.rb)
 
 **[The Need to go Reactive](#the-need-to-go-reactive)** |
 **[About the Reactive Extensions](#about-the-reactive-extensions)** |
