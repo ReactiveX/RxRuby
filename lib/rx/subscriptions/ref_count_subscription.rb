@@ -57,7 +57,7 @@ module RX
       subscription = nil
       @gate.synchronize do
         if @subscription
-          count =- 1
+          @count =- 1
 
           if @primary_unsubscribed && @count == 0
             subscription = @subscription
