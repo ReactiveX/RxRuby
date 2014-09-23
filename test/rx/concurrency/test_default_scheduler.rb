@@ -4,7 +4,7 @@ require 'thread'
 require 'minitest/autorun'
 require 'rx'
 
-class TestDefaultScheduler < MiniTest::Unit::TestCase
+class TestDefaultScheduler < Minitest::Test
 
   def test_now
     s = RX::DefaultScheduler.instance

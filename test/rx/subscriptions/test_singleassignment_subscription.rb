@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestSingleAssignmentSubscription < MiniTest::Unit::TestCase
+class TestSingleAssignmentSubscription < Minitest::Test
 
   def test_subscription_null
     d = RX::SingleAssignmentSubscription.new

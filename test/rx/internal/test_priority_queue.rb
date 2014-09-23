@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestPriorityQueue < MiniTest::Unit::TestCase
+class TestPriorityQueue < Minitest::Test
 
   def test_simple_push_and_shift
     queue = RX::PriorityQueue.new

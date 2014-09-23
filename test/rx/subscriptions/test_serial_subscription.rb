@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestSerialSubscription < MiniTest::Unit::TestCase
+class TestSerialSubscription < Minitest::Test
 
     def test_ctor
         d = RX::SerialSubscription.new

@@ -35,7 +35,7 @@ class MyScheduler
   end
 end
 
-class TestBaseScheduler < MiniTest::Unit::TestCase
+class TestBaseScheduler < Minitest::Test
 
   def test_schedule_non_recursive
     ms = MyScheduler.new

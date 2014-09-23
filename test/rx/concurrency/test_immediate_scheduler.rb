@@ -4,7 +4,7 @@ require 'thread'
 require 'minitest/autorun'
 require 'rx'
 
-class TestImmediateScheduler < MiniTest::Unit::TestCase
+class TestImmediateScheduler < Minitest::Test
   def test_now
     s = RX::ImmediateScheduler.instance
     assert (s.now - Time.new < 1)

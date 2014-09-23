@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'rx'
 
-class TestSubscription < MiniTest::Unit::TestCase
+class TestSubscription < Minitest::Test
 
   def test_disposable_create
     d = RX::Subscription.create { }

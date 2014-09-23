@@ -30,7 +30,7 @@ class MyObserver
 
 end
 
-class TestObserver < MiniTest::Unit::TestCase
+class TestObserver < Minitest::Test
 
   def test_from_notifier_notification_on_next
     i = 0
