@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/ReactiveX/Rx.rb.svg?branch=master)](https://travis-ci.org/ReactiveX/Rx.rb)
+[![Code Climate](https://codeclimate.com/github/ReactiveX/Rx.rb/badges/gpa.svg)](https://codeclimate.com/github/ReactiveX/Rx.rb)
 
 **[The Need to go Reactive](#the-need-to-go-reactive)** |
 **[About the Reactive Extensions](#about-the-reactive-extensions)** |
