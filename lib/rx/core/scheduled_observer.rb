@@ -65,7 +65,7 @@ module RX
         work.call
       rescue => e
         @queue = []
-        @fauled = true
+        @faulted = true
 
         raise e
       end
