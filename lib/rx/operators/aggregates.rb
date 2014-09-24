@@ -51,7 +51,7 @@ module RX
       if (args.length == 2 && args[1].is_a?(Symbol)) || (args.length == 1 && block_given?)
         scan(*args, &block).start_with(args[0]).final
       elsif (args.length == 1 && args[0].is_a?(Symbol)) || (args.length == 0 && block_given?)
-        return scan(*args, &block).final
+        scan(*args, &block).final
       else
         raise ArgumentError.new 'Invalid arguments'
       end
@@ -344,7 +344,7 @@ module RX
     # @param [RX::Observable] other Other observable sequence to compare.
     # @return [RX::Observable] An observable sequence that contains a single element which indicates whether both
     # sequences are of equal length and their corresponding elements are equal.
-    def sequence_equal?(other)
+    def sequence_eql?(other)
       AnonymousObservable.new do |observer|
         gate = Mutex.new
         left_done = false
@@ -524,19 +524,19 @@ module RX
     class HashConfiguration
       DEFAULT_SELECTOR = lambda {|x| x}
 
-      attr_reader :key_selector_action, :value_selector_action
+      attr_reader :key_selector_block, :value_selector_block
 
       def initialize
-        @key_selector_action = DEFAULT_SELECTOR
-        @value_selector_action = DEFAULT_SELECTOR
+        @key_selector_block = DEFAULT_SELECTOR
+        @value_selector_block = DEFAULT_SELECTOR
       end
 
-      def key_selector(&key_selector_action)
-        @on_next_action = key_selector_action
+      def key_selector(&key_selector_block)
+        @key_selector_block = key_selector_block
       end
 
-      def value_selector(&value_selector_action)
-        @on_error_action = value_selector_action
+      def value_selector(&value_selector_block)
+        @on_error_block = value_selector_block
       end
     end
 
@@ -546,7 +546,7 @@ module RX
       h = HashConfiguration.new
       yield h if block_given?
       reduce(Hash.new) do |acc, x|
-        acc[h.key_selector_action.call x] = h.value_selector_action.call x
+        acc[h.key_selector_block.call x] = h.value_selector_block.call x
         acc
       end
     end

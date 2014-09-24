@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/ReactiveX/Rx.rb.svg?branch=master)](https://travis-ci.org/ReactiveX/Rx.rb)
+[![GitHub version](http://img.shields.io/github/tag/reactive-extensions/Rx.rb.svg)](https://github.com/Reactive-Extensions/Rx.rb)
+[![Downloads](http://img.shields.io/gem/dt/rx.svg)](https://npmjs.org/package/rx)
 [![Code Climate](https://codeclimate.com/github/ReactiveX/Rx.rb/badges/gpa.svg)](https://codeclimate.com/github/ReactiveX/Rx.rb)
 
 **[The Need to go Reactive](#the-need-to-go-reactive)** |
@@ -9,10 +11,6 @@
 
 # The Reactive Extensions for Ruby (Rx.rb) <sup>0.1</sup>... #
 *...is a set of libraries to compose asynchronous and event-based programs using observable collections and Enumerable module style composition in Ruby*
-
-The project is actively developed by Microsoft Open Technologies, Inc., in collaboration with a community of open source developers.
-
-This project is a mirror of the [CodePlex](http://rxrb.codeplex.com/) repository.
 
 ## The Need to go Reactive ##
 
@@ -134,8 +132,6 @@ If you want to find out more, please check out the JavaScript version, [RxJS](ht
 Our overall goal is to make this one of the best Rx libraries out there, better than RxJS, RxPy, ReactiveCocoa, RxJava, etc, all while maintaining the "Ruby Way".
 
 ## Contributing ##
-
-There are lots of ways to [contribute](https://github.com/Reactive-Extensions/Rx.rb/wiki/Contributing) to the project, and we appreciate our [contributors](https://github.com/Reactive-Extensions/Rx.rb/wiki/Contributors).
 
 You can contribute by reviewing and sending feedback on code checkins, suggesting and trying out new features as they are implemented, submit bugs and help us verify fixes as they are checked in, as well as submit code fixes or code contributions of your own. Note that all code submissions will be rigorously reviewed and tested by the Rx Team, and only those that meet an extremely high bar for both quality and design/roadmap appropriateness will be merged into the source.
 
