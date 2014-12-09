@@ -2,9 +2,9 @@ module Enumerable
   def subscribe(observer, scheduler = RX::ImmediateScheduler.instance)
     begin
       self.each do |e|
-        scheduler.schedule do
+        scheduler.schedule lambda {
           observer.on_next(e)
-        end
+        }
       end
     rescue => ex
       observer.on_error(ex)
