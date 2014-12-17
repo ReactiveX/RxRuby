@@ -717,14 +717,13 @@ module RX
         end
       end
 
-    end
+      private
 
-    private
-
-    def enumerable_select_with_index(arr, &block)
-      [].tap do |new_arr|
-        arr.each_with_index do |item, index|
-          new_arr.push item if block.call item, index
+      def enumerable_select_with_index(arr, &block)
+        [].tap do |new_arr|
+          arr.each_with_index do |item, index|
+            new_arr.push item if block.call item, index
+          end
         end
       end
     end
