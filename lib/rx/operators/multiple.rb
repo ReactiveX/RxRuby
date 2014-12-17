@@ -493,7 +493,7 @@ module RX
       # Merges the specified observable sequences into one observable sequence by using the selector function whenever any of the observable sequences produces an element.
       def combine_latest(*args, &result_selector)
         AnonymousObservable.new do |observer|
-          result_selector ||= lambda {|*inner_args| observer.on_next inner_args }
+          result_selector ||= lambda {|*inner_args| inner_args }
 
           n = args.length
           has_value = Array.new(n, false)
