@@ -40,7 +40,9 @@ module RX
 
       t = Thread.new do
         sleep dt
-        d.subscription = action.call self, state unless d.unsubscribed?
+        Thread.new {
+          d.subscription = action.call self, state unless d.unsubscribed?
+        }
       end
 
       CompositeSubscription.new [d, Subscription.create { t.exit }]         
