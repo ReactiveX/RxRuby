@@ -670,6 +670,7 @@ module RX
       # Merges the specified observable sequences into one observable sequence by using the selector function whenever all of the observable sequences have produced an element at a corresponding index.
       def zip(*args, &result_selector)
         AnonymousObservable.new do |observer|
+          result_selector ||= lambda {|*inner_args| inner_args }
           n = args.length
 
           queues = Array.new(n) {|i| Array.new }
@@ -678,7 +679,7 @@ module RX
           next_action = lambda do |i|
             if queues.all? {|q| q.length > 0 }
               res = queues.map {|q| q.shift }
-              observer.on_next(res)
+              observer.on_next(result_selector.call *res)
             elsif enumerable_select_with_index(is_done) {|x, j| j != i } .all?
               observer.on_completed
             end
