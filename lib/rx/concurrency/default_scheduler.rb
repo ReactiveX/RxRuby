@@ -89,8 +89,10 @@ module RX
         Thread.new do
           should_run = true
 
+          elapsed = 0
           while should_run
-            sleep( @seconds - time_block { yield } ) 
+            sleep @seconds - elapsed
+            elapsed = time_block { yield }
             @gate.synchronize do
               should_run = !@unsubscribed
             end                    
