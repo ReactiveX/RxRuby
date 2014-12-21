@@ -270,7 +270,11 @@ module RX
     end
 
     # Prepends a sequence of values to an observable sequence.
-    def start_with(scheduler = CurrentThreadScheduler.instance, *args)
+    def start_with(*args)
+      scheduler = CurrentThreadScheduler.instance
+      if args.size > 0 && Scheduler === args[0]
+        scheduler = args.shift
+      end
       Observable.from_array(args, scheduler).concat(self)
     end
 
