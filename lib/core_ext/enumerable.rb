@@ -1,10 +1,10 @@
 module Enumerable
-  def subscribe(observer, scheduler = RX::Scheduler.immediate)
+  def subscribe(observer, scheduler = RX::ImmediateScheduler.instance)
     begin
       self.each do |e|
-        scheduler.schedule do
+        scheduler.schedule lambda {
           observer.on_next(e)
-        end
+        }
       end
     rescue => ex
       observer.on_error(ex)
@@ -14,7 +14,7 @@ module Enumerable
     observer.on_completed
   end
   
-  def to_observable(scheduler = RX::Scheduler.immediate)
+  def to_observable(scheduler = RX::ImmediateScheduler.instance)
     RX::AnonymousObservable.new do |observer|
       self.subscribe(observer, scheduler)
     end
