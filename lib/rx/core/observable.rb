@@ -10,10 +10,27 @@ module RX
 
   module Observable
 
+    def subscribe(*args)
+      case args.size
+      when 0
+        _subscribe Observer.configure
+      when 1
+        _subscribe args[0]
+      when 3
+        _subscribe Observer.configure {|o|
+          o.on_next &args[0]
+          o.on_error &args[1]
+          o.on_completed &args[2]
+        }
+      else
+        raise ArgumentError, "wrong number of arguments (#{args.size} for 0..1 or 3)"
+      end
+    end
+
     # Subscribes the given observer to the observable sequence.
     # @param [Observer] observer
     # @return [Subscription]
-    def subscribe(observer = Observer.configure)
+    def _subscribe(observer)
 
       auto_detach_observer = AutoDetachObserver.new observer
 

@@ -192,6 +192,19 @@ module RX
         end
       end
   
+      def from_array(array, scheduler = CurrentThreadScheduler.instance)
+        AnonymousObservable.new do |observer|
+          scheduler.schedule_recursive_with_state 0, lambda {|i, this|
+            if i < array.size
+              observer.on_next array[i]
+              this.call(i + 1)
+            else
+              observer.on_completed
+            end
+          }
+        end
+      end
+
     end
 
   end

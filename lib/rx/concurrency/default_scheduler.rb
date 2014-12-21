@@ -40,7 +40,9 @@ module RX
 
       t = Thread.new do
         sleep dt
-        d.subscription = action.call self, state unless d.unsubscribed?
+        Thread.new {
+          d.subscription = action.call self, state unless d.unsubscribed?
+        }
       end
 
       CompositeSubscription.new [d, Subscription.create { t.exit }]         
@@ -89,8 +91,10 @@ module RX
         Thread.new do
           should_run = true
 
+          elapsed = 0
           while should_run
-            sleep( @seconds - time_block { yield } ) 
+            sleep @seconds - elapsed
+            elapsed = time_block { yield }
             @gate.synchronize do
               should_run = !@unsubscribed
             end                    
