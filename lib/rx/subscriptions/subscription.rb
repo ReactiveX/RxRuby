@@ -5,6 +5,9 @@ require 'singleton'
 
 module RX
   module Subscription
+    def dispose
+      unsubscribe
+    end
   end
   Disposable = Subscription
 
