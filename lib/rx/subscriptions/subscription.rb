@@ -4,8 +4,16 @@ require 'thread'
 require 'singleton'
 
 module RX
+  module Subscription
+    def dispose
+      unsubscribe
+    end
+  end
+  Disposable = Subscription
+
   class EmptySubscription
 
+    include Subscription
     include Singleton
 
     def unsubscribe
@@ -14,6 +22,7 @@ module RX
   end
 
   class AnonymousSubscription
+    include Subscription
 
     def initialize(&unsubscribe_action)
       @unsubscribe_action = unsubscribe_action
@@ -32,7 +41,7 @@ module RX
   end
 
   # Provides a set of class methods for creating Disposables.
-  class Subscription
+  module Subscription
 
     # Creates a subscription object that invokes the specified action when unsubscribed.
     def self.create(&unsubscribe_action)
