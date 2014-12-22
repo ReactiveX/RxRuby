@@ -16,7 +16,15 @@ module RX
       # Creates an observable sequence from a specified subscribe method implementation.
       def create(&subscribe)
         AnonymousObservable.new do |observer|
-          subscribe.call(observer) || Subscription.empty
+          subscription = subscribe.call(observer)
+          case subscription
+          when Subscription
+            subscription
+          when Proc
+            Subscription.create(&subscription)
+          else
+            Subscription.empty
+          end
         end
       end
 
