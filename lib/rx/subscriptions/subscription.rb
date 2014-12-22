@@ -6,6 +6,7 @@ require 'singleton'
 module RX
   module Subscription
   end
+  Disposable = Subscription
 
   class EmptySubscription
 
