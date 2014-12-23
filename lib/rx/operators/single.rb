@@ -21,17 +21,17 @@ module RX
     def buffer_with_count(count, skip = count)
       raise ArgumentError.new 'Count must be greater than zero' if count <= 0
       raise ArgumentError.new 'Skip must be greater than zero' if skip <= 0
-      window(count, skip).flat_map(&method(:to_a)).filter {|x| x.length > 0 }
+      window_with_count(count, skip).flat_map(&method(:to_a)).filter {|x| x.length > 0 }
     end
 
     # Dematerializes the explicit notification values of an observable sequence as implicit notifications.
     def dematerialize
       AnonymousObservable.new do |observer|
-        
+
         new_obs = RX::Observer.configure do |o|
           o.on_next {|x| x.accept observer }
           o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)              
+          o.on_completed &observer.method(:on_completed)
         end
 
         subscribe new_obs
@@ -63,7 +63,7 @@ module RX
           end
 
           o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)              
+          o.on_completed &observer.method(:on_completed)
         end
 
         subscribe new_obs
@@ -95,7 +95,7 @@ module RX
             end
 
             obs.on_error err
-          end          
+          end
 
           o.on_completed do
             begin
@@ -117,7 +117,7 @@ module RX
     def ensures
       AnonymousObservable.new do |observer|
         subscription = subscribe observer
-        Subscription.create do 
+        Subscription.create do
           begin
             subscription.unsubscribe
           ensure
@@ -133,7 +133,7 @@ module RX
         new_obs = RX::Observer.configure do |o|
           o.on_next {|_| }
           o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)  
+          o.on_completed &observer.method(:on_completed)
         end
 
         subscribe new_obs
@@ -182,7 +182,7 @@ module RX
       Observable.rescue_error(enumerator_repeat_times(retry_count, self))
     end
 
-    # Applies an accumulator function over an observable sequence and returns each intermediate result. 
+    # Applies an accumulator function over an observable sequence and returns each intermediate result.
     # The optional seed value is used as the initial accumulator value.
     # For aggregation behavior with no intermediate results, see Observable.reduce.
     def scan(*args, &block)
@@ -238,7 +238,7 @@ module RX
 
           o.on_error &observer.method(:on_error)
 
-          o.on_completed do 
+          o.on_completed do
             observer.on_next seed if !has_value && has_seed
             observer.on_completed
           end
@@ -322,7 +322,7 @@ module RX
 
           o.on_error &observer.method(:on_error)
 
-          o.on_completed do 
+          o.on_completed do
             observer.on_next q
             observer.on_completed
           end
@@ -368,7 +368,7 @@ module RX
             observer.on_error err
           end
 
-          o.on_completed do 
+          o.on_completed do
             q.shift.on_completed while q.length > 0
             observer.on_completed
           end
