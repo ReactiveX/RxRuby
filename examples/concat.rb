@@ -1,6 +1,6 @@
 require 'rx'
 
-#  Using Observable sequences 
+#  Using Observable sequences
 source1 = RX::Observable.return(42)
 source2 = RX::Observable.return(56)
 
