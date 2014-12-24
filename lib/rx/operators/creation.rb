@@ -104,6 +104,7 @@ module RX
           }
         end
       end
+      alias :return :just
 
       # Converts an array to an observable sequence, using an optional scheduler to enumerate the array.
       def of_array(array, scheduler = CurrentThreadScheduler.instance)

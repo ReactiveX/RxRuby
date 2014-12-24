@@ -436,7 +436,7 @@ module RX
           subscription = SerialSubscription.new
           last_error = nil
 
-          cancelable = CurrentThreadScheduler.instance.schedule_recursive do |this|
+          cancelable = CurrentThreadScheduler.instance.schedule_recursive lambda {|this|
             gate.wait do
               current = nil
               has_next = false
@@ -484,7 +484,7 @@ module RX
               subscription.subscription = d
               d.subscription = current.subscribe new_obs
             end
-          end
+          }
 
           CompositeSubscription.new [subscription, cancelable, Subscription.create { gate.wait { disposed = true } }]
         end
@@ -621,7 +621,7 @@ module RX
           e = args.length == 1 && args[0].is_a?(Enumerator) ? args[0] : args.to_enum
           subscription = SerialSubscription.new
 
-          cancelable = CurrentThreadScheduler.schedule_recursive do |this|
+          cancelable = CurrentThreadScheduler.schedule_recursive lambda {|this|
             gate.wait do
               current = nil
               has_next = false
@@ -661,7 +661,7 @@ module RX
 
               d.subscription = current.subscribe new_obs
             end
-          end
+          }
 
           CompositeSubscription.new [subscription, cancelable, Subscription.create { gate.wait { disposed = true } }]
         end
