@@ -53,7 +53,7 @@ module RX
       end
 
       # Generates an observable sequence by running a state-driven loop producing the sequence's elements.
-      def generate(initial_state, condition, result_selector, iterate, scheduler = CurrentThreadScheduler.instance)
+      def generate(initial_state, condition, iterate, result_selector, scheduler = CurrentThreadScheduler.instance)
         AnonymousObservable.new do |observer|
           state = initial_state
           first = true
