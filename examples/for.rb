@@ -1,10 +1,13 @@
 require 'rx'
 
-#  Using Observable sequences
-source1 = RX::Observable.return(42)
-source2 = RX::Observable.return(56)
+#  Using Observables
+array = [1, 2, 3]
 
-source = RX::Observable.concat(source1, source2)
+source = RX::Observable.for(
+    array,
+    lambda {|x|
+        RX::Observable.return(x)
+    })
 
 subscription = source.subscribe(
     lambda {|x|
@@ -17,6 +20,7 @@ subscription = source.subscribe(
         puts 'Completed'
     })
 
-# => Next: 42
-# => Next: 56
+# => Next: 1
+# => Next: 2
+# => Next: 3
 # => Completed

@@ -1,10 +1,6 @@
 require 'rx'
 
-#  Using Observable sequences
-source1 = RX::Observable.return(42)
-source2 = RX::Observable.return(56)
-
-source = RX::Observable.concat(source1, source2)
+source = RX::Observable.empty()
 
 subscription = source.subscribe(
     lambda {|x|
@@ -17,6 +13,4 @@ subscription = source.subscribe(
         puts 'Completed'
     })
 
-# => Next: 42
-# => Next: 56
 # => Completed
