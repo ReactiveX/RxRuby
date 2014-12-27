@@ -612,6 +612,7 @@ module RX
       def merge_all(scheduler = CurrentThreadScheduler.instance, *args)
         Observable.from_array(args, scheduler).merge_all
       end
+      alias :merge :merge_all
 
       # Concatenates all of the specified observable sequences, even if the previous observable sequence terminated exceptionally.
       def on_error_resume_next(*args)
