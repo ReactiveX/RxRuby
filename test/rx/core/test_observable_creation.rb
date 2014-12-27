@@ -300,9 +300,9 @@ class TestObservableCreation < Minitest::Test
     res = scheduler.configure do
       RX::Observable.generate(
         0,
-        Proc.new { |x| return x <= 3 },
-        Proc.new { |x| return x + 1 },
-        Proc.new { |x| return x },
+        lambda { |x| return x <= 3 },
+        lambda { |x| return x + 1 },
+        lambda { |x| return x },
         scheduler)
     end
 
@@ -323,9 +323,9 @@ class TestObservableCreation < Minitest::Test
     res = scheduler.configure do
       RX::Observable.generate(
         0,
-        Proc.new { |x| raise err },
-        Proc.new { |x| return x + 1 },
-        Proc.new { |x| return x },
+        lambda { |x| raise err },
+        lambda { |x| return x + 1 },
+        lambda { |x| return x },
         scheduler)
     end
 
@@ -342,9 +342,9 @@ class TestObservableCreation < Minitest::Test
     res = scheduler.configure do
       RX::Observable.generate(
         0,
-        Proc.new { |x| return true },
-        Proc.new { |x| return x + 1 },
-        Proc.new { |x| raise err },
+        lambda { |x| return true },
+        lambda { |x| return x + 1 },
+        lambda { |x| raise err },
         scheduler)
     end
 
@@ -361,14 +361,15 @@ class TestObservableCreation < Minitest::Test
     res = scheduler.configure do
       RX::Observable.generate(
         0,
-        Proc.new { |x| return true },
-        Proc.new { |x| raise err },
-        Proc.new { |x| return x },
+        lambda { |x| return true },
+        lambda { |x| raise err },
+        lambda { |x| return x },
         scheduler)
     end
 
     msgs = [
-      on_error(201, err)  
+      on_next(201, 0),
+      on_error(202, err)
     ]
     assert_messages msgs, res.messages    
   end
@@ -376,12 +377,12 @@ class TestObservableCreation < Minitest::Test
   def test_generate_dispose
     scheduler = RX::TestScheduler.new
 
-    res = scheduler.configure(:dispose => 203) do
+    res = scheduler.configure(:disposed => 203) do
       RX::Observable.generate(
         0,
-        Proc.new { |x| return x <= 3 },
-        Proc.new { |x| return x + 1 },
-        Proc.new { |x| return x },
+        lambda { |x| return x <= 3 },
+        lambda { |x| return x + 1 },
+        lambda { |x| return x },
         scheduler)
     end
 
