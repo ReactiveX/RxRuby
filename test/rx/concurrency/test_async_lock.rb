@@ -17,20 +17,30 @@ class TestAsyncLock < Minitest::Test
     called1 = false
     called2 = false
 
+    # 1
     thread1 = Thread.new do
       lock.wait do
+        # 3
         sleep 0.01
         called1 = true
+        # 5
       end
+      Thread.pass  # switch force
+      # 8
       assert called1
       assert called2
     end
 
+    # 2
     thread2 = Thread.new do
+      Thread.pass  # switch force
       lock.wait do
+        # 6
         sleep 0.05
         called2 = true
+        # 7
       end
+      # 4
       assert !called1
       assert !called2
     end
