@@ -27,6 +27,7 @@ class TestAsyncLock < Minitest::Test
     end
 
     thread2 = Thread.new do
+      Thread.pass  # switch force
       lock.wait do
         sleep 0.05
         called2 = true
