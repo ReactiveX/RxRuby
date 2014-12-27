@@ -377,7 +377,7 @@ class TestObservableCreation < Minitest::Test
   def test_generate_dispose
     scheduler = RX::TestScheduler.new
 
-    res = scheduler.configure(:dispose => 203) do
+    res = scheduler.configure(:disposed => 203) do
       RX::Observable.generate(
         0,
         lambda { |x| return x <= 3 },
