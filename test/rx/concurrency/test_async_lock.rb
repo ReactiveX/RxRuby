@@ -25,6 +25,7 @@ class TestAsyncLock < Minitest::Test
         called1 = true
         # 5
       end
+      Thread.pass  # switch force
       # 8
       assert called1
       assert called2
