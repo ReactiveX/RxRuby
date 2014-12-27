@@ -50,11 +50,11 @@ module RX
     end
 
     def assert_messages(expected, actual)
-      assert_equal expected.length, actual.length
+      assert_equal expected.length, actual.length, "The size of messages differ"
 
       for i in 0..expected.length - 1
-        assert_equal expected[i].time, actual[i].time
-        assert (expected[i].value == actual[i].value)
+        assert_equal expected[i].time, actual[i].time, "The messages[#{i}].time differ"
+        assert_equal expected[i].value, actual[i].value, "The messages[#{i}].value differ"
       end
     end
 
