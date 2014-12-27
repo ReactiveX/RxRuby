@@ -368,7 +368,8 @@ class TestObservableCreation < Minitest::Test
     end
 
     msgs = [
-      on_error(201, err)  
+      on_next(201, 0),
+      on_error(202, err)
     ]
     assert_messages msgs, res.messages    
   end
