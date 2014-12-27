@@ -3,9 +3,11 @@ require 'rx'
 source1 = RX::Observable.interval(0.1)
     .time_interval()
     .pluck('interval')
+    .take(3)
 source2 = RX::Observable.interval(0.15)
     .time_interval()
     .pluck('interval')
+    .take(2)
 
 source = RX::Observable.merge(
     source1,
@@ -28,3 +30,7 @@ subscription = source.subscribe(
 # => Next: 150
 # => Next: 100
 # => Completed
+
+while Thread.list.size > 1
+  (Thread.list - [Thread.current]).each &:join
+end
