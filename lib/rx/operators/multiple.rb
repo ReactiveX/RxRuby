@@ -609,7 +609,11 @@ module RX
       end
 
       # Merges elements from all of the specified observable sequences into a single observable sequence, using the specified scheduler for enumeration of and subscription to the sources.
-      def merge_all(scheduler = CurrentThreadScheduler.instance, *args)
+      def merge_all(*args)
+        scheduler = CurrentThreadScheduler.instance
+        if args.size > 0 && Scheduler === args[0]
+          scheduler = args.shift
+        end
         Observable.from_array(args, scheduler).merge_all
       end
       alias :merge :merge_all
