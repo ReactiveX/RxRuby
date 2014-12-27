@@ -42,6 +42,11 @@ module RX
 
     # Starts the test scheduler and uses the specified virtual times to invoke the factory function, subscribe to the resulting sequence, and unsubscribe the subscription.
     def configure(options = {})
+      options.each {|key,_|
+        unless [:created, :subscribed, :disposed].include? key
+          raise ArgumentError, "Should be spcified whether :created, :subscribed or :disposed, but the #{key.inspect}"
+        end
+      }
       o = {
         :created    => ReactiveTest::CREATED,
         :subscribed => ReactiveTest::SUBSCRIBED,
