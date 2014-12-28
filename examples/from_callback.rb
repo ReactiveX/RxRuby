@@ -8,7 +8,7 @@ source = exists.call('file.txt')
 
 subscription = source.subscribe(
     lambda {|x|
-        puts 'Next: ' + result
+        puts 'Next: ' + x.to_s
     },
     lambda {|err|
         puts 'Error: ' + err.to_s
