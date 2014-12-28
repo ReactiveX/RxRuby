@@ -277,7 +277,7 @@ module RX
             inner_obs = Observer.configure do |io|
               io.on_next {|x| gate.synchronize { observer.on_next x } }
               
-              io.on_error {|_| gate.synchronize { observer.on_error x } }
+              io.on_error {|err| gate.synchronize { observer.on_error err } }
               
               io.on_completed do
                 group.delete inner_subscription
