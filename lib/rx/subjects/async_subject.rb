@@ -38,7 +38,7 @@ module RX
       hv = false
 
       gate.synchronize do
-        self.check_unsubscribed
+        check_unsubscribed
 
         unless @stopped
           os = @observers.clone
@@ -67,7 +67,7 @@ module RX
 
       os = nil
       gate.synchronize do
-        self.check_unsubscribed
+        check_unsubscribed
 
         unless @stopped
           os = observers.clone
@@ -77,13 +77,13 @@ module RX
         end
       end
 
-      os.each {|o| observer.on_error error } if os
+      os.each {|o| o.on_error error } if os
     end
 
     # Notifies all subscribed observers with the value.
     def on_next(value)
       gate.synchronize do
-        self.check_unsubscribed
+        check_unsubscribed
         unless @stopped
           @value = value
           @has_value = true
@@ -100,7 +100,7 @@ module RX
       hv = false
 
       gate.synchronize do
-        self.check_unsubscribed
+        check_unsubscribed
 
         if !@stopped
           observers.push(observer)
