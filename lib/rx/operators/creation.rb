@@ -124,7 +124,7 @@ module RX
 
       # Converts an Enumerable to an observable sequence, using an optional scheduler to enumerate the array.
       def of_enumerable(enumerable, scheduler = CurrentThreadScheduler.instance)
-        Observer.of_enumerator(enumerable.to_enum, scheduler)
+        Observable.of_enumerator(enumerable.to_enum, scheduler)
       end
 
       # Converts an Enumerator to an observable sequence, using an optional scheduler to enumerate the array.

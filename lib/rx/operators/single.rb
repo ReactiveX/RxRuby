@@ -14,7 +14,7 @@ module RX
 
     # Hides the identity of an observable sequence.
     def as_observable
-      AnonymousObservable.new &subscribe
+      AnonymousObservable.new {|observer| subscribe(observer) }
     end
 
     # Projects each element of an observable sequence into zero or more buffers which are produced based on element count information.
