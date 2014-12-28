@@ -1,12 +1,16 @@
 module RX
   class <<Observable
-    def to_async(func, context, scheduler = DefaultScheduler.instance)
+    def to_async(func, context = nil, scheduler = DefaultScheduler.instance)
       lambda() {|*args|
         subject = AsyncSubject.new
 
         scheduler.schedule lambda {
           begin
-            result = proc_bind(func, context).call(*args)
+            if context
+              result = proc_bind(func, context).call(*args)
+            else
+              result = func.call(*args)
+            end
           rescue => e
             subject.on_error e
             return
