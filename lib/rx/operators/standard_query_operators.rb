@@ -58,7 +58,7 @@ module RX
               end
             rescue => e
               observer.on_error e
-              return
+              next
             end
 
             observer.on_next x if has_added
@@ -85,7 +85,7 @@ module RX
               i += 1
             rescue => e
               observer.on_error e
-              return
+              next
             end
 
             observer.on_next result
@@ -159,7 +159,7 @@ module RX
                 i += 1
               rescue => e
                 observer.on_error e
-                return
+                next
               end
 
               observer.on_next x if running
@@ -221,7 +221,7 @@ module RX
                 i += 1
               rescue => e
                 observer.on_error e
-                return
+                next
               end
 
               if running
@@ -260,7 +260,7 @@ module RX
               i += 1
             rescue => e
               observer.on_error e
-              return
+              next
             end
 
             observer.on_next x if should_run
