@@ -626,7 +626,7 @@ module RX
           e = args.length == 1 && args[0].is_a?(Enumerator) ? args[0] : args.to_enum
           subscription = SerialSubscription.new
 
-          cancelable = CurrentThreadScheduler.schedule_recursive lambda {|this|
+          cancelable = CurrentThreadScheduler.instance.schedule_recursive lambda {|this|
             gate.wait do
               current = nil
               has_next = false
