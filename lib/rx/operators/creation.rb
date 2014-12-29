@@ -194,7 +194,7 @@ module RX
             subscription = resource unless resource.nil?
             source = observable_factory.call resource
           rescue => e
-            return CompositeSubscription.new [self.class.raise_error(e).subscribe(observer), subscription]
+            next CompositeSubscription.new [self.raise_error(e).subscribe(observer), subscription]
           end
 
           CompositeSubscription.new [source.subscribe(observer), subscription]
