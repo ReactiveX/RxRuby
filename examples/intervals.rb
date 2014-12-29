@@ -2,7 +2,7 @@ require 'rx'
 
 source = RX::Observable
     .interval(0.5) # ms
-    .time_interval()
+    .time_interval
     .take(3)
 
 subscription = source.subscribe(
