@@ -1,6 +1,6 @@
 require 'rx'
 
-source = RX::Observable.empty()
+source = RX::Observable.empty
 
 subscription = source.subscribe(
     lambda {|x|

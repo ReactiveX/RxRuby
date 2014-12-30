@@ -7,7 +7,7 @@ class DisposableResource
     @disposed = disposed
   end
 
-  def getValue
+  def value
     if @disposed
       throw Exception.new('Object is disposed')
     end
@@ -15,7 +15,7 @@ class DisposableResource
   end
 
   def unsubscribe
-    if !@disposed
+    unless @disposed
       @disposed = true
       @value = nil
     end
@@ -27,7 +27,7 @@ source = RX::Observable.using(
   lambda { return DisposableResource.new(42) },
   lambda {|resource|
     subject = RX::AsyncSubject.new
-    subject.on_next(resource.getValue)
+    subject.on_next(resource.value)
     subject.on_completed
     return subject
   }
@@ -47,6 +47,6 @@ subscription = source.subscribe(
 # => Next: 42
 # => Completed
 
-subscription.dispose()
+subscription.dispose
 
 # => Disposed

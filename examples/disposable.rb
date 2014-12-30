@@ -4,9 +4,9 @@ disposable = RX::Disposable.create {
     puts 'disposed'
 }
 
-disposable.dispose()
+disposable.dispose
 # => disposed
 
 disposable = RX::Disposable.empty
 
-disposable.dispose() # Does nothing
+disposable.dispose # Does nothing

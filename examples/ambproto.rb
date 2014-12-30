@@ -16,7 +16,7 @@ subscription = source.subscribe(
         puts 'Completed'
     })
 
-# => Next: bar
+# => Next: first
 # => Completed
 
 while Thread.list.size > 1

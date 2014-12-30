@@ -3,7 +3,7 @@ require 'rx'
 #  Using a function
 source = RX::Observable.create {|observer|
     observer.on_next(42)
-    observer.on_completed()
+    observer.on_completed
 
     # Note that this is optional, you do not have to return this if you require no cleanup
     lambda {
@@ -25,14 +25,14 @@ subscription = source.subscribe(
 # => Next: 42
 # => Completed
 
-subscription.dispose()
+subscription.dispose
 
 # => disposed
 
 #  Using a disposable
 source = RX::Observable.create {|observer|
     observer.on_next(42)
-    observer.on_completed()
+    observer.on_completed
 
     # Note that this is optional, you do not have to return this if you require no cleanup
     RX::Disposable.create {

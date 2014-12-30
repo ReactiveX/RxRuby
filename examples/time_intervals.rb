@@ -1,8 +1,8 @@
 require 'rx'
 
 source = RX::Observable.timer(0, 1)
-    .time_interval()
-    .map() {|x| x.value.to_s + ":" + x.interval.to_s }
+    .time_interval
+    .map {|x| x.value.to_s + ":" + x.interval.to_s }
     .take(5)
 
 subscription = source.subscribe(
