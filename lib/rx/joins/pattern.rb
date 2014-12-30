@@ -7,7 +7,7 @@ module RX
     def and(other)
       Pattern.new(@patterns.concat(other))
     end
-    def then_do(selector)
+    def then_do(selector = Proc.new)
       Plan.new(self, selector)
     end
   end

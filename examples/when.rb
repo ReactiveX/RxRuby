@@ -3,7 +3,7 @@ require 'rx'
 # Fire each plan when both are ready
 source = RX::Observable.when(
   RX::Observable.timer(0.1).and(RX::Observable.timer(0.5)).then_do(lambda {|x, y| return 'first' }),
-  RX::Observable.timer(0.4).and(RX::Observable.timer(0.3)).then_do(lambda {|x, y| return 'second' })
+  RX::Observable.timer(0.4).and(RX::Observable.timer(0.3)).then_do {|x, y| 'second' }
 )
 
 subscription = source.subscribe(
