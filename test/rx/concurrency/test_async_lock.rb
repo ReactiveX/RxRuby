@@ -3,6 +3,8 @@
 require 'minitest/autorun'
 require 'rx'
 
+require 'thread'
+
 class TestAsyncLock < Minitest::Test
 
   def test_simple_wait
@@ -17,34 +19,40 @@ class TestAsyncLock < Minitest::Test
     called1 = false
     called2 = false
 
-    # 1
+    q1 = Queue.new
+    q2 = Queue.new
+
     thread1 = Thread.new do
+      assert q1.pop == 1
+      # 1
       lock.wait do
-        # 3
-        sleep 0.01
+        q2.push 2
+        assert q1.pop == 4
+        # 4
         called1 = true
         # 5
       end
-      Thread.pass  # switch force
       # 8
       assert called1
       assert called2
     end
 
-    # 2
     thread2 = Thread.new do
-      Thread.pass  # switch force
+      assert q2.pop == 2
+      # 2
       lock.wait do
         # 6
-        sleep 0.05
+        assert Thread.current == thread1
         called2 = true
         # 7
       end
-      # 4
+      # 3
       assert !called1
       assert !called2
+      q1.push 4
     end
 
+    q1.push 1
     [thread1, thread2].each(&:join)
   end
 
