@@ -13,7 +13,11 @@ module RX
     def subscribe(*args)
       case args.size
       when 0
-        _subscribe Observer.configure
+        if block_given?
+          _subscribe Observer.configure {|o| o.on_next &Proc.new }
+        else
+          _subscribe Observer.configure
+        end
       when 1
         _subscribe args[0]
       when 3
