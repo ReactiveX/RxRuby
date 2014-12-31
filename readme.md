@@ -42,7 +42,7 @@ Using Rx.rb, you can accomplish the same kind of thing with a push based collect
 someSource
   .select {|x| x.even? }
   .map {|x| x * x }
-  .subscribe_on_next {|x| puts x.to_s }
+  .subscribe {|x| puts x.to_s }
 ```
 
 ## Why Rx.rb? ##
@@ -114,7 +114,7 @@ require 'rx'
 a = RX::Observable.from_array [ 4, 5, 6 ]
 b = RX::Observable.from_array [ 7, 8, 9 ]
 
-sub = a.zip(b).subscribe_on_next {|arr| puts arr.to_s }
+sub = a.zip(b).subscribe {|arr| puts arr.to_s }
 # => "[4, 7]"
 # => "[5, 8]"
 # => "[6, 9]"
