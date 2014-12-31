@@ -31,7 +31,7 @@ module RX
     def on_completed
       os = nil
       @gate.synchronize do 
-        self.check_disposed
+        check_disposed
 
         unless @stopped
           os = @observers.clone
@@ -49,7 +49,7 @@ module RX
 
       os = nil
       @gate.synchronize do
-        self.check_disposed
+        check_disposed
 
         unless @stopped
           os = @observers.clone
@@ -66,11 +66,11 @@ module RX
     def on_next(value) 
       os = nil
       @gate.synchronize do 
-        self.check_disposed
+        check_disposed
         os = @observers.clone unless @stopped
       end
 
-      os.each {|o| observer.on_next value } if os      
+      os.each {|o| o.on_next value } if os      
     end
 
     # Subscribes an observer to the subject.
@@ -78,7 +78,7 @@ module RX
       raise 'observer cannot be nil' unless observer
 
       @gate.synchronize do
-        self.check_disposed
+        check_disposed
 
         if !@stopped
           @observers.push(observer)
@@ -109,14 +109,14 @@ module RX
 
       def unsubscribe
         if @observer
-          @subject.unsubscribe_observer(@observer)
+          @subject.send(:unsubscribe_observer, @observer)
           @subject = nil
           @observer = nil
         end
       end
     end
 
-    private 
+    private
 
     def unsubscribe_observer(observer)
       @gate.synchronize do
@@ -127,5 +127,5 @@ module RX
     def check_disposed
       raise ArgumentError.new 'Subject disposed' if @disposed
     end
-  end
-end  
+  end  
+end
