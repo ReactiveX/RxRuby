@@ -518,7 +518,16 @@ module RX
     # Creates an array from an observable sequence.
     # @return [RX::Observable] An array created from an observable sequence.
     def to_a
-      reduce([]) {|acc, x| acc.push x }
+      AnonymousObservable.new do |observer|
+        arr = []
+        self.subscribe(
+          arr.method(:push),
+          observer.method(:on_error),
+          lambda {
+            observer.on_next arr
+            observer.on_completed
+          })
+      end
     end
 
     class HashConfiguration
