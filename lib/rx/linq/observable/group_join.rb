@@ -9,8 +9,6 @@ module RX
         left_id = 0
         right_id = 0
 
-        handle_error = lambda {|e| lambda {|v| v.on_error(e) } }
-
         left_obs = Observer.configure do |o|
           o.on_next {|value|
             s = Subject.new
@@ -21,7 +19,7 @@ module RX
             begin
               result = result_selector.call(value, add_ref(s, r))
             rescue => e
-              left_map.values.each {|e| handle_error.call(e) }
+              left_map.values.each {|v| v.on_error(e) }
               observer.on_error(e)
               next
             end
@@ -42,7 +40,7 @@ module RX
             begin
               duration = left_duration_selector.call(value)
             rescue => e
-              left_map.values.each {|e| handle_error.call(e) }
+              left_map.values.each {|v| v.on_error(e) }
               observer.on_error(e)
               next
             end
@@ -50,14 +48,14 @@ module RX
             md.subscription = duration.take(1).subscribe(
               lambda {|_| },
               lambda {|e|
-                left_map.values.each {|e| handle_error.call(e) }
+                left_map.values.each {|v| v.on_error(e) }
                 observer.on_error(e)
               },
               expire)
           }
 
           o.on_error {|e|
-            left_map.values.each {|e| handle_error(e) }
+            left_map.values.each {|v| v.on_error(e) }
             observer.on_error(e)
           }
 
@@ -82,7 +80,7 @@ module RX
             begin
               duration = right_duration_selector.call(value)
             rescue => e
-              right_map.values.each {|e| handle_error.call(e) }
+              right_map.values.each {|v| v.on_error(e) }
               observer.on_error(e)
               next
             end
@@ -90,14 +88,14 @@ module RX
             md.subscription = duration.take(1).subscribe(
               lambda {|_| },
               lambda {|e|
-                left_map.values.each {|e| handle_error.call(e) }
+                left_map.values.each {|v| v.on_error(e) }
                 observer.on_error(e)
               },
               expire)
           }
 
           o.on_error {|e|
-            left_map.values.each {|e| handle_error(e) }
+            left_map.values.each {|v| v.on_error(e) }
             observer.on_error(e)
           }
         end
