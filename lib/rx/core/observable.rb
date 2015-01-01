@@ -14,7 +14,7 @@ module RX
       case args.size
       when 0
         if block_given?
-          _subscribe Observer.configure {|o| o.on_next &Proc.new }
+          _subscribe Observer.configure {|o| o.on_next(&Proc.new) }
         else
           _subscribe Observer.configure
         end
@@ -22,9 +22,9 @@ module RX
         _subscribe args[0]
       when 3
         _subscribe Observer.configure {|o|
-          o.on_next &args[0]
-          o.on_error &args[1]
-          o.on_completed &args[2]
+          o.on_next(&args[0])
+          o.on_error(&args[1])
+          o.on_completed(&args[2])
         }
       else
         raise ArgumentError, "wrong number of arguments (#{args.size} for 0..1 or 3)"
@@ -56,19 +56,19 @@ module RX
     # @return [Subscription]
     def subscribe_on_next(&block)
       raise ArgumentError.new 'Block is required' unless block_given?
-      subscribe(Observer.configure {|o| o.on_next &block })
+      subscribe(Observer.configure {|o| o.on_next(&block) })
     end
 
     # Subscribes the given block to the on_error action of the observable sequence.
     def subscribe_on_error(&block)
       raise ArgumentError.new 'Block is required' unless block_given?
-      subscribe(Observer.configure {|o| o.on_error &block })
+      subscribe(Observer.configure {|o| o.on_error(&block) })
     end
 
     # Subscribes the given block to the on_completed action of the observable sequence.
     def subscribe_on_completed(&block)
       raise ArgumentError.new 'Block is required' unless block_given?
-      subscribe(Observer.configure {|o| o.on_completed &block })
+      subscribe(Observer.configure {|o| o.on_completed(&block) })
     end
 
     private

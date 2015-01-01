@@ -18,9 +18,9 @@ module RX
 
             begin
               result = result_selector.call(value, add_ref(s, r))
-            rescue => e
-              left_map.values.each {|v| v.on_error(e) }
-              observer.on_error(e)
+            rescue => err
+              left_map.values.each {|v| v.on_error(err) }
+              observer.on_error(err)
               next
             end
             observer.on_next(result)
@@ -39,9 +39,9 @@ module RX
 
             begin
               duration = left_duration_selector.call(value)
-            rescue => e
-              left_map.values.each {|v| v.on_error(e) }
-              observer.on_error(e)
+            rescue => err
+              left_map.values.each {|v| v.on_error(err) }
+              observer.on_error(err)
               next
             end
 
@@ -59,7 +59,7 @@ module RX
             observer.on_error(e)
           }
 
-          o.on_completed &observer.method(:on_completed)
+          o.on_completed(&observer.method(:on_completed))
         end
         group.push self.subscribe(left_obs)
 
@@ -79,9 +79,9 @@ module RX
 
             begin
               duration = right_duration_selector.call(value)
-            rescue => e
-              right_map.values.each {|v| v.on_error(e) }
-              observer.on_error(e)
+            rescue => err
+              right_map.values.each {|v| v.on_error(err) }
+              observer.on_error(err)
               next
             end
 

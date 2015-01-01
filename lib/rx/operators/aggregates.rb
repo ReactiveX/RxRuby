@@ -24,7 +24,7 @@ module RX
             has_value = true
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             if has_value
@@ -90,7 +90,7 @@ module RX
             observer.on_completed
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next false
@@ -128,7 +128,7 @@ module RX
     # observable sequence satisfy a condition if the block is given, else the number of items in the observable
     # sequence
     def count(&block)
-      return select &block .count if block_given?
+      return select(&block).count if block_given?
       reduce(0) {|c, _| c + 1 }
     end
 
@@ -150,7 +150,7 @@ module RX
             i -= 1
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
           o.on_completed { raise 'Sequence contains no elements' }
         end
 
@@ -175,7 +175,7 @@ module RX
             i -= 1
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next default_value
@@ -193,7 +193,7 @@ module RX
     # @return [RX::Observable] Sequence containing the first element in the observable sequence that satisfies the
     # condition in the predicate if a block is given, else the first element.
     def first(&block)
-      return select &block .first if block_given?
+      return select(&block).first if block_given?
       AnonymousObservable.new do |observer|
         new_obs = Observer.configure do |o|
           o.on_next do |x|
@@ -201,7 +201,7 @@ module RX
             observer.on_completed
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
           o.on_completed { raise 'Sequence contains no elements' }
         end
 
@@ -216,7 +216,7 @@ module RX
     # @return [RX::Observable] Sequence containing the first element in the observable sequence that satisfies the
     # condition in the predicate if given, or a default value if no such element exists.
     def first_or_default(default_value = nil, &block)
-      return select &block .first_or_default(default_value) if block_given?
+      return select(&block).first_or_default(default_value) if block_given?
       AnonymousObservable.new do |observer|
         new_obs = Observer.configure do |o|
           o.on_next do |x|
@@ -224,7 +224,7 @@ module RX
             observer.on_completed
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next default_value
@@ -249,7 +249,7 @@ module RX
     # @return {RX::Observable} Sequence containing the last element in the observable sequence that satisfies the
     # condition in the predicate if given, or the last element in the observable sequence.
     def last(&block)
-      return select &block .last if block_given?
+      return select(&block).last if block_given?
       AnonymousObservable.new do |observer|
 
         value = nil
@@ -261,7 +261,7 @@ module RX
             seen_value = true
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             if seen_value
@@ -284,7 +284,7 @@ module RX
     # @return {RX::Observable} Sequence containing the last element in the observable sequence that satisfies the
     # condition in the predicate if given, or a default value if no such element exists.
     def last_or_default(default_value = nil, &block)
-      return select &block .last_or_default(default_value) if block_given?
+      return select(&block).last_or_default(default_value) if block_given?
       AnonymousObservable.new do |observer|
 
         value = nil
@@ -296,7 +296,7 @@ module RX
             seen_value = true
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next (seen_value ? value : default_value)
@@ -312,7 +312,7 @@ module RX
     # @param [Proc] block An optional selector function to produce an element.
     # @return [RX::Observable] The maximum element in an observable sequence.
     def max(&block)
-      return map &block .max if block_given?
+      return map(&block).max if block_given?
       max_by {x| x} .map {|x| x[0] }
     end
 
@@ -328,7 +328,7 @@ module RX
     # @param [Proc] block An optional selector function to produce an element.
     # @return [RX::Observable] The minimum element in an observable sequence.
     def min(&block)
-      return map &block .min if block_given?
+      return map(&block).min if block_given?
       min_by {|x| x} .map {|x| x[0] }
     end
 
@@ -372,7 +372,7 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             gate.synchronize do
@@ -412,7 +412,7 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             gate.synchronize do
@@ -441,7 +441,7 @@ module RX
     # @param [Proc] block A predicate function to evaluate for elements in the source sequence.
     # @return [RX::Observable] >Sequence containing the single element in the observable sequence.
     def single(&block)
-      return select &block .single if block_given?
+      return select(&block).single if block_given?
       AnonymousObservable.new do |observer|
         seen_value = false
         value = nil
@@ -456,7 +456,7 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             if seen_value
@@ -479,7 +479,7 @@ module RX
     # @return [RX::Observable] Sequence containing the single element in the observable sequence, or a default value
     # if no such element exists.
     def single_or_default(default_value = nil, &block)
-      return select &block .single_or_default(default_value) if block_given?
+      return select(&block).single_or_default(default_value) if block_given?
       AnonymousObservable.new do |observer|
         seen_value = false
         value = nil
@@ -494,7 +494,7 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next (seen_value ? value : default_value)
@@ -511,7 +511,7 @@ module RX
     # @return [RX::Observable] An observable sequence containing a single element with the sum of the values in the
     # source sequence.
     def sum(&block)
-      return map &block .sum if block_given?
+      return map(&block).sum if block_given?
       reduce(0) {|acc, x| acc + x}
     end
 
@@ -585,7 +585,7 @@ module RX
             list.push x if comparison >= 0
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next list

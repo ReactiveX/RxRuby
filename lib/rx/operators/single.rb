@@ -30,8 +30,8 @@ module RX
 
         new_obs = RX::Observer.configure do |o|
           o.on_next {|x| x.accept observer }
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe new_obs
@@ -62,8 +62,8 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe new_obs
@@ -132,8 +132,8 @@ module RX
       AnonymousObservable.new do |observer|
         new_obs = RX::Observer.configure do |o|
           o.on_next {|_| }
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe new_obs
@@ -236,7 +236,7 @@ module RX
             observer.on_next accumulation
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next seed if !has_value && has_seed
@@ -261,8 +261,8 @@ module RX
             observer.on_next(q.shift) if q.length > count
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe new_obs
@@ -291,7 +291,7 @@ module RX
             q.shift if q.length > 0
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             g.push(scheduler.schedule_recursive lambda {|this|
@@ -320,7 +320,7 @@ module RX
             q.shift if q.length > count
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             observer.on_next q

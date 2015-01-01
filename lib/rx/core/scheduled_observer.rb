@@ -18,9 +18,9 @@ module RX
       @faulted = false
 
       config = ObserverConfiguration.new
-      config.on_next &method(:on_next_core)
-      config.on_error &method(:on_error_core)
-      config.on_completed &method(:on_completed_core)
+      config.on_next(&method(:on_next_core))
+      config.on_error(&method(:on_error_core))
+      config.on_completed(&method(:on_completed_core))
 
       super(config)      
     end
