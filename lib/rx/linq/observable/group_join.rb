@@ -19,7 +19,7 @@ module RX
             left_map[id] = s
 
             begin
-              result = result_selector.call(value, add_ref(s, r))
+              result = result_selector.call(value, s.add_ref(r))
             rescue => e
               left_map.values.each {|e| handle_error.call(e) }
               observer.on_error(e)

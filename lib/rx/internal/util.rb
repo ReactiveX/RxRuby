@@ -1,10 +1,8 @@
 module RX
   module Observable
-    private
-
-    def add_ref(xs, r)
+    def add_ref(r)
       AnonymousObservable.new do |observer|
-        CompositeSubscription.new [r.subscription, xs.subscribe(observer)]
+        CompositeSubscription.new [r.subscription, self.subscribe(observer)]
       end
     end
   end
