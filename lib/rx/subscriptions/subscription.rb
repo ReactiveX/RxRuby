@@ -45,7 +45,7 @@ module RX
 
     # Creates a subscription object that invokes the specified action when unsubscribed.
     def self.create(&unsubscribe_action)
-      AnonymousSubscription.new &unsubscribe_action
+      AnonymousSubscription.new(&unsubscribe_action)
     end
 
     # Gets the subscription that does nothing when unsubscribed.

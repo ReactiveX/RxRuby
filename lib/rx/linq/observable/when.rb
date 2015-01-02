@@ -5,13 +5,13 @@ module RX
         active_plans = []
         external_subscriptions = {}
         out_observer = Observer.configure {|o|
-          o.on_next &observer.method(:on_next)
+          o.on_next(&observer.method(:on_next))
           o.on_error {|err|
             external_subscriptions.each {|_, v|
               v.on_error err
             }
           }
-          o.on_completed &observer.method(:on_completed)
+          o.on_completed(&observer.method(:on_completed))
         }
         begin
           plans.each {|x|
