@@ -97,7 +97,7 @@ module RX
               result = action.call(err)
             rescue => e
               observer.on_error(e)
-              return
+              next
             end
 
             d = SingleAssignmentSubscription.new
