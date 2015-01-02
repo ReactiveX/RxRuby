@@ -244,7 +244,7 @@ module RX
                 active += 1
                 subscriber.call inner_source
               else
-                q >> inner_source
+                q << inner_source
               end
             end
           end
