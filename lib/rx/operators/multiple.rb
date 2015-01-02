@@ -213,7 +213,7 @@ module RX
         subscriber = nil
         subscriber = lambda do |xs|
           subscription = SingleAssignmentSubscription.new
-          group >> subscription
+          group << subscription
 
           new_obs = Observer.configure do |o|
             o.on_next {|x| gate.synchronize { observer.on_next x } }
@@ -257,7 +257,7 @@ module RX
           end
         end
 
-        group >> subscribe(inner_obs)
+        group << subscribe(inner_obs)
       end
     end
 
@@ -272,7 +272,7 @@ module RX
         new_obs = Observer.configure do |o|
           o.on_next do |inner_source|
             inner_subscription = SingleAssignmentSubscription.new
-            group >> inner_subscription
+            group << inner_subscription
 
             inner_obs = Observer.configure do |io|
               io.on_next {|x| gate.synchronize { observer.on_next x } }

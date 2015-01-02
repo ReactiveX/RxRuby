@@ -60,7 +60,7 @@ module RX
 
       return self
     end
-    alias_method :>>, :push
+    alias_method :<<, :push
     
     # Removes and unsubscribes all subscriptions from the CompositeSubscription, but does not dispose the CompositeSubscription.
     def clear
