@@ -23,7 +23,7 @@ module RX
             observer.on_next x
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do 
             observer.on_next(default_value) unless found
@@ -64,8 +64,8 @@ module RX
             observer.on_next x if has_added
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe(new_observer)
@@ -91,8 +91,8 @@ module RX
             observer.on_next result
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)          
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe(new_observer)
@@ -129,8 +129,8 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)  
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
 
@@ -166,8 +166,8 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)  
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe(new_observer)
@@ -192,8 +192,8 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)  
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe(new_observer)
@@ -232,8 +232,8 @@ module RX
             end
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)  
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe(new_observer)
@@ -266,8 +266,8 @@ module RX
             observer.on_next x if should_run
           end
 
-          o.on_error &observer.method(:on_error)
-          o.on_completed &observer.method(:on_completed)  
+          o.on_error(&observer.method(:on_error))
+          o.on_completed(&observer.method(:on_completed))
         end
 
         subscribe(new_observer)        

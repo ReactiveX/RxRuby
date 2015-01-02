@@ -72,7 +72,7 @@ module RX
         @unsubscribed = false
         @gate = Mutex.new
 
-        self.run_loop &action
+        self.run_loop(&action)
       end
 
       def unsubscribe

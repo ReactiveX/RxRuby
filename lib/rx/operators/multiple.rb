@@ -89,8 +89,8 @@ module RX
         subscription.subscription = d1
 
         new_obs = Observer.configure do |o|
-          o.on_next &observer.method(:on_next)
-          
+          o.on_next(&observer.method(:on_next))
+
           o.on_error do |err|
             result = nil
             begin
@@ -105,7 +105,7 @@ module RX
             d.subscription = result.subscribe observer
           end
 
-          o.on_completed &observer.method(:on_completed)          
+          o.on_completed(&observer.method(:on_completed))
         end
 
         d1.subscription = subscribe new_obs
@@ -149,9 +149,9 @@ module RX
             observer.on_completed if right_done
           end
 
-          o.on_error &observer.method(:on_error)  
+          o.on_error(&observer.method(:on_error))
 
-          o.on_completed do 
+          o.on_completed do
             left_done = true
             observer.on_completed if right_done
           end
@@ -176,7 +176,7 @@ module RX
             observer.on_completed if left_done
           end
 
-          o.on_error &observer.method(:on_error)  
+          o.on_error(&observer.method(:on_error))
 
           o.on_completed do
             right_done = true
@@ -304,7 +304,7 @@ module RX
     def on_error_resume_next(other)
       raise ArgumentError.new 'Other cannot be nil' unless other
 
-      Observable.on_error_resume_next *[self, other]
+      Observable.on_error_resume_next self, other
     end
 
     # Returns the elements from the source observable sequence only after the other observable sequence produces an element.
@@ -320,7 +320,7 @@ module RX
 
         source_obs = Observer.configure do |o|
           o.on_next {|x| observer.on_next x if open }
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
           o.on_completed { observer.on_completed if open }
         end
 
@@ -330,7 +330,7 @@ module RX
             other_subscription.unsubscribe
           end
 
-          o.on_error &observer.method(:on_error)
+          o.on_error(&observer.method(:on_error))
         end
 
         source_subscription.subscription = synchronize(gate).subscribe(source_obs)
@@ -404,7 +404,7 @@ module RX
 
         other_obs = Observer.configure do |o|
           o.on_next {|_| observer.on_completed }
-          o.on_error &observer.method(:on_error)   
+          o.on_error(&observer.method(:on_error))
         end
 
         other_subscription.subscription = other.synchronize(gate).subscribe(other_obs)
@@ -440,7 +440,7 @@ module RX
             gate.wait do
               current = nil
               has_next = false
-              err = nil
+              error = nil
 
               if disposed
                 return
@@ -451,12 +451,12 @@ module RX
                 rescue StopIteration => _
                   # Do nothing
                 rescue => e
-                  err = e
+                  error = e
                 end
               end
 
-              if err
-                observer.on_error err
+              if error
+                observer.on_error error
                 return
               end
 
@@ -470,14 +470,14 @@ module RX
               end
 
               new_obs = Observer.configure do |o|
-                o.on_next &observer.method(:on_next)
+                o.on_next(&observer.method(:on_next))
 
                 o.on_error do |err|
                   last_error = err
                   this.call
                 end
 
-                o.on_completed &observer.method(:on_completed)    
+                o.on_completed(&observer.method(:on_completed))
               end
 
               d = SingleAssignmentSubscription.new
@@ -535,7 +535,7 @@ module RX
                 next_item.call i
               end
 
-              o.on_error &observer.method(:on_error)   
+              o.on_error(&observer.method(:on_error))
 
               o.on_completed { done.call i }
             end
@@ -590,8 +590,8 @@ module RX
               subscription.subscription = d
 
               new_obs = Observer.configure do |o|
-                o.on_next &observer.method(:on_next)
-                o.on_error &observer.method(:on_error)
+                o.on_next(&observer.method(:on_next))
+                o.on_error(&observer.method(:on_error))
                 o.on_completed { this.call }
               end
 
@@ -659,7 +659,7 @@ module RX
               subscription.subscription = d
 
               new_obs = Observer.configure do |o|
-                o.on_next &observer.method(:on_next)
+                o.on_next(&observer.method(:on_next))
                 o.on_error {|_| this.call }
                 o.on_completed { this.call }
               end
@@ -684,7 +684,7 @@ module RX
           next_action = lambda do |i|
             if queues.all? {|q| q.length > 0 }
               res = queues.map {|q| q.shift }
-              observer.on_next(result_selector.call *res)
+              observer.on_next(result_selector.call(*res))
             elsif enumerable_select_with_index(is_done) {|x, j| j != i } .all?
               observer.on_completed
             end
@@ -706,7 +706,7 @@ module RX
                 next_action.call i
               end
 
-              o.on_error &observer.method(:on_error)
+              o.on_error(&observer.method(:on_error))
 
               o.on_completed { done.call i }
             end

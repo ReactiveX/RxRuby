@@ -24,7 +24,7 @@ module RX
 
     # Factory method for writing an assert that checks for an on_next notification record at a given time, using the specified predicate to check the value.
     def on_next_predicate(ticks, &block)
-      n = OnNextPredicate.new &block
+      n = OnNextPredicate.new(&block)
       Recorded.new(ticks, n)
     end
 
@@ -34,8 +34,8 @@ module RX
     end
 
     # Factory method for writing an assert that checks for an on_error notification record at a given time, using the specified predicate to check the exception.
-    def on_next_predicate(ticks, &block)
-      n = OnErrorPredicate.new &block
+    def on_error_predicate(ticks, &block)
+      n = OnErrorPredicate.new(&block)
       Recorded.new(ticks, n)
     end
 
