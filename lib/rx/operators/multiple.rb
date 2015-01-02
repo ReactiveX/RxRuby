@@ -192,8 +192,8 @@ module RX
     end
 
     # Concatenates the second observable sequence to the first observable sequence upon successful termination of the first.
-    def concat(other)
-      Observable.concat([self, other].to_enum)
+    def concat(*other)
+      Observable.concat([self, *other].to_enum)
     end
 
     # Merges elements from two observable sequences into a single observable sequence, using the specified scheduler for enumeration of and subscription to the sources.
