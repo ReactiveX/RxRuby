@@ -63,14 +63,14 @@ module RX
           total_time = new_total_time
 
           if is_span
-            next_span = next_span + time_shift
+            next_span += time_shift
           end
           if is_shift
-            next_shift = next_shift + time_shift
+            next_shift += time_shift
           end
 
           m.subscription = scheduler.schedule_relative(ts, lambda {
-            @gate.synchronize do
+            gate.synchronize do
               if is_shift
                 s = Subject.new
                 q.push s
@@ -80,9 +80,9 @@ module RX
                 s = q.shift
                 s.on_completed
               end
+              create_timer.call
             end
           })
-          create_timer.call
         }
 
         q.push(Subject.new)
@@ -91,28 +91,27 @@ module RX
 
         new_obs = Observer.configure do |o|
           o.on_next do |x|
-            @gate.synchronize do
+            gate.synchronize do
               q.each {|s| s.on_next x}
             end
           end
 
           o.on_error do |err|
-            @gate.synchronize do
+            gate.synchronize do
               q.each {|s| s.on_error err}
               observer.on_error err
             end
           end
 
           o.on_completed do
-            @gate.synchronize do
+            gate.synchronize do
               q.each {|s| s.on_on_completed}
               observer.on_completed
             end
           end
         end
 
-        m.subscription = subscribe new_obs
-        group_subscription.push m
+        group_subscription.push subscribe(new_obs)
 
         ref_count_subscription
       end
