@@ -17,7 +17,7 @@ module RX
             left_map[id] = s
 
             begin
-              result = result_selector.call(value, add_ref(s, r))
+              result = result_selector.call(value, s.add_ref(r))
             rescue => err
               left_map.values.each {|v| v.on_error(err) }
               observer.on_error(err)
@@ -102,13 +102,6 @@ module RX
         group.push right.subscribe(right_obs)
 
         r
-      end
-    end
-
-    private
-    def add_ref(xs, r)
-      AnonymousObservable.new do |observer|
-        CompositeSubscription.new [r.subscription, xs.subscribe(observer)]
       end
     end
   end

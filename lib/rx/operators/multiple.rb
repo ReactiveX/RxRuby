@@ -97,7 +97,7 @@ module RX
               result = action.call(err)
             rescue => e
               observer.on_error(e)
-              return
+              next
             end
 
             d = SingleAssignmentSubscription.new
@@ -192,8 +192,8 @@ module RX
     end
 
     # Concatenates the second observable sequence to the first observable sequence upon successful termination of the first.
-    def concat(other)
-      Observable.concat([self, other].to_enum)
+    def concat(*other)
+      Observable.concat([self, *other].to_enum)
     end
 
     # Merges elements from two observable sequences into a single observable sequence, using the specified scheduler for enumeration of and subscription to the sources.
@@ -213,7 +213,7 @@ module RX
         subscriber = nil
         subscriber = lambda do |xs|
           subscription = SingleAssignmentSubscription.new
-          group >> subscription
+          group << subscription
 
           new_obs = Observer.configure do |o|
             o.on_next {|x| gate.synchronize { observer.on_next x } }
@@ -244,7 +244,7 @@ module RX
                 active += 1
                 subscriber.call inner_source
               else
-                q >> inner_source
+                q << inner_source
               end
             end
           end
@@ -257,7 +257,7 @@ module RX
           end
         end
 
-        group >> subscribe(inner_obs)
+        group << subscribe(inner_obs)
       end
     end
 
@@ -272,7 +272,7 @@ module RX
         new_obs = Observer.configure do |o|
           o.on_next do |inner_source|
             inner_subscription = SingleAssignmentSubscription.new
-            group >> inner_subscription
+            group << inner_subscription
 
             inner_obs = Observer.configure do |io|
               io.on_next {|x| gate.synchronize { observer.on_next x } }

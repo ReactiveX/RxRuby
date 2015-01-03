@@ -21,7 +21,7 @@ module RX
     def buffer_with_count(count, skip = count)
       raise ArgumentError.new 'Count must be greater than zero' if count <= 0
       raise ArgumentError.new 'Skip must be greater than zero' if skip <= 0
-      window_with_count(count, skip).flat_map(&method(:to_a)).filter {|x| x.length > 0 }
+      window_with_count(count, skip).flat_map(&:to_a).find_all {|x| x.length > 0 }
     end
 
     # Dematerializes the explicit notification values of an observable sequence as implicit notifications.
