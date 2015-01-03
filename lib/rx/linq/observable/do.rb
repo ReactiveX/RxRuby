@@ -1,7 +1,9 @@
 module RX
   module Observable
-    def do(observer_or_on_next, on_error_func = nil, on_completed_func = nil)
-      if Proc === observer_or_on_next
+    def do(observer_or_on_next = nil, on_error_func = nil, on_completed_func = nil)
+      if block_given?
+        on_next_func = Proc.new
+      elsif Proc === observer_or_on_next
         on_next_func = observer_or_on_next
       else
         on_next_func = observer_or_on_next.method(:on_next)
