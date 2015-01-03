@@ -56,6 +56,13 @@ module RX
         ObserverBase.new config
       end
 
+      def create(on_next = nil, on_error = nil, on_completed = nil)
+        configure do |o|
+          o.on_next(&on_next) if on_next
+          o.on_error(&on_error) if on_error
+          o.on_completed(&on_completed) if on_completed
+        end
+      end
     end
 
   end
