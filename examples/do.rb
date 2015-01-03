@@ -29,11 +29,11 @@ subscription = source.subscribe(
 # => Completed
 
 #  Using an observer
-observer = RX::Observer.configure do |o|
-  o.on_next      {|x|   puts 'Do Next: ' + x.to_s }
-  o.on_error     {|err| puts 'Do Error: ' + err.to_s }
-  o.on_completed {      puts 'Do Completed' }
-end
+observer = RX::Observer.create(
+  lambda {|x|   puts 'Do Next: ' + x.to_s },
+  lambda {|err| puts 'Do Error: ' + err.to_s },
+  lambda {      puts 'Do Completed' }
+)
 
 source = RX::Observable.range(0, 3)
     .do(observer)
