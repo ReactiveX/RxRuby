@@ -6,6 +6,7 @@ module RX
 
   # Represents a subscription resource whose underlying subscription resource can be replaced by another subscription resource, causing automatic disposal of the previous underlying subscription resource.
   class SerialSubscription
+    include Subscription
 
     def initialize
       @gate = Mutex.new
