@@ -13,7 +13,7 @@ module RX
     # Standard Query Operators
 
     # Returns the elements of the specified sequence or the type parameter's default value in a singleton sequence if the sequence is empty.
-    def default_if_empty(default_value)
+    def default_if_empty(default_value = nil)
       AnonymousObservable.new do |observer|
         found = false
         new_observer = Observer.configure do |o|
