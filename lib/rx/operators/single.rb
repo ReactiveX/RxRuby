@@ -52,7 +52,7 @@ module RX
               key = key_selector.call value
             rescue => err
               observer.on_error err
-              return
+              next
             end
 
             if !current_key || key != current_key
