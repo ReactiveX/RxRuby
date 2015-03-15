@@ -29,7 +29,7 @@ Because observable sequences are data streams, you can query them using standard
 But the best news of all is that you already know how to program like this.  Take for example the following Ruby code, where we get some stock data and then manipulate and then iterate the results.
 
 ```ruby
-# Get evens and double each
+# Get evens and square each
 someSource
   .select {|x| x.even? }
   .map {|x| x * x }
