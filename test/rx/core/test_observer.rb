@@ -2,8 +2,7 @@
 
 require 'monitor'
 require 'thread'
-require 'minitest/autorun'
-require 'rx'
+require 'test_helper'
 
 class MyObserver
   include RX::Observer
