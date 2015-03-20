@@ -1,4 +1,3 @@
-require 'minitest/autorun'
 require 'simplecov'
 
 SimpleCov.start do
@@ -6,4 +5,5 @@ SimpleCov.start do
   add_filter 'test/'
 end
 
+require 'minitest/autorun'
 require 'rx'
