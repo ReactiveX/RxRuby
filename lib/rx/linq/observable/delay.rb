@@ -54,7 +54,7 @@ module RX
                 recurse_due_time = 0
                 if q.length > 0
                   should_recurse = true
-                  recurse_due_time = Math.max(0, q[0][:timestamp] - scheduler.now)
+                  recurse_due_time = [0, q[0][:timestamp] - scheduler.now].max
                 else
                   active = false
                 end
