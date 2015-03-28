@@ -14,14 +14,14 @@ module RX
     attr_reader :clock
 
     def initialize(initial_clock)
-      @clock = initial_clock
+      @clock = initial_clock.to_i
       @queue = PriorityQueue.new
       @enabled = false
     end
 
     # Gets the scheduler's notion of current time.
     def now
-      self.to_time clock
+      clock
     end
 
     # Gets whether the scheduler is enabled to run work.
@@ -59,20 +59,6 @@ module RX
       schedule_at_absolute_with_state(state, clock, action)
     end
 
-    # Schedules an action to be executed after due_time.
-    def schedule_relative_with_state(state, due_time, action)
-      raise 'action cannot be nil' unless action
-
-      schedule_at_relative_with_state(state, to_relative(due_time), action)
-    end
-
-    # Schedules an action to be executed at due_time.
-    def schedule_absolute_with_state(state, due_time, action)
-      raise 'action cannot be nil' unless action
-
-      schedule_at_relative_with_state(state, to_relative(due_time - now), action)
-    end
-
     # Schedules an action to be executed at due_time.
     def schedule_at_relative(due_time, action)
       raise 'action cannot be nil' unless action
@@ -84,10 +70,9 @@ module RX
     def schedule_at_relative_with_state(state, due_time, action)
       raise 'action cannot be nil' unless action
 
-      run_at = add(@clock, due_time)
-
-      schedule_at_absolute_with_state(state, run_at, action)
+      schedule_at_absolute_with_state(state, @clock + due_time, action)
     end
+    alias_method :schedule_relative_with_state, :schedule_at_relative_with_state
 
     # Schedules an action to be executed at due_time.
     def schedule_at_absolute(due_time, action)
@@ -111,6 +96,7 @@ module RX
 
       Subscription.create { si.cancel }
     end
+    alias_method :schedule_absolute_with_state, :schedule_at_absolute_with_state
 
     # Advances the scheduler's clock to the specified time, running all work till that point.
     def advance_to(time)
@@ -142,7 +128,7 @@ module RX
 
     # Advances the scheduler's clock by the specified relative time, running all work scheduled for that timespan.
     def advance_by(time)
-      dt = self.add(@clock, time)
+      dt = @clock + time
 
       due_to_clock = dt<=>clock
       raise 'Time is out of range' if due_to_clock < 0
@@ -155,7 +141,7 @@ module RX
 
     # Advances the scheduler's clock by the specified relative time.
     def sleep(time)
-      dt = self.add(@clock, time)
+      dt = @clock + time
 
       due_to_clock = dt<=>@clock
       raise 'Time is out of range' if due_to_clock < 0
