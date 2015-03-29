@@ -129,32 +129,19 @@ module RX
       state = pair[:state]
       action = pair[:action]
 
-      recursive_action = lambda { |state1|
-        action.call(state1, lambda { |state2, due_time1|
-          is_added = false
-          is_done = false
+      recursive_action = ->(state1) do
+        internal_action = ->(state2, due_time1) do
 
-          d = nil
           d = scheduler.send(method, state2, due_time1, lambda do |_, state3|
             gate.synchronize do
-              if is_added
-                group.delete(d)
-              else
-                is_done = true
-              end
+              group.delete(d)
             end
             recursive_action.call(state3)
             Subscription.empty
           end)
-
-          gate.synchronize do
-            unless is_done
-              group.push(d)
-              is_added = true
-            end
-          end
-        })
-      }
+        end
+        action.call(state1, internal_action)
+      end
 
       recursive_action.call(state)
       group            

@@ -36,97 +36,93 @@ end
 
 class TestBaseScheduler < Minitest::Test
 
+  def setup
+    @scheduler = MyScheduler.new
+  end
+
+  def test_now
+    assert_equal(Time.now.to_i, RX::Scheduler.now.to_i)
+  end
+
+  def test_schedule_absolute
+    due  = Time.now + 1
+    ran  = false
+    task = ->() { ran = true }
+
+    @scheduler.check { |a, s, t| assert_equal(1, t.to_i) }
+    @scheduler.schedule_absolute(due, task)
+
+    assert_equal(true, ran)
+    assert_equal(1, @scheduler.wait_cycles.to_i)
+  end
+
   def test_schedule_non_recursive
-    ms = MyScheduler.new
-    res = false
-    ms.schedule_recursive(lambda {|a| res = true })
-    assert res
+    ran = false
+    @scheduler.schedule_recursive(->(a) { ran = true })
+    assert_equal(true, ran)
   end
 
   def test_schedule_recursive
-    ms = MyScheduler.new
-    i = 0
-    ms.schedule_recursive(lambda {|a|
-      i+=1
-      a.call if i < 10
-    })
+    calls = 0
+    task = ->(a) do
+      calls += 1
+      a.call if calls < 10
+    end
+    @scheduler.schedule_recursive(task)
 
-    assert_equal 10, i
+    assert_equal(10, calls)
   end
 
   def test_schedule_recursive_absolute_non_recursive
     now = Time.now
-    ms = MyScheduler.new now
-    res = false
+    ran = false
 
-    ms.check do |a, s, t|
-      assert_equal t, 0
-    end
-
-    ms.schedule_recursive_absolute(now, lambda {|a| res = true })
-    assert res
-    assert_equal 0, ms.wait_cycles
+    @scheduler.check { |a, s, t| assert_equal(0, t.to_i) }
+    @scheduler.schedule_recursive_absolute(now, ->(a) { ran = true })
+    assert_equal(true, ran)
+    assert_equal(0, @scheduler.wait_cycles.to_i)
   end
 
   def test_schedule_recursive_absolute_recursive
-    now = Time.now
-    i = 0
-    ms = MyScheduler.new(now)
-
-    ms.check do |a, s, t|
-      assert_equal t, 0
+    now   = Time.now
+    calls = 0
+    task  = ->(a) do
+      calls += 1
+      a.call(now) if calls < 10
     end
 
-    ms.schedule_recursive_absolute(now, lambda {|a|
-      i += 1
-      a.call(now) if i < 10
-    })
+    @scheduler.check { |a, s, t| assert_equal(0, t.to_i) }
+    @scheduler.schedule_recursive_absolute(now, task)
 
-    assert_equal 0, ms.wait_cycles
-    assert_equal 10, i    
+    assert_equal(0, @scheduler.wait_cycles.to_i)
+    assert_equal(10, calls)
   end
 
   def test_schedule_recursive_relative_non_recursive
-    now = Time.now
-    ms = MyScheduler.new(now)
-    res = false
+    now  = Time.now
+    ran  = false
+    task = ->(a) { ran = true }
 
-    ms.check do |a, s, t|
-      assert_equal t, 0
-    end
+    @scheduler.check { |a, s, t| assert_equal(0, t.to_i) }
+    @scheduler.schedule_recursive_relative(0, task)
 
-    ms.schedule_recursive_relative(0, lambda {|a| res = true })
-
-    assert res
-    assert_equal 0, ms.wait_cycles
+    assert_equal(true, ran)
+    assert_equal(0, @scheduler.wait_cycles)
   end
 
   def test_schedule_recursive_relative_recursive
-    now = Time.now
-    i = 0
-    ms = MyScheduler.new(now)
-
-    ms.check do |a, s, t|
-      assert_operator t, :<, 10
+    now   = Time.now
+    calls = 0
+    task  = ->(a) do
+      calls += 1
+      a.call(calls) if calls < 10
     end
 
-    ms.schedule_recursive_relative(0, lambda {|a|
-      i += 1
-      a.call i if i < 10
-    })
+    @scheduler.check { |a, s, t| assert_operator(t, :<, 10) }
 
-    assert_equal 45, ms.wait_cycles
-    assert_equal 10, i  
-  end
-
-  def test_schedule_state_threading
-    lst = []
-    RX::ImmediateScheduler.instance.schedule_recursive_with_state(0, lambda {|i, a|
-      lst.push(i)
-      a.call(i + 1) if i < 9
-    })
-
-    assert_equal (0..9).to_a, lst
+    @scheduler.schedule_recursive_relative(0, task)
+    assert_equal(45, @scheduler.wait_cycles)
+    assert_equal(10, calls)
   end
 
 end
