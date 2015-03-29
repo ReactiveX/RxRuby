@@ -1,10 +1,10 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 require 'test_helper'
-require 'rx/concurrency/historical_virtual_helper'
+require 'rx/concurrency/helpers/historical_virtual_helper'
 
 class TestHistoricalScheduler < Minitest::Test
-  include ScheduleTestHelper
+  include HistoricalVirtualScheduleTestHelper
 
   def setup
     @start     = Time.at(1000)
