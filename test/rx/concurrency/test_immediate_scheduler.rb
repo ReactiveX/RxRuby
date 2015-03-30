@@ -1,115 +1,53 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-require 'thread'
 require 'test_helper'
+require 'rx/concurrency/helpers/immediate_local_scheduler_helper'
 
 class TestImmediateScheduler < Minitest::Test
+  include ImmediateLocalSchedulerTestHelper
+
+  def setup
+    @scheduler = RX::ImmediateScheduler.instance
+  end
+
   def test_now
-    s = RX::ImmediateScheduler.instance
-    assert (s.now - Time.new < 1)
+    assert_equal(Time.now.to_i, @scheduler.now.to_i)
   end
 
   def test_immediate_schedule
-    s = RX::ImmediateScheduler.instance
-    id = Thread.current.object_id
     ran = false
-    s.schedule lambda { 
-        assert_equal id, Thread.current.object_id
-        ran = true
-    }
-
-    assert ran
+    @scheduler.schedule -> { ran = true }
+    assert_equal(true, ran)
   end
 
-  def test_schedule_error
-    s = RX::ImmediateScheduler.instance
-    e = Exception.new
+  def test_immediate_schedule_runs_in_current_thread
+    id = Thread.current.object_id
+    @scheduler.schedule -> { assert_equal(id, Thread.current.object_id) }
+  end
 
-    begin
-      s.schedule lambda {
-          raise e
-          assert false
-      }
-    rescue Exception => ex
-      assert_same e, ex
+  def test_schedule_error_raises
+    task = -> do
+      raise(StandardError)
+      flunk "Should not be reached."
     end
+
+    assert_raises(StandardError) { @scheduler.schedule(task) }
   end
 
   def test_schedule_with_state_simple
-    s = RX::ImmediateScheduler.instance
-    x = 0
+    state = []
+    task = ->(_, s) { s << 1 }
+    @scheduler.schedule_with_state(state, task)
 
-    s.schedule_with_state(42, lambda {|sched, xx|  
-      x = xx
-      RX::Subscription.empty
-    })
-
-    assert_equal 42, x
-  end
-
-  def test_schedule_with_state_simple_relative
-    s = RX::ImmediateScheduler.instance
-    x = 0
-
-    s.schedule_relative_with_state(42, 0, lambda {|sched, xx|  
-      x = xx
-      RX::Subscription.empty
-    })
-
-    assert_equal 42, x
-  end 
-
-  def test_schedule_with_state_simple_absolute
-    s = RX::ImmediateScheduler.instance
-    x = 0
-
-    s.schedule_absolute_with_state(42, Time.new, lambda {|sched, xx|  
-        x = xx
-        RX::Subscription.empty
-    })
-
-    assert_equal 42, x
+    assert_equal([1], state)
   end
 
   def test_schedule_recursive_with_state_simple
-    s = RX::ImmediateScheduler.instance
-    x = 0
-    y = 0
+    state = []
+    inner = ->(_, s) { s << 1 }
+    outer = ->(sched, s) { sched.schedule_with_state(s, inner) }
+    @scheduler.schedule_with_state(state, outer)
 
-    s.schedule_with_state(42, lambda {|sched, xx|
-      x = xx 
-      sched.schedule_with_state(43, lambda {|sched1, yy| 
-        y = yy
-        RX::Subscription.empty
-      })
-    })
+    assert_equal([1], state)
   end
-
-  def test_schedule_recursive_relative_with_state_simple
-    s = RX::ImmediateScheduler.instance
-    x = 0
-    y = 0
-
-    s.schedule_with_state(42, lambda {|sched, xx|
-      x = xx 
-      sched.schedule_relative_with_state(43, 1, lambda {|sched1, yy| 
-        y = yy
-        RX::Subscription.empty
-      })
-    })
-  end 
-
-  def test_schedule_recursive_absolute_with_state_simple
-    s = RX::ImmediateScheduler.instance
-    x = 0
-    y = 0
-
-    s.schedule_with_state(42, lambda { |sched, xx|
-      x = xx 
-      sched.schedule_absolute_with_state(43, Time.new(), lambda { |sched1, yy| 
-        y = yy
-        RX::Subscription.empty
-      })
-    })
-  end     
 end

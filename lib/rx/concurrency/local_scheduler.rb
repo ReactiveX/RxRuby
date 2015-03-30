@@ -27,5 +27,13 @@ module RX
       schedule_relative_with_state(state, (due_time - self.now), action)
     end
 
+    def schedule_relative_with_state(state, due_time, action)
+      raise ArgumentError.new 'action cannot be nil' unless action
+
+      dt = RX::Scheduler.normalize due_time
+      sleep dt if dt > 0
+      action.call(self, state)
+    end
+
   end
 end
