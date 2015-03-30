@@ -1,70 +1,44 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-require 'thread'
 require 'test_helper'
 
+# DefaultScheduler creates new threads in which to run scheduled tasks; a short
+# sleep is necessary to allow the thread scheduler to yield to the other
+# threads.
 class TestDefaultScheduler < Minitest::Test
 
-  def test_now
-    s = RX::DefaultScheduler.instance
-    assert (s.now - Time.new < 1)
+  def setup
+    @scheduler = RX::DefaultScheduler.instance
   end
 
-  def test_default_schedule
-    id = Thread.current.object_id
-    s = RX::DefaultScheduler.instance
+  def test_schedule_with_state
+    state = []
+    task  = ->(_, s) { s << 1 }
+    d = @scheduler.schedule_with_state(state, task)
+    sleep 0.001
 
-    s.schedule lambda {
-      refute id, Thread.current.object_id
-    }
-    sleep 1
+    assert_equal([1], state)
   end
 
-  def test_default_schedule_due
-    id = Thread.current.object_id
-    s = RX::DefaultScheduler.instance
+  def test_schedule_relative_with_state
+    state = []
+    task  = ->(_, s) { s << 1 }
+    d = @scheduler.schedule_relative_with_state(state, 0.05, task)
+    sleep 0.1
 
-    s.schedule_relative 0.2, lambda {
-      refute id, Thread.current.object_id
-    }
-    sleep 1
+    assert_equal([1], state)
+  end
+
+  def test_default_schedule_runs_in_its_own_thread
+    id = Thread.current.object_id
+    @scheduler.schedule -> { refute_equal(id, Thread.current.object_id) }
+    sleep 0.001
   end
 
   def test_schedule_action_cancel
-    id = Thread.current.object_id
-    s = RX::DefaultScheduler.instance
-    set = false
-    d = s.schedule_relative 0.2, lambda {
-      assert false
-    }
-    d.unsubscribe
-    sleep 0.4
-    refute set
+    task = -> { flunk "This should not run." }
+    subscription = @scheduler.schedule_relative(0.05, task)
+    subscription.unsubscribe
+    sleep 0.1
   end
-
-  def test_periodic_non_reentrant
-    s = RX::DefaultScheduler.instance
-    n = 0
-    fail = false
-
-    d = s.schedule_periodic_with_state(0, 0.05, lambda {|x| 
-      begin
-        if n > 1
-          n += 1
-          fail = true
-        end
-
-        sleep 0.1
-
-        return x + 1
-      ensure
-        n -= 1
-      end
-    })
-
-    sleep 0.5
-    d.unsubscribe
-    refute fail
-  end
-
 end

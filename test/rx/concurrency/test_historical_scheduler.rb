@@ -3,12 +3,16 @@
 require 'test_helper'
 require 'rx/concurrency/helpers/historical_virtual_scheduler_helper'
 
-class TestVirtualTimeScheduler < Minitest::Test
-
+class TestHistoricalScheduler < Minitest::Test
   include HistoricalVirtualSchedulerTestHelper
 
   def setup
-    @start     = Time.now.to_i
-    @scheduler = RX::VirtualTimeScheduler.new(@start)
+    @start     = Time.at(1000)
+    @scheduler = RX::HistoricalScheduler.new(@start)
+  end
+
+  def test_initialization
+    assert_equal(Time.at(1000), @scheduler.now)
+    assert_equal(Time.at(0), RX::HistoricalScheduler.new.now)
   end
 end

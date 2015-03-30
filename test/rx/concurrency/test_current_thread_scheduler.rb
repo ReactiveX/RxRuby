@@ -1,139 +1,44 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-require 'thread'
 require 'test_helper'
+require 'rx/concurrency/helpers/immediate_local_scheduler_helper'
 
-module RX
-  # Extend to include ensure trampoline
-  class CurrentThreadScheduler
-
-    def ensure_trampoline(action)
-      if self.class.schedule_required?
-        self.schedule(action);
-      else
-        action.call
-      end
-    end
-
-  end
-end
 
 class TestCurrentThreadScheduler < Minitest::Test
+  include ImmediateLocalSchedulerTestHelper
 
-  def test_now
-    s = RX::CurrentThreadScheduler.instance
-    assert (s.now - Time.now < 1)
+  def setup
+    @scheduler = RX::CurrentThreadScheduler.instance
+  end
+
+  def test_schedule_required
+    assert_equal(true, RX::CurrentThreadScheduler.schedule_required?)
   end
 
   def test_schedule
-    id = Thread.current.object_id
-    s = RX::CurrentThreadScheduler.instance
     ran = false
+    @scheduler.schedule -> { ran = true }
 
-    s.schedule lambda {
-      assert_equal id, Thread.current.object_id
-      ran = true
-    }
-
-    assert ran
+    assert_equal(true, ran)
   end
 
-  def test_schedule_error
-    s = RX::CurrentThreadScheduler.instance
-    e = Exception.new
+  def test_schedule_runs_in_current_thead
+    id = Thread.current.object_id
+    @scheduler.schedule -> { assert_equal(id, Thread.current.object_id) }
+  end
 
-    begin
-      s.schedule lambda {
-        raise e
-        assert false
-      }
-    rescue Exception => ex
-        assert_same e, ex
+  def test_schedule_error_raises
+    assert_raises(StandardError) do
+      @scheduler.schedule -> { raise StandardError }
     end
   end
 
   def test_schedule_nested
-    s = RX::CurrentThreadScheduler.instance
-    id = Thread.current.object_id
     ran = false
+    @scheduler.schedule -> do
+      @scheduler.schedule -> { ran = true }
+    end
 
-    s.schedule lambda {
-      assert_equal id, Thread.current.object_id
-      s.schedule lambda { ran = true }
-    }
-
-    assert ran
+    assert_equal(true, ran)
   end
-
-  def test_schedule_nested_relative
-    s = RX::CurrentThreadScheduler.instance
-    id = Thread.current.object_id
-    ran = false
-
-    s.schedule lambda {
-      assert_equal id, Thread.current.object_id
-      s.schedule_relative 1, lambda { ran = true }
-    }
-
-    assert ran
-  end
-
-  def test_ensure_trampoline
-    s = RX::CurrentThreadScheduler.instance
-    ran1 = false
-    ran2 = false
-
-    s.ensure_trampoline lambda {
-      s.schedule lambda { ran1 = true }
-      s.schedule lambda { ran2 = true }
-    }
-
-    assert ran1
-    assert ran2
-  end
-
-  def test_ensure_trampoline_nested
-    s = RX::CurrentThreadScheduler.instance
-    ran1 = false
-    ran2 = false
-
-    s.ensure_trampoline lambda {
-      s.ensure_trampoline lambda { ran1 = true }
-      s.ensure_trampoline lambda { ran2 = true }
-    }
-
-    assert ran1
-    assert ran2
-  end
-
-  def test_ensure_trampoline_and_cancel
-    s = RX::CurrentThreadScheduler.instance
-    ran1 = false
-    ran2 = false
-
-    s.ensure_trampoline lambda {
-      ran1 = true
-      d = s.schedule lambda { ran2 = true }
-      d.unsubscribe
-    }
-
-    assert ran1
-    refute ran2
-  end
-
-  def test_ensure_trampoline_and_cancel_timed
-    s = RX::CurrentThreadScheduler.instance
-    ran1 = false
-    ran2 = false
-
-    s.ensure_trampoline lambda {
-      ran1 = true
-      d = s.schedule_relative 1, lambda { ran2 = true }
-      d.unsubscribe
-    }
-
-    assert ran1
-    refute ran2
-  end     
-
 end
