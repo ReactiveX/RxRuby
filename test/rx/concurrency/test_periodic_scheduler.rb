@@ -41,7 +41,7 @@ class TestPeriodicScheduler < Minitest::Test
     assert_equal(state.length, 2)
   end
 
-  def test_periodic_with_state_exceptions
+  def test_periodic_exceptions
     assert_raises(RuntimeError) do
       @scheduler.schedule_periodic(0.01, nil)
     end
