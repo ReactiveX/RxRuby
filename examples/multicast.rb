@@ -1,10 +1,10 @@
-require 'rx'
+require 'rx_ruby'
 
-subject = RX::Subject.new
-source = RX::Observable.range(0, 3)
+subject = RxRuby::Subject.new
+source = RxRuby::Observable.range(0, 3)
     .multicast(subject)
 
-observer = RX::Observer.create(
+observer = RxRuby::Observer.create(
     lambda {|x|
         puts 'Next: ' + x.to_s
     },

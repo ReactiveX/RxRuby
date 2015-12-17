@@ -1,6 +1,6 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable.timer(0, 0.1)
+source = RxRuby::Observable.timer(0, 0.1)
     .take(5)
     .to_a
 

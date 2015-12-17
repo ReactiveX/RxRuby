@@ -1,4 +1,4 @@
-require 'rx'
+require 'rx_ruby'
 
 # Using Standard JavaScript
 obj = {
@@ -7,7 +7,7 @@ obj = {
   baz: 78
 }
 
-source = RX::Observable.pairs(obj)
+source = RxRuby::Observable.pairs(obj)
 
 subscription = source.subscribe(
   lambda {|x|

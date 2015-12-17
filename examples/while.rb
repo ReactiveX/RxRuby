@@ -1,11 +1,11 @@
-require 'rx'
+require 'rx_ruby'
 
 i = 0
 
 # Repeat until condition no longer holds
-source = RX::Observable.while(
+source = RxRuby::Observable.while(
     lambda { i += 1; i <= 3 },
-    RX::Observable.return(42)
+    RxRuby::Observable.return(42)
 )
 
 subscription = source.subscribe(

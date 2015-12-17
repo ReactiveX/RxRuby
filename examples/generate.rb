@@ -1,6 +1,6 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable.generate(
+source = RxRuby::Observable.generate(
     0,
     lambda {|x| x < 3 }, # condition
     lambda {|x| x + 1 }, # iterate

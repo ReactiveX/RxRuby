@@ -1,4 +1,4 @@
-require 'rx'
+require 'rx_ruby'
 
 times = [
     { value: 0, time: 0.1 },
@@ -9,9 +9,9 @@ times = [
 ]
 
 # Delay each item by time and project value
-source = RX::Observable.from(times)
+source = RxRuby::Observable.from(times)
   .flat_map {|item|
-    RX::Observable.of(item[:value])
+    RxRuby::Observable.of(item[:value])
       .delay(item[:time])
   }
   .debounce 0.5 # ms

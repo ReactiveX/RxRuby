@@ -1,6 +1,6 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable.timer(0, 1)
+source = RxRuby::Observable.timer(0, 1)
     .timestamp
     .map {|x| x[:value].to_s + ':' + x[:timestamp].to_i.to_s }
     .take(5)

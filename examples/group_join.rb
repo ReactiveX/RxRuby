@@ -1,15 +1,15 @@
-require 'rx'
+require 'rx_ruby'
 
-xs = RX::Observable.interval(0.1)
+xs = RxRuby::Observable.interval(0.1)
     .map {|x| 'first' + x.to_s }
 
-ys = RX::Observable.interval(0.1)
+ys = RxRuby::Observable.interval(0.1)
     .map {|x| 'second' + x.to_s }
 
 source = xs.group_join(
     ys,
-    lambda {|_| return RX::Observable.timer(0) },
-    lambda {|_| return RX::Observable.timer(0) },
+    lambda {|_| return RxRuby::Observable.timer(0) },
+    lambda {|_| return RxRuby::Observable.timer(0) },
     lambda {|x, yy|
         return yy.map {|y|
             x + y

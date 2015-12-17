@@ -1,13 +1,13 @@
-require 'rx'
+require 'rx_ruby'
 
 sources = {
-    'foo' => RX::Observable.return(42),
-    'bar' => RX::Observable.return(56)
+    'foo' => RxRuby::Observable.return(42),
+    'bar' => RxRuby::Observable.return(56)
 }
 
-defaultSource = RX::Observable.empty()
+defaultSource = RxRuby::Observable.empty()
 
-source = RX::Observable.case(
+source = RxRuby::Observable.case(
     lambda {
         'foo'
     },

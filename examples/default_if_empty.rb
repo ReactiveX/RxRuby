@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Without a default value
-source = RX::Observable.empty.default_if_empty
+source = RxRuby::Observable.empty.default_if_empty
 
 subscription = source.subscribe(
     lambda {|x|
@@ -18,7 +18,7 @@ subscription = source.subscribe(
 # => Completed
 
 #  With a default_value
-source = RX::Observable.empty.default_if_empty(false)
+source = RxRuby::Observable.empty.default_if_empty(false)
 
 subscription = source.subscribe(
     lambda {|x|

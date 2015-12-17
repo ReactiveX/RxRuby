@@ -1,9 +1,9 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable
+source = RxRuby::Observable
     .from_array([
-        RX::Notification.create_on_next(42),
-        RX::Notification.create_on_error(Exception.new('woops'))
+        RxRuby::Notification.create_on_next(42),
+        RxRuby::Notification.create_on_error(Exception.new('woops'))
     ])
     .dematerialize
 

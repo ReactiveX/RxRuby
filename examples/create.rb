@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Using a function
-source = RX::Observable.create {|observer|
+source = RxRuby::Observable.create {|observer|
     observer.on_next(42)
     observer.on_completed
 
@@ -30,12 +30,12 @@ subscription.dispose
 # => disposed
 
 #  Using a disposable
-source = RX::Observable.create {|observer|
+source = RxRuby::Observable.create {|observer|
     observer.on_next(42)
     observer.on_completed
 
     # Note that this is optional, you do not have to return this if you require no cleanup
-    RX::Disposable.create {
+    RxRuby::Disposable.create {
         puts 'disposed'
     }
 }

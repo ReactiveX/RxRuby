@@ -1,8 +1,8 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Using a second observable
-source = RX::Observable.raise_error(Exception.new)
-    .rescue_error(RX::Observable.return(42))
+source = RxRuby::Observable.raise_error(Exception.new)
+    .rescue_error(RxRuby::Observable.return(42))
 
 subscription = source.subscribe(
     lambda {|x|
@@ -19,9 +19,9 @@ subscription = source.subscribe(
 # => Completed
 
 #  Using a handler function
-source = RX::Observable.raise_error(Exception.new)
+source = RxRuby::Observable.raise_error(Exception.new)
     .rescue_error {|e|
-        RX::Observable.return(e.is_a? Exception)
+        RxRuby::Observable.return(e.is_a? Exception)
     }
 
 subscription = source.subscribe(

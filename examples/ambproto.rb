@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
-first = RX::Observable.timer(0.3).map { 'first' }
-second = RX::Observable.timer(0.5).map { 'second' }
+first = RxRuby::Observable.timer(0.3).map { 'first' }
+second = RxRuby::Observable.timer(0.5).map { 'second' }
 
 source = first.amb(second)
 
