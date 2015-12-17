@@ -1,13 +1,13 @@
-require 'rx'
+require 'rx_ruby'
 
 context = { value: 42 }
 
-source = RX::Observable.start(
+source = RxRuby::Observable.start(
     lambda {
         return self[:value]
     },
     context,
-    RX::DefaultScheduler.instance
+    RxRuby::DefaultScheduler.instance
 )
 
 subscription = source.subscribe(

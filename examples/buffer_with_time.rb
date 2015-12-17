@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Without a skip
-source = RX::Observable.interval(0.1)
+source = RxRuby::Observable.interval(0.1)
     .buffer_with_time(0.5)
     .take(3)
 
@@ -26,7 +26,7 @@ while Thread.list.size > 1
 end
 
 #  Using a skip
-source = RX::Observable.interval(0.1)
+source = RxRuby::Observable.interval(0.1)
     .buffer_with_time(0.5, 0.1)
     .take(3)
 

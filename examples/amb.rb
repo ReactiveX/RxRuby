@@ -1,9 +1,9 @@
-require 'rx'
+require 'rx_ruby'
 
 # Using Observable sequences
-source = RX::Observable.amb(
-    RX::Observable.timer(0.5).map { 'foo' },
-    RX::Observable.timer(0.2).map { 'bar' }
+source = RxRuby::Observable.amb(
+    RxRuby::Observable.timer(0.5).map { 'foo' },
+    RxRuby::Observable.timer(0.2).map { 'bar' }
 )
 
 subscription = source.subscribe(

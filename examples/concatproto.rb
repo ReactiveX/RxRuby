@@ -1,8 +1,8 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable
+source = RxRuby::Observable
     .return(42)
-    .concat(RX::Observable.return(56), RX::Observable.return(72))
+    .concat(RxRuby::Observable.return(56), RxRuby::Observable.return(72))
 
 subscription = source.subscribe(
     lambda {|x|

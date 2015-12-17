@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Using a function
-source = RX::Observable.range(0, 3)
+source = RxRuby::Observable.range(0, 3)
   .do(
     lambda {|x|   puts 'Do Next:' + x.to_s },
     lambda {|err| puts 'Do Error:' + err.to_s },
@@ -29,13 +29,13 @@ subscription = source.subscribe(
 # => Completed
 
 #  Using an observer
-observer = RX::Observer.create(
+observer = RxRuby::Observer.create(
   lambda {|x|   puts 'Do Next: ' + x.to_s },
   lambda {|err| puts 'Do Error: ' + err.to_s },
   lambda {      puts 'Do Completed' }
 )
 
-source = RX::Observable.range(0, 3)
+source = RxRuby::Observable.range(0, 3)
     .do(observer)
 
 subscription = source.subscribe(

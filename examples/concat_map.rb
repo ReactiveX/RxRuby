@@ -1,8 +1,8 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable.range(0, 5)
+source = RxRuby::Observable.range(0, 5)
     .concat_map(lambda {|x, i|
-        return RX::Observable
+        return RxRuby::Observable
             .interval(0.1)
             .take(x).map { i }
     })
@@ -35,7 +35,7 @@ while Thread.list.size > 1
 end
 
 #  Using an array
-source = RX::Observable.of(1,2,3)
+source = RxRuby::Observable.of(1,2,3)
   .concat_map(
     lambda {|x, i| return [x,i] },
     lambda {|x, y, ix, iy| return x + y + ix + iy }

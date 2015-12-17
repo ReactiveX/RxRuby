@@ -1,6 +1,6 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable.timer(0.2, 0.1)
+source = RxRuby::Observable.timer(0.2, 0.1)
     .time_interval
     .pluck('interval')
     .take(3)

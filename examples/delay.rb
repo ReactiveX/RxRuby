@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Using an absolute time to delay by a second
-source = RX::Observable.range(0, 3)
+source = RxRuby::Observable.range(0, 3)
     .delay(Time.now + 1)
 
 subscription = source.subscribe(
@@ -25,7 +25,7 @@ while Thread.list.size > 1
 end
 
 #  Using an relatove time to delay by a second
-source = RX::Observable.range(0, 3)
+source = RxRuby::Observable.range(0, 3)
     .delay(1)
 
 subscription = source.subscribe(

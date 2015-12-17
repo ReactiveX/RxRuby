@@ -1,6 +1,6 @@
-require 'rx'
+require 'rx_ruby'
 
-source = RX::Observable
+source = RxRuby::Observable
     .interval(0.5) # ms
     .time_interval
     .take(3)

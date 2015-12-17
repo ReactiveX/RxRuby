@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 # Wrap fs.exists
-exists = RX::Observable.from_callback(File.method(:exist?))
+exists = RxRuby::Observable.from_callback(File.method(:exist?))
 
 # Check if file.txt exists
 source = exists.call('file.txt')

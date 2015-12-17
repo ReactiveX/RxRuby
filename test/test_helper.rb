@@ -8,4 +8,4 @@ if ENV['COVERAGE']
 end
 
 require 'minitest/autorun'
-require 'rx'
+require 'rx_ruby'

@@ -1,14 +1,14 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Without publish
-interval = RX::Observable.interval(1)
+interval = RxRuby::Observable.interval(1)
 
 source = interval
     .take(2)
     .do {|x| puts 'Side effect' }
 
 def create_observer(tag)
-    RX::Observer.create(
+    RxRuby::Observer.create(
         lambda {|x|
             puts 'Next: ' + tag + x.to_s
         },
@@ -39,14 +39,14 @@ end
 # => Completed
 
 #  With publish
-interval = RX::Observable.interval(1)
+interval = RxRuby::Observable.interval(1)
 
 source = interval
     .take(2)
     .do {|x| puts 'Side effect' }
 
 def create_observer(tag)
-    RX::Observer.create(
+    RxRuby::Observer.create(
         lambda {|x|
             puts 'Next: ' + tag + x.to_s
         },

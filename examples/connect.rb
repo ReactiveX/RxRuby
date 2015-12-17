@@ -1,13 +1,13 @@
-require 'rx'
+require 'rx_ruby'
 
-interval = RX::Observable.interval(1)
+interval = RxRuby::Observable.interval(1)
 
 source = interval
     .take(2)
     .do {|x| puts 'Side effect' }
 
 def create_observer(tag)
-    return RX::Observer.create(
+    return RxRuby::Observer.create(
         lambda {|x|
             puts 'Next: ' + tag + x.to_s
         },

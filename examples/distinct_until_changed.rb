@@ -1,7 +1,7 @@
-require 'rx'
+require 'rx_ruby'
 
 #  Without key selector
-source = RX::Observable.from_array([
+source = RxRuby::Observable.from_array([
         42, 42, 24, 24
     ])
     .distinct_until_changed
@@ -22,7 +22,7 @@ subscription = source.subscribe(
 # => Completed
 
 #  With key selector
-source = RX::Observable.from_array([
+source = RxRuby::Observable.from_array([
         {value: 42}, {value: 42}, {value: 24}, {value: 24}
     ])
     .distinct_until_changed {|x| x[:value] }
