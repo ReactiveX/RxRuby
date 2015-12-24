@@ -1,15 +1,15 @@
-[![Build Status](https://travis-ci.org/ReactiveX/Rx.rb.svg?branch=master)](https://travis-ci.org/ReactiveX/Rx.rb)
-[![GitHub version](http://img.shields.io/github/tag/reactive-extensions/Rx.rb.svg)](https://github.com/Reactive-Extensions/Rx.rb)
+[![Build Status](https://travis-ci.org/ReactiveX/RxRuby.svg?branch=master)](https://travis-ci.org/ReactiveX/RxRuby)
+[![GitHub version](http://img.shields.io/github/tag/ReactiveX/RxRuby.svg)](https://github.com/ReactiveX/RxRuby)
 [![Downloads](http://img.shields.io/gem/dt/rx.svg)](https://npmjs.org/package/rx)
-[![Code Climate](https://codeclimate.com/github/ReactiveX/Rx.rb/badges/gpa.svg)](https://codeclimate.com/github/ReactiveX/Rx.rb)
+[![Code Climate](https://codeclimate.com/github/ReactiveX/RxRuby/badges/gpa.svg)](https://codeclimate.com/github/ReactiveX/RxRuby)
 
 **[The Need to go Reactive](#the-need-to-go-reactive)** |
 **[About the Reactive Extensions](#about-the-reactive-extensions)** |
-**[Why Rx.rb?](#why-rxrb)** |
+**[Why RxRuby?](#why-rxruby)** |
 **[Contributing](#contributing)** |
 **[License](#license)**
 
-# The Reactive Extensions for Ruby (Rx.rb) <sup>0.1</sup>... #
+# The Reactive Extensions for Ruby (RxRuby) <sup>0.1</sup>... #
 *...is a set of libraries to compose asynchronous and event-based programs using observable collections and Enumerable module style composition in Ruby*
 
 ## The Need to go Reactive ##
@@ -18,11 +18,11 @@ Reactive Programming is a hot topic as of late, especially with such things as t
 
 ## About the Reactive Extensions ##
 
-The Reactive Extensions for Ruby (Rx.rb) is a set of libraries for composing asynchronous and event-based programs using observable sequences and fluent query operators that many of you already know by with the  in Ruby. Using Rx.rb, developers represent asynchronous data streams with Observables, query asynchronous data streams using our many operators, and parameterize the concurrency in the asynchronous data streams using Schedulers. Simply put, Rx.rb = Observables + Operators + Schedulers.
+The Reactive Extensions for Ruby (RxRuby) is a set of libraries for composing asynchronous and event-based programs using observable sequences and fluent query operators that many of you already know by with the  in Ruby. Using RxRuby, developers represent asynchronous data streams with Observables, query asynchronous data streams using our many operators, and parameterize the concurrency in the asynchronous data streams using Schedulers. Simply put, RxRuby = Observables + Operators + Schedulers.
 
 When you're authoring applications with Ruby, there may be times when you want to deal with asynchronous programming and event-based programming, and synchronization is difficult and error prone.
 
-Using Rx.rb, you can represent multiple asynchronous data streams (that come from diverse sources, e.g., stock quote, tweets, computer events, web service requests, etc.), and subscribe to the event stream using the Observer module. The Observable notifies the subscribed Observer instance whenever an event occurs.
+Using RxRuby, you can represent multiple asynchronous data streams (that come from diverse sources, e.g., stock quote, tweets, computer events, web service requests, etc.), and subscribe to the event stream using the Observer module. The Observable notifies the subscribed Observer instance whenever an event occurs.
 
 Because observable sequences are data streams, you can query them using standard query operators implemented by the Observable module. Thus you can filter, project, reduce, compose and perform time-based operations on multiple events easily by using these our many operators. In addition, there are a number of other reactive stream specific operators that allow powerful queries to be written. Cancellation, exceptions, and synchronization are also handled gracefully by using the methods on the Observable module.
 
@@ -36,7 +36,7 @@ someSource
   .each {|x| puts x.to_s }
 ```
 
-Using Rx.rb, you can accomplish the same kind of thing with a push based collection with little to no change to your code at all, changing `each` to `subscribe`.
+Using RxRuby, you can accomplish the same kind of thing with a push based collection with little to no change to your code at all, changing `each` to `subscribe`.
 
 ```ruby
 someSource
@@ -45,9 +45,9 @@ someSource
   .subscribe {|x| puts x.to_s }
 ```
 
-## Why Rx.rb? ##
+## Why RxRuby? ##
 
-The overall goal of [Rx.rb](https://github.com/Reactive-Extensions/Rx.rb) is to have a push based version of the [Enumerable module](http://www.ruby-doc.org/core-2.1.0/Enumerable.html) with an added notion of time.  Right now, the [Observable module](http://ruby-doc.org/stdlib-1.9.3/libdoc/observer/rdoc/Observable.html) is not quite what we want because it does not allow for composition.  That is no more than a simple implementation of the Subject/Observer pattern from the Gang of Four book, such as the following.
+The overall goal of [RxRuby](https://github.com/ReactiveX/RxRuby) is to have a push based version of the [Enumerable module](http://www.ruby-doc.org/core-2.1.0/Enumerable.html) with an added notion of time.  Right now, the [Observable module](http://ruby-doc.org/stdlib-1.9.3/libdoc/observer/rdoc/Observable.html) is not quite what we want because it does not allow for composition.  That is no more than a simple implementation of the Subject/Observer pattern from the Gang of Four book, such as the following.
 
 ```ruby
 require 'observer'
@@ -106,13 +106,13 @@ b = [ 7, 8, 9 ]
 a.zip([1, 2], [8])       #=> [[4, 1, 8], [5, 2, nil], [6, nil, nil]]
 ```
 
-Now, we could do something similar in [Rx.rb](https://github.com/Reactive-Extensions/Rx.rb) with two observable sequences:
+Now, we could do something similar in [RxRuby](https://github.com/ReactiveX/RxRuby) with two observable sequences:
 
 ```ruby
-require 'rx'
+require 'rx_ruby'
 
-a = RX::Observable.from_array [ 4, 5, 6 ]
-b = RX::Observable.from_array [ 7, 8, 9 ]
+a = RxRuby::Observable.from_array [ 4, 5, 6 ]
+b = RxRuby::Observable.from_array [ 7, 8, 9 ]
 
 sub = a.zip(b).subscribe {|arr| puts arr.to_s }
 # => "[4, 7]"
@@ -123,7 +123,7 @@ sub = a.zip(b).subscribe {|arr| puts arr.to_s }
 sub.unsubscribe
 ```
 
-The difference here is that `zip` returns an `RX::Observable` instead of an `Enumerable`.  And once you call `subscribe` it's much like `each` but takes an observer, or perhaps just some blocks, lambdas, etc.  The subscription handed back contains the cancellation logic.  For example, if you are listening to events and you no longer want to listen, then you can call `unsubscribe` on the `sub` variable above.
+The difference here is that `zip` returns an `RxRuby::Observable` instead of an `Enumerable`.  And once you call `subscribe` it's much like `each` but takes an observer, or perhaps just some blocks, lambdas, etc.  The subscription handed back contains the cancellation logic.  For example, if you are listening to events and you no longer want to listen, then you can call `unsubscribe` on the `sub` variable above.
 
 What's the end goal?  The first part is where we want to support the main `Enumerable` module methods in the `Observable` module and have them react the same way, but push instead of pull based.  Then from there, we can explore such things as multi-threading, and calls across the network.
 
