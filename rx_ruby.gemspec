@@ -1,4 +1,7 @@
 # -*- encoding: utf-8 -*-
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'rx_ruby/version'
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Microsoft Open Technologies, Inc."]
@@ -10,7 +13,8 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "rx_ruby"
   gem.require_paths = ["lib"]
-  gem.version       = "0.0.1"
+  gem.version       = RxRuby::VERSION
+  gem.license       = 'Apache License, v2.0'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'minitest'
