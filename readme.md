@@ -111,8 +111,8 @@ Now, we could do something similar in [RxRuby](https://github.com/ReactiveX/RxRu
 ```ruby
 require 'rx_ruby'
 
-a = RxRuby::Observable.from_array [ 4, 5, 6 ]
-b = RxRuby::Observable.from_array [ 7, 8, 9 ]
+a = Rx::Observable.from_array [ 4, 5, 6 ]
+b = Rx::Observable.from_array [ 7, 8, 9 ]
 
 sub = a.zip(b).subscribe {|arr| puts arr.to_s }
 # => "[4, 7]"
@@ -123,7 +123,7 @@ sub = a.zip(b).subscribe {|arr| puts arr.to_s }
 sub.unsubscribe
 ```
 
-The difference here is that `zip` returns an `RxRuby::Observable` instead of an `Enumerable`.  And once you call `subscribe` it's much like `each` but takes an observer, or perhaps just some blocks, lambdas, etc.  The subscription handed back contains the cancellation logic.  For example, if you are listening to events and you no longer want to listen, then you can call `unsubscribe` on the `sub` variable above.
+The difference here is that `zip` returns an `Rx::Observable` instead of an `Enumerable`.  And once you call `subscribe` it's much like `each` but takes an observer, or perhaps just some blocks, lambdas, etc.  The subscription handed back contains the cancellation logic.  For example, if you are listening to events and you no longer want to listen, then you can call `unsubscribe` on the `sub` variable above.
 
 What's the end goal?  The first part is where we want to support the main `Enumerable` module methods in the `Observable` module and have them react the same way, but push instead of pull based.  Then from there, we can explore such things as multi-threading, and calls across the network.
 
