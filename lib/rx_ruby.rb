@@ -25,3 +25,5 @@ require_all 'rx_ruby/subjects/'
 require_all 'rx_ruby/testing/'
 require_all 'rx_ruby/joins/'
 require_all 'rx_ruby/'
+
+Rx = RxRuby
