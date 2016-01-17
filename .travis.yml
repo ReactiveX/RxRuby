@@ -1,9 +1,12 @@
 language: ruby
+sudo: false
+cache: bundler
 rvm:
   - 1.9.3
   - 2.0.0
   - 2.1.2
   - 2.2.0
+  - 2.3.0
   - jruby-19mode # JRuby in 1.9 mode
   - rbx-2.6
 before_install:
