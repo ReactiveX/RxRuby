@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ReactiveX/RxRuby.svg?branch=master)](https://travis-ci.org/ReactiveX/RxRuby)
-[![GitHub version](http://img.shields.io/github/tag/ReactiveX/RxRuby.svg)](https://github.com/ReactiveX/RxRuby)
-[![Downloads](http://img.shields.io/gem/dt/rx.svg)](https://npmjs.org/package/rx)
+[![GitHub version](https://img.shields.io/github/tag/ReactiveX/RxRuby.svg)](https://github.com/ReactiveX/RxRuby)
+[![Downloads](https://img.shields.io/gem/dt/rx.svg)](https://www.npmjs.com/package/rx)
 [![Code Climate](https://codeclimate.com/github/ReactiveX/RxRuby/badges/gpa.svg)](https://codeclimate.com/github/ReactiveX/RxRuby)
 
 **[The Need to go Reactive](#the-need-to-go-reactive)** |
@@ -47,7 +47,7 @@ someSource
 
 ## Why RxRuby? ##
 
-The overall goal of [RxRuby](https://github.com/ReactiveX/RxRuby) is to have a push based version of the [Enumerable module](http://www.ruby-doc.org/core-2.1.0/Enumerable.html) with an added notion of time.  Right now, the [Observable module](http://ruby-doc.org/stdlib-1.9.3/libdoc/observer/rdoc/Observable.html) is not quite what we want because it does not allow for composition.  That is no more than a simple implementation of the Subject/Observer pattern from the Gang of Four book, such as the following.
+The overall goal of [RxRuby](https://github.com/ReactiveX/RxRuby) is to have a push based version of the [Enumerable module](http://ruby-doc.org/core-2.1.0/Enumerable.html) with an added notion of time.  Right now, the [Observable module](http://ruby-doc.org/stdlib-1.9.3/libdoc/observer/rdoc/Observable.html) is not quite what we want because it does not allow for composition.  That is no more than a simple implementation of the Subject/Observer pattern from the Gang of Four book, such as the following.
 
 ```ruby
 require 'observer'
@@ -89,7 +89,7 @@ observer = ArrayObserver.new(observable)
 
 But, how do you enable better composition so that you can compose together Observable instances?  In this current model, this can't happen.  That's why we need the Reactive Extensions for Ruby.  Not only that, but we can at any point in the computation, change the concurrency model to be immediate, on a new thread, or on another machine.
 
-There are many implementations of the Reactive Extensions such as [RxJS](https://github.com/Reactive-Extensions/RxJS), [Rx.NET](https://github.com/reactive-extensions/rx.net), [Java/JVM/Clojure/Scala/JRuby/Groovy](https://github.com/Netflix/RxJava) and [ObjC/ReactiveCocoa](https://github.com/ReactiveCocoa/ReactiveCocoa).  Our goal is to have one operate like the JRuby one, but be available to all users of Ruby regardless of VM.
+There are many implementations of the Reactive Extensions such as [RxJS](https://github.com/Reactive-Extensions/RxJS), [Rx.NET](https://github.com/reactive-extensions/rx.net), [Java/JVM/Clojure/Scala/JRuby/Groovy](https://github.com/ReactiveX/RxJava) and [ObjC/ReactiveCocoa](https://github.com/ReactiveCocoa/ReactiveCocoa).  Our goal is to have one operate like the JRuby one, but be available to all users of Ruby regardless of VM.
 
 We'd like it to be much like our JavaScript version, [RxJS](https://github.com/Reactive-Extensions/RxJS) but be able to handle multi-threading, parallelism, and in addition, go across the network.
 
