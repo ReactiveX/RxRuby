@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-require 'test_helper'
+require "#{File.dirname(__FILE__)}/../../test_helper"
 
 class TestObservableCreation < Minitest::Test
   include RxRuby::ReactiveTest
@@ -69,7 +69,6 @@ class TestObservableCreation < Minitest::Test
   end
 
   def test_create_unsubscribe
-    err = RuntimeError.new
     scheduler = RxRuby::TestScheduler.new
 
     res = scheduler.configure do 
@@ -447,10 +446,10 @@ class TestObservableCreation < Minitest::Test
     assert_messages msgs, res.messages      
   end
 
-  def range_dispose
+  def test_range_dispose
     scheduler = RxRuby::TestScheduler.new
 
-    res = scheduler.configure(:dispose => 204) do
+    res = scheduler.configure(:disposed => 204) do
       RxRuby::Observable.range(-10, 5, scheduler)
     end
 
@@ -463,21 +462,179 @@ class TestObservableCreation < Minitest::Test
   end
 
   # Repeat methods
-
 =begin
+# the clock is actually off, because of not using the `scheduler.schedule_recursive`
   def test_repeat_value_count_zero
     scheduler = RxRuby::TestScheduler.new
 
-    res = scheduler.configure(:dispose => 204) do
+    res = scheduler.configure do
       RxRuby::Observable.repeat(42, 0, scheduler)
     end
 
     msgs = [
       on_completed(201)
     ]
-    assert_messages msgs, res.messages 
+    assert_messages msgs, res.messages
+  end
+
+  def test_repeat_value_once
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure do
+      RxRuby::Observable.repeat(42, 1, scheduler)
+    end
+
+    msgs = [
+        on_next(201, 42),
+        on_completed(202)
+    ]
+    assert_messages msgs, res.messages
   end
 =end
 
+  def test_repeat_infinitely_dispose
+    scheduler = RxRuby::TestScheduler.new
 
+    res = scheduler.configure(:disposed => 203) do
+      RxRuby::Observable.repeat_infinitely({a: 1}, scheduler)
+    end
+
+    msgs = [
+        on_next(201, {a: 1}),
+        on_next(202, {a: 1})
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  # of_enumerable/of_enumerator
+  def test_of_enumerable_empty
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure do
+      RxRuby::Observable.of_enumerable([], scheduler)
+    end
+
+    msgs = [
+        on_completed(201)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_of_enumerable_simple
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure do
+      RxRuby::Observable.of_enumerable(%w(foo bar baz), scheduler)
+    end
+
+    msgs = [
+        on_next(201, 'foo'),
+        on_next(202, 'bar'),
+        on_next(203, 'baz'),
+        on_completed(204)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+
+  def test_of_enumerator_empty
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure do
+      RxRuby::Observable.of_enumerator([].to_enum, scheduler)
+    end
+
+    msgs = [
+        on_completed(201)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_of_enumerator_error
+    scheduler = RxRuby::TestScheduler.new
+    err = RuntimeError.new
+    fibs = Enumerator.new do |x|
+      a = b = 1
+      6.times do
+        x << a
+        a, b = b, a + b
+      end
+      raise err
+    end
+    res = scheduler.configure do
+      RxRuby::Observable.of_enumerator(fibs, scheduler)
+    end
+
+    msgs = [
+        on_next(201, 1),
+        on_next(202, 1),
+        on_next(203, 2),
+        on_next(204, 3),
+        on_next(205, 5),
+        on_next(206, 8),
+        on_error(207, err)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_of_enumerator_infinite_dispose
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure(:disposed => 205) do
+      RxRuby::Observable.of_enumerator([42].cycle, scheduler)
+    end
+
+    msgs = [
+        on_next(201, 42),
+        on_next(202, 42),
+        on_next(203, 42),
+        on_next(204, 42)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  # from_array methods
+  def test_from_array_empty
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure do
+      RxRuby::Observable.from_array([], scheduler)
+    end
+
+    msgs = [
+        on_completed(201)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_from_array_simple
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure do
+      RxRuby::Observable.from_array([1, 2, 3], scheduler)
+    end
+
+    msgs = [
+        on_next(201, 1),
+        on_next(202, 2),
+        on_next(203, 3),
+        on_completed(204)
+    ]
+    assert_messages msgs, res.messages
+  end
+
+  def test_from_array_complex_dispose
+    scheduler = RxRuby::TestScheduler.new
+
+    res = scheduler.configure(:disposed => 204) do
+      RxRuby::Observable.from_array([[], [[]], [[[]]], [[[[]]]]], scheduler)
+    end
+
+    msgs = [
+        on_next(201, []),
+        on_next(202, [[]]),
+        on_next(203, [[[]]])
+    ]
+    assert_messages msgs, res.messages
+  end
 end
