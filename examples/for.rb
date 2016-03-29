@@ -1,12 +1,12 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Using Observables
 array = [1, 2, 3]
 
-source = RxRuby::Observable.for(
+source = Rx::Observable.for(
     array,
     lambda {|x|
-        RxRuby::Observable.return(x)
+        Rx::Observable.return(x)
     })
 
 subscription = source.subscribe(

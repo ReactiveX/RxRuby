@@ -1,9 +1,9 @@
-require 'rx_ruby'
+require 'rx'
 
-obs1 = RxRuby::Observable.raise_error(Exception.new('error'))
-obs2 = RxRuby::Observable.return(42)
+obs1 = Rx::Observable.raise_error(Exception.new('error'))
+obs2 = Rx::Observable.return(42)
 
-source = RxRuby::Observable.rescue_error(obs1, obs2)
+source = Rx::Observable.rescue_error(obs1, obs2)
 
 subscription = source.subscribe(
     lambda {|x|

@@ -1,14 +1,14 @@
-require 'rx_ruby'
+require 'rx'
 
 # Have staggering intervals
-source1 = RxRuby::Observable.interval(0.1)
+source1 = Rx::Observable.interval(0.1)
     .map {|i| 'First: ' + i.to_s }
 
-source2 = RxRuby::Observable.interval(0.15)
+source2 = Rx::Observable.interval(0.15)
     .map {|i| 'Second: ' + i.to_s }
 
 # Combine latest of source1 and source2 whenever either gives a value
-source = RxRuby::Observable.combine_latest(
+source = Rx::Observable.combine_latest(
         source1,
         source2) {|s1, s2| s1.to_s + ', ' + s2.to_s }
     .take(4)

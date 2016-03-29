@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Without a skip
-source = RxRuby::Observable.range(1, 6)
+source = Rx::Observable.range(1, 6)
     .buffer_with_count(2)
 
 subscription = source.subscribe(
@@ -21,7 +21,7 @@ subscription = source.subscribe(
 # => Completed
 
 #  Using a skip
-source = RxRuby::Observable.range(1, 6)
+source = Rx::Observable.range(1, 6)
     .buffer_with_count(2, 1)
 
 subscription = source.subscribe(

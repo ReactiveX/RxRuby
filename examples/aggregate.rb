@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 # Using a seed for the accumulate
-source = RxRuby::Observable.range(1, 10).aggregate(1) {|acc, x|
+source = Rx::Observable.range(1, 10).aggregate(1) {|acc, x|
     acc * x
 }
 
@@ -20,7 +20,7 @@ subscription = source.subscribe(
 # => Completed
 
 # Without a seed
-source = RxRuby::Observable.range(1, 10).aggregate {|acc, x|
+source = Rx::Observable.range(1, 10).aggregate {|acc, x|
     acc + x
 }
 

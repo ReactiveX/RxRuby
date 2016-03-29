@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 # Create subject
-subject = RxRuby::AsyncSubject.new
+subject = Rx::AsyncSubject.new
 
 # Send a value
 subject.on_next(42)

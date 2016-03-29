@@ -1,6 +1,6 @@
-require 'rx_ruby'
+require 'rx'
 
-func = RxRuby::Observable.to_async(lambda {|x, y|
+func = Rx::Observable.to_async(lambda {|x, y|
     return x + y
 })
 

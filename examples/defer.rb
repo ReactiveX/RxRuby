@@ -1,8 +1,8 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Using an observable sequence
-source = RxRuby::Observable.defer {
-    RxRuby::Observable.return(42)
+source = Rx::Observable.defer {
+    Rx::Observable.return(42)
 }
 
 subscription = source.subscribe(

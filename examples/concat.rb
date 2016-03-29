@@ -1,10 +1,10 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Using Observable sequences
-source1 = RxRuby::Observable.return(42)
-source2 = RxRuby::Observable.return(56)
+source1 = Rx::Observable.return(42)
+source2 = Rx::Observable.return(56)
 
-source = RxRuby::Observable.concat(source1, source2)
+source = Rx::Observable.concat(source1, source2)
 
 subscription = source.subscribe(
     lambda {|x|

@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Without a seed
-source = RxRuby::Observable.range(1, 3)
+source = Rx::Observable.range(1, 3)
     .scan {|acc, x| acc + x }
 
 subscription = source.subscribe(
@@ -21,7 +21,7 @@ subscription = source.subscribe(
 # => Completed
 
 #  With a seed
-source = RxRuby::Observable.range(1, 3)
+source = Rx::Observable.range(1, 3)
     .scan(1) {|acc, x| acc * x }
 
 subscription = source.subscribe(

@@ -1,12 +1,12 @@
-require 'rx_ruby'
+require 'rx'
 
 #  With subscription_delay
-source = RxRuby::Observable
+source = Rx::Observable
     .range(0, 3)
     .delay_with_selector(
-        RxRuby::Observable.timer(0.3),
+        Rx::Observable.timer(0.3),
         lambda {|x|
-            return RxRuby::Observable.timer(x * 0.4)
+            return Rx::Observable.timer(x * 0.4)
         }
     )
     .time_interval
@@ -33,11 +33,11 @@ while Thread.list.size > 1
 end
 
 #  Without subscription_delay
-source = RxRuby::Observable
+source = Rx::Observable
     .range(0, 3)
     .delay_with_selector(
         lambda {|x|
-            return RxRuby::Observable.timer(x * 0.4)
+            return Rx::Observable.timer(x * 0.4)
         })
     .time_interval
     .map {|x| x.value.to_s + ':' + x.interval.to_s }

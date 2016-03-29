@@ -1,8 +1,8 @@
-require 'rx_ruby'
+require 'rx'
 
 array = [1,2,3]
 
-source = RxRuby::Observable.from_array(array)
+source = Rx::Observable.from_array(array)
 
 subscription = source.subscribe(
     lambda {|x|

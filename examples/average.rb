@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 # Without a selector
-source = RxRuby::Observable.range(0, 9).average
+source = Rx::Observable.range(0, 9).average
 
 subscription = source.subscribe(
     lambda {|x|
@@ -24,7 +24,7 @@ arr = [
     { value: 3 }
 ]
 
-source = RxRuby::Observable.from_array(arr).average {|x|
+source = Rx::Observable.from_array(arr).average {|x|
     x[:value]
 }
 

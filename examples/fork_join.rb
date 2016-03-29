@@ -1,11 +1,11 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Using observables and Promises
-source = RxRuby::Observable.fork_join(
-    RxRuby::Observable.return(42),
-    RxRuby::Observable.range(0, 10),
-    RxRuby::Observable.from_array([1,2,3]),
-    RxRuby::Observable.return(56)
+source = Rx::Observable.fork_join(
+    Rx::Observable.return(42),
+    Rx::Observable.range(0, 10),
+    Rx::Observable.from_array([1,2,3]),
+    Rx::Observable.return(56)
 )
 
 subscription = source.subscribe(
