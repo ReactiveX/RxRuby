@@ -76,7 +76,7 @@ module RxRuby
               end
             rescue => err
               observer.on_error err
-              return
+              break
             end
             if has_result
               observer.on_next result

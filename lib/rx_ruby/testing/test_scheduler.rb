@@ -44,7 +44,7 @@ module RxRuby
     def configure(options = {})
       options.each {|key,_|
         unless [:created, :subscribed, :disposed].include? key
-          raise ArgumentError, "Should be spcified whether :created, :subscribed or :disposed, but the #{key.inspect}"
+          raise ArgumentError, "Should be specified whether :created, :subscribed or :disposed, but the #{key.inspect}"
         end
       }
       o = {
