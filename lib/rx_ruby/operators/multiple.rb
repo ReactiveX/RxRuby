@@ -141,7 +141,7 @@ module RxRuby
                 res = result_selector.call left, right
               rescue => e
                 observer.on_error e
-                return
+                break
               end
               observer.on_next res
             end
@@ -168,7 +168,7 @@ module RxRuby
                 res = result_selector.call left, right
               rescue => e
                 observer.on_error e
-                return
+                break
               end
               observer.on_next res
             end
@@ -443,7 +443,7 @@ module RxRuby
               error = nil
 
               if disposed
-                return
+                break
               else
                 begin
                   current = e.next
@@ -457,7 +457,7 @@ module RxRuby
 
               if error
                 observer.on_error error
-                return
+                break
               end
 
               unless has_next
@@ -466,7 +466,7 @@ module RxRuby
                 else
                   observer.on_completed
                 end
-                return
+                break
               end
 
               new_obs = Observer.configure do |o|
@@ -510,13 +510,13 @@ module RxRuby
                 res = result_selector.call(*values)
               rescue => e
                 observer.on_error e
-                return
+                break
               end
 
               observer.on_next(res)
             elsif enumerable_select_with_index(is_done) {|_, j| j != i} .all?
               observer.on_completed
-              return
+              break
             end
           end
 
@@ -564,7 +564,7 @@ module RxRuby
               err = nil
 
               if disposed
-                return
+                break
               else
                 begin
                   current = e.next
@@ -578,12 +578,12 @@ module RxRuby
 
               if err
                 observer.on_error err
-                return
+                break
               end
 
               unless has_next
                 observer.on_completed
-                return
+                break
               end
 
               d = SingleAssignmentSubscription.new
@@ -631,7 +631,6 @@ module RxRuby
               current = nil
               has_next = false
               err = nil
-
               if !disposed
                 begin
                   current = e.next
@@ -642,17 +641,17 @@ module RxRuby
                   err = e
                 end
               else
-                return
+                break
               end
 
               if err
                 observer.on_error err
-                return
+                break
               end
 
               unless has_next
                 observer.on_completed
-                return
+                break
               end
 
               d = SingleAssignmentSubscription.new
