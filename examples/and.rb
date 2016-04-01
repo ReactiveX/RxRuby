@@ -1,9 +1,9 @@
-require 'rx_ruby'
+require 'rx'
 
 # Choice of either plan, the first set of timers or second set
-source = RxRuby::Observable.when(
-    RxRuby::Observable.timer(0.2).and(RxRuby::Observable.timer(0.3)).then_do(lambda {|x, y| return 'first' }),
-    RxRuby::Observable.timer(0.4).and(RxRuby::Observable.timer(0.5)).then_do(lambda {|x, y| return 'second' }),
+source = Rx::Observable.when(
+    Rx::Observable.timer(0.2).and(Rx::Observable.timer(0.3)).then_do(lambda {|x, y| return 'first' }),
+    Rx::Observable.timer(0.4).and(Rx::Observable.timer(0.5)).then_do(lambda {|x, y| return 'second' }),
 )
 
 subscription = source.subscribe(

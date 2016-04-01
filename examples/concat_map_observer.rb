@@ -1,15 +1,15 @@
-require 'rx_ruby'
+require 'rx'
 
-source = RxRuby::Observable.range(1, 3)
+source = Rx::Observable.range(1, 3)
     .concat_map_observer(
         lambda {|x, i|
-            return RxRuby::Observable.repeat(x, i)
+            return Rx::Observable.repeat(x, i)
         },
         lambda {|err|
-            return RxRuby::Observable.return(42)
+            return Rx::Observable.return(42)
         },
         lambda {
-            return RxRuby::Observable.empty
+            return Rx::Observable.empty
         })
 
 subscription = source.subscribe(

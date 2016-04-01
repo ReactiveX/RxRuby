@@ -1,4 +1,4 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Using an AsyncSubject as a resource which supports the .dispose method
 class DisposableResource
@@ -23,10 +23,10 @@ class DisposableResource
   end
 end
 
-source = RxRuby::Observable.using(
+source = Rx::Observable.using(
   lambda { return DisposableResource.new(42) },
   lambda {|resource|
-    subject = RxRuby::AsyncSubject.new
+    subject = Rx::AsyncSubject.new
     subject.on_next(resource.value)
     subject.on_completed
     return subject

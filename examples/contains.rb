@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Without an index
-source = RxRuby::Observable.of(42)
+source = Rx::Observable.of(42)
   .contains(42)
 
 subscription = source.subscribe(
@@ -19,7 +19,7 @@ subscription = source.subscribe(
 # => Completed
 
 #  With an index
-source = RxRuby::Observable.of(1,2,3)
+source = Rx::Observable.of(1,2,3)
   .contains(2, 1)
 
 subscription = source.subscribe(

@@ -1,15 +1,15 @@
-require 'rx_ruby'
+require 'rx'
 
-source1 = RxRuby::Observable.interval(0.1)
+source1 = Rx::Observable.interval(0.1)
     .time_interval()
     .pluck('interval')
     .take(3)
-source2 = RxRuby::Observable.interval(0.15)
+source2 = Rx::Observable.interval(0.15)
     .time_interval()
     .pluck('interval')
     .take(2)
 
-source = RxRuby::Observable.merge(
+source = Rx::Observable.merge(
     source1,
     source2)
 

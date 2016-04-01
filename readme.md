@@ -109,7 +109,7 @@ a.zip([1, 2], [8])       #=> [[4, 1, 8], [5, 2, nil], [6, nil, nil]]
 Now, we could do something similar in [RxRuby](https://github.com/ReactiveX/RxRuby) with two observable sequences:
 
 ```ruby
-require 'rx_ruby'
+require 'rx'
 
 a = Rx::Observable.from_array [ 4, 5, 6 ]
 b = Rx::Observable.from_array [ 7, 8, 9 ]

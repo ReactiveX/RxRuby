@@ -1,6 +1,6 @@
-require 'rx_ruby'
+require 'rx'
 
-source = RxRuby::Observable.range(1, 3)
+source = Rx::Observable.range(1, 3)
     .reduce(1) {|acc, x| acc * x }
 
 subscription = source.subscribe(

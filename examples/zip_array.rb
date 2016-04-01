@@ -1,8 +1,8 @@
-require 'rx_ruby'
+require 'rx'
 
-range = RxRuby::Observable.range(0, 5)
+range = Rx::Observable.range(0, 5)
 
-source = RxRuby::Observable.zip(
+source = Rx::Observable.zip(
     range,
     range.skip(1),
     range.skip(2)

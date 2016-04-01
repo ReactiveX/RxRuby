@@ -1,8 +1,8 @@
-require 'rx_ruby'
+require 'rx'
 
 # Array-like object (arguments) to Observable
 def f(*arguments)
-  RxRuby::Observable.from(arguments)
+  Rx::Observable.from(arguments)
 end
 
 f(1, 2, 3).subscribe(
@@ -23,7 +23,7 @@ f(1, 2, 3).subscribe(
 
 # Any iterable object...
 s = ["foo", :window]
-RxRuby::Observable.from(s).subscribe(
+Rx::Observable.from(s).subscribe(
   lambda {|x|
     puts 'Next: ' + x.to_s
   },
@@ -39,7 +39,7 @@ RxRuby::Observable.from(s).subscribe(
 
 # Map
 m = {1 => 2, 2 => 4, 4 => 8}
-RxRuby::Observable.from(m).subscribe(
+Rx::Observable.from(m).subscribe(
   lambda {|x|
     puts 'Next: ' + x.to_s
   },
@@ -55,7 +55,7 @@ RxRuby::Observable.from(m).subscribe(
 # => Completed
 
 # String
-RxRuby::Observable.from("foo".to_enum(:each_char)).subscribe(
+Rx::Observable.from("foo".to_enum(:each_char)).subscribe(
   lambda {|x|
     puts 'Next: ' + x.to_s
   },
@@ -72,7 +72,7 @@ RxRuby::Observable.from("foo".to_enum(:each_char)).subscribe(
 
 # Using an arrow function as the map function to
 # manipulate the elements
-RxRuby::Observable.from([1, 2, 3], lambda {|x, i| x + x }).subscribe(
+Rx::Observable.from([1, 2, 3], lambda {|x, i| x + x }).subscribe(
   lambda {|x|
     puts 'Next: ' + x.to_s
   },
@@ -88,7 +88,7 @@ RxRuby::Observable.from([1, 2, 3], lambda {|x, i| x + x }).subscribe(
 # => Completed
 
 # Generate a sequence of numbers
-RxRuby::Observable.from(5.times, lambda {|v, k| k }).subscribe(
+Rx::Observable.from(5.times, lambda {|v, k| k }).subscribe(
   lambda {|x|
     puts 'Next: ' + x.to_s
   },

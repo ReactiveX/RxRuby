@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
-source = RxRuby::Observable.return(42)
-    .flat_map { RxRuby::Observable.raise_error(Exception.new('error!')) }
+source = Rx::Observable.return(42)
+    .flat_map { Rx::Observable.raise_error(Exception.new('error!')) }
 
 subscription = source.subscribe(
     lambda {|x|

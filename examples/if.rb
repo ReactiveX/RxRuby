@@ -1,11 +1,11 @@
-require 'rx_ruby'
+require 'rx'
 
 # This uses and only then source
 should_run = true
 
-source = RxRuby::Observable.if(
+source = Rx::Observable.if(
     lambda { return should_run },
-    RxRuby::Observable.return(42)
+    Rx::Observable.return(42)
 )
 
 subscription = source.subscribe(
@@ -25,10 +25,10 @@ subscription = source.subscribe(
 # The next example uses an elseSource
 should_run = false
 
-source = RxRuby::Observable.if(
+source = Rx::Observable.if(
     lambda { return should_run },
-    RxRuby::Observable.return(42),
-    RxRuby::Observable.return(56)
+    Rx::Observable.return(42),
+    Rx::Observable.return(56)
 )
 
 subscription = source.subscribe(

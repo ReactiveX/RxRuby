@@ -1,6 +1,6 @@
-require 'rx_ruby'
+require 'rx'
 
-source = RxRuby::Observable.just(42)
+source = Rx::Observable.just(42)
 
 subscription = source.subscribe(
   lambda {|x|

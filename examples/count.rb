@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 #  Without a predicate
-source = RxRuby::Observable.range(0, 10).count
+source = Rx::Observable.range(0, 10).count
 
 subscription = source.subscribe(
     lambda {|x|
@@ -18,7 +18,7 @@ subscription = source.subscribe(
 # => Completed
 
 #  With a predicate
-source = RxRuby::Observable.range(0, 10)
+source = Rx::Observable.range(0, 10)
     .count {|x| x % 2 === 0 }
 
 subscription = source.subscribe(

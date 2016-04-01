@@ -1,7 +1,7 @@
-require 'rx_ruby'
+require 'rx'
 
 # This will never produce a value, hence never calling any of the callbacks
-source = RxRuby::Observable.never
+source = Rx::Observable.never
 
 subscription = source.subscribe(
     lambda {|x|

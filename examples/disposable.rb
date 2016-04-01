@@ -1,12 +1,12 @@
-require 'rx_ruby'
+require 'rx'
 
-disposable = RxRuby::Disposable.create {
+disposable = Rx::Disposable.create {
     puts 'disposed'
 }
 
 disposable.dispose
 # => disposed
 
-disposable = RxRuby::Disposable.empty
+disposable = Rx::Disposable.empty
 
 disposable.dispose # Does nothing
