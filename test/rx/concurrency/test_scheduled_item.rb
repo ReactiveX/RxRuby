@@ -40,7 +40,7 @@ class TestScheduledItem < Minitest::Test
     assert_raises(RuntimeError) { @item.invoke }
   end
 
-  def test_cancel
+  def test_cancel_and_invoke
     assert_equal(false, @item.cancelled?)
     @item.cancel
     assert_equal(true, @item.cancelled?)

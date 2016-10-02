@@ -278,7 +278,7 @@ class TestObserver < Minitest::Test
     refute error
   end
 
-  def test_configure_on_next_on_error_on_completed1
+  def test_configure_on_next_on_error_on_completed2
     ex = RuntimeError.new
     next_called = false
     error = false
@@ -308,7 +308,7 @@ class TestObserver < Minitest::Test
     refute error
   end
 
-  def test_configure_on_next_on_error_on_completed2
+  def test_configure_on_next_on_error_on_completed3
     ex = RuntimeError.new
     next_called = false
     error = false
