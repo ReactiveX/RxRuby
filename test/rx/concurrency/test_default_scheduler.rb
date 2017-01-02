@@ -14,7 +14,7 @@ class TestDefaultScheduler < Minitest::Test
   def test_schedule_with_state
     state = []
     task  = ->(_, s) { s << 1 }
-    d = @scheduler.schedule_with_state(state, task)
+    @scheduler.schedule_with_state(state, task)
     sleep 0.001
 
     assert_equal([1], state)
@@ -23,7 +23,7 @@ class TestDefaultScheduler < Minitest::Test
   def test_schedule_relative_with_state
     state = []
     task  = ->(_, s) { s << 1 }
-    d = @scheduler.schedule_relative_with_state(state, 0.05, task)
+    @scheduler.schedule_relative_with_state(state, 0.05, task)
     sleep 0.1
 
     assert_equal([1], state)
