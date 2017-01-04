@@ -99,7 +99,6 @@ class TestBaseScheduler < Minitest::Test
   end
 
   def test_schedule_recursive_relative_non_recursive
-    now  = Time.now
     ran  = false
     task = ->(a) { ran = true }
 
@@ -111,7 +110,6 @@ class TestBaseScheduler < Minitest::Test
   end
 
   def test_schedule_recursive_relative_recursive
-    now   = Time.now
     calls = 0
     task  = ->(a) do
       calls += 1
