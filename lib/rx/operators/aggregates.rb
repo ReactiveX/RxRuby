@@ -313,7 +313,7 @@ module Rx
     # @return [Rx::Observable] The maximum element in an observable sequence.
     def max(&block)
       return map(&block).max if block_given?
-      max_by {x| x} .map {|x| x[0] }
+      max_by {|x| x} .map {|x| x[0] }
     end
 
     # Returns the elements in an observable sequence with the maximum key value.
