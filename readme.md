@@ -31,18 +31,18 @@ But the best news of all is that you already know how to program like this.  Tak
 ```ruby
 # Get evens and square each
 someSource
-  .select {|x| x.even? }
-  .map {|x| x * x }
-  .each {|x| puts x.to_s }
+  .select { |x| x.even? }
+  .map { |x| x * x }
+  .each { |x| puts x.to_s }
 ```
 
 Using RxRuby, you can accomplish the same kind of thing with a push-based collection by changing `each` to `subscribe`.
 
 ```ruby
 someSource
-  .select {|x| x.even? }
-  .map {|x| x * x }
-  .subscribe {|x| puts x.to_s }
+  .select { |x| x.even? }
+  .map { |x| x * x }
+  .subscribe { |x| puts x.to_s }
 ```
 
 ## Why RxRuby? ##
@@ -98,8 +98,8 @@ Instead, our goal is to make the Observable module look exactly like the Enumera
 So, take an example, zipping two Arrays.
 
 ```ruby
-a = [ 4, 5, 6 ]
-b = [ 7, 8, 9 ]
+a = [4, 5, 6]
+b = [7, 8, 9]
 
 [1, 2, 3].zip(a, b)      #=> [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 [1, 2].zip(a, b)         #=> [[1, 4, 7], [2, 5, 8]]
@@ -111,10 +111,10 @@ Now, we could do something similar in [RxRuby](https://github.com/ReactiveX/RxRu
 ```ruby
 require 'rx'
 
-a = Rx::Observable.from_array [ 4, 5, 6 ]
-b = Rx::Observable.from_array [ 7, 8, 9 ]
+a = Rx::Observable.from_array [4, 5, 6]
+b = Rx::Observable.from_array [7, 8, 9]
 
-sub = a.zip(b).subscribe {|arr| puts arr.to_s }
+sub = a.zip(b).subscribe { |arr| puts arr.to_s }
 # => "[4, 7]"
 # => "[5, 8]"
 # => "[6, 9]"
