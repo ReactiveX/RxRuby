@@ -105,7 +105,7 @@ module Rx
 
           o.on_completed do
             gate.synchronize do
-              q.each {|s| s.on_on_completed}
+              q.each {|s| s.on_completed}
               observer.on_completed
             end
           end
