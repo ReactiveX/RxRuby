@@ -60,14 +60,14 @@ class ArrayObservable
   end
 
   def run
-  	index = 0
+    index = 0
 
-  	while index < @array.length
+    while index < @array.length
       change #notify of change
       notify_observers @array[index] # send the current value
       index += 1
       sleep 1
-  	end
+    end
   end
 end
 
@@ -77,7 +77,7 @@ class ArrayObserver
   end
 
   def update(item)
-  	puts item.to_s
+    puts item.to_s
   end
 end
 
