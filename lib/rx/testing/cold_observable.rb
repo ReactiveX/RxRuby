@@ -7,6 +7,7 @@ require 'rx/testing/test_subscription'
 module Rx
 
   class ColdObservable
+    include Observable
 
     attr_reader :messages, :subscriptions
 
